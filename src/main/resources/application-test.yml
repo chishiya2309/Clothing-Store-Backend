@@ -1,0 +1,29 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: optional:file:.env[.properties]
+  devtools:
+    add-properties: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+openapi:
+  service:
+    api-docs: clothing-store-api-docs
+    title: Clothing Store API
+    version: 1.0.0
+    server: ${BACKEND_SERVICE:http://localhost:${server.port}

@@ -1,0 +1,14 @@
+services:
+  clothing-store-backend:
+    container_name: clothing-store-backend
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - default
+
+networks:
+  default:
+    name: clothing-store-service
