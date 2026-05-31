@@ -58,23 +58,112 @@ INSERT INTO categories (name, slug, parent_id, description, display_order, is_ac
 
 -- ========== PRODUCTS (20 SP) ==========
 INSERT INTO products (name, slug, description, material, care_instructions, category_id, base_price, sale_price, is_active, is_featured, total_sold, average_rating) VALUES
-('Áo Polo Nam Classic Pique', 'ao-polo-nam-classic-pique', 'Áo polo nam chất liệu Cotton Pique cao cấp, form regular fit thoải mái. Thiết kế cổ bẻ thanh lịch, phù hợp đi làm và dạo phố.', 'Cotton Pique 100%', 'Giặt máy ở 30°C, không tẩy, ủi nhẹ', 12, 350000, 299000, TRUE, TRUE, 156, 4.50),
-('Áo Polo Nam Coolmax Sport', 'ao-polo-nam-coolmax-sport', 'Áo polo thể thao công nghệ Coolmax, thấm hút mồ hôi nhanh, thoáng mát suốt ngày dài.', 'Polyester Coolmax 92%, Spandex 8%', 'Giặt máy ở 30°C, không sấy', 12, 420000, NULL, TRUE, FALSE, 89, 4.30),
-('Áo Thun Nam Basic Cổ Tròn', 'ao-thun-nam-basic-co-tron', 'Áo thun nam basic cotton tự nhiên, form slim fit trẻ trung. Dễ phối đồ, phù hợp mọi dịp.', 'Cotton Compact 95%, Spandex 5%', 'Giặt máy ở 30°C, phơi trong bóng râm', 13, 199000, 169000, TRUE, TRUE, 324, 4.70),
-('Áo Thun Nam Oversize Streetwear', 'ao-thun-nam-oversize-streetwear', 'Áo thun oversize phong cách streetwear, in hình độc đáo. Cotton dày dặn 250GSM.', 'Cotton 250GSM', 'Giặt tay hoặc máy nhẹ, lộn trái khi giặt', 13, 280000, NULL, TRUE, FALSE, 201, 4.40),
-('Áo Sơ Mi Nam Oxford Trắng', 'ao-so-mi-nam-oxford-trang', 'Áo sơ mi nam chất Oxford dày dặn, cổ button-down lịch lãm. Phù hợp công sở và sự kiện.', 'Cotton Oxford 100%', 'Giặt máy ở 40°C, ủi ở nhiệt độ trung bình', 14, 450000, 399000, TRUE, TRUE, 178, 4.60),
-('Áo Sơ Mi Nam Linen Casual', 'ao-so-mi-nam-linen-casual', 'Áo sơ mi nam chất linen tự nhiên, thoáng mát cho mùa hè. Kiểu dáng regular fit thoải mái.', 'Linen 70%, Cotton 30%', 'Giặt tay nhẹ nhàng, phơi ngang', 14, 520000, NULL, TRUE, FALSE, 67, 4.20),
-('Quần Jeans Nam Slim Fit', 'quan-jeans-nam-slim-fit', 'Quần jeans nam slim fit co giãn nhẹ, wash medium blue. Phom dáng chuẩn Hàn Quốc.', 'Cotton 98%, Elastane 2%', 'Giặt máy lộn trái, không tẩy, phơi trong bóng râm', 15, 550000, 480000, TRUE, TRUE, 245, 4.50),
-('Quần Jeans Nam Regular Đen', 'quan-jeans-nam-regular-den', 'Quần jeans nam regular fit màu đen cơ bản, vải denim dày 12oz.', 'Denim 100% Cotton 12oz', 'Giặt riêng lần đầu, giặt máy ở 30°C', 15, 490000, NULL, TRUE, FALSE, 134, 4.30),
-('Quần Kaki Nam Slim Beige', 'quan-kaki-nam-slim-beige', 'Quần kaki nam slim fit màu be, chất kaki co giãn thoải mái. Phù hợp công sở smart casual.', 'Cotton 97%, Spandex 3%', 'Giặt máy ở 30°C, ủi mặt trái', 16, 420000, 369000, TRUE, FALSE, 98, 4.40),
-('Quần Kaki Nam Jogger', 'quan-kaki-nam-jogger', 'Quần kaki jogger nam bo gấu thể thao, chất liệu co giãn 4 chiều.', 'Nylon 85%, Spandex 15%', 'Giặt máy ở 30°C, không sấy', 16, 380000, NULL, TRUE, FALSE, 156, 4.20),
-('Áo Thun Nữ Baby Tee', 'ao-thun-nu-baby-tee', 'Áo thun nữ baby tee ôm form, chất cotton mềm mại. Hot trend 2026.', 'Cotton Combed 100%', 'Giặt máy ở 30°C, phơi trong bóng râm', 17, 180000, 149000, TRUE, TRUE, 412, 4.80),
-('Áo Thun Nữ Crop Top', 'ao-thun-nu-crop-top', 'Áo crop top nữ năng động, phối với quần cạp cao cực chuẩn.', 'Cotton Modal 60%, Polyester 40%', 'Giặt máy nhẹ, không vắt', 17, 220000, NULL, TRUE, FALSE, 287, 4.50),
-('Áo Sơ Mi Nữ Lụa Cổ V', 'ao-so-mi-nu-lua-co-v', 'Áo sơ mi nữ chất lụa cao cấp, cổ V thanh lịch. Phù hợp công sở và dạo phố.', 'Lụa tơ tằm pha 70%, Polyester 30%', 'Giặt tay nhẹ, ủi ở nhiệt độ thấp', 18, 650000, 550000, TRUE, TRUE, 89, 4.60),
-('Quần Jeans Nữ Skinny', 'quan-jeans-nu-skinny', 'Quần jeans nữ skinny fit co giãn cực tốt, tôn dáng. Wash xanh đậm cổ điển.', 'Cotton 92%, Polyester 6%, Elastane 2%', 'Giặt lộn trái ở 30°C', 19, 480000, 420000, TRUE, FALSE, 198, 4.40),
-('Đầm Liền Hoa Nhí Vintage', 'dam-lien-hoa-nhi-vintage', 'Đầm liền hoa nhí phong cách vintage, chất voan nhẹ nhàng nữ tính. Dáng xòe ngang gối.', 'Voan Chiffon 100%', 'Giặt tay, phơi trong bóng râm', 20, 580000, 499000, TRUE, TRUE, 167, 4.70),
-('Đầm Liền Công Sở', 'dam-lien-cong-so', 'Đầm liền dáng suông thanh lịch, chất liệu cao cấp phù hợp văn phòng.', 'Polyester 65%, Viscose 35%', 'Giặt máy nhẹ, ủi ở nhiệt độ trung bình', 20, 720000, NULL, TRUE, FALSE, 56, 4.30),
-('Áo Polo Nam Bamboo Eco', 'ao-polo-nam-bamboo-eco', 'Áo polo nam sợi tre tự nhiên, kháng khuẩn, thân thiện môi trường.', 'Bamboo Fiber 60%, Cotton 40%', 'Giặt máy ở 30°C, phơi trong bóng râm', 12, 390000, NULL, TRUE, FALSE, 73, 4.10),
-('Áo Thun Nam Café DriS', 'ao-thun-nam-cafe-dris', 'Áo thun nam công nghệ sợi cà phê S.Café, khử mùi tự nhiên.', 'S.Café Yarn 50%, Cotton 50%', 'Giặt máy ở 30°C', 13, 320000, 279000, TRUE, FALSE, 145, 4.50),
-('Quần Short Nam Chino', 'quan-short-nam-chino', 'Quần short nam chino thanh lịch, dài ngang gối. Phù hợp mùa hè.', 'Cotton Twill 98%, Spandex 2%', 'Giặt máy ở 30°C', 16, 299000, 249000, TRUE, FALSE, 189, 4.30),
-('Áo Khoác Nữ Denim', 'ao-khoac-nu-denim', 'Áo khoác jeans nữ classic, wash medium vintage. Oversize nhẹ thời trang.', 'Denim Cotton 100%', 'Giặt máy lộn trái, phơi trong bóng râm', 17, 680000, 599000, TRUE, TRUE, 78, 4.60);
+
+-- Áo Polo Nam (category: ao-polo-nam)
+('Áo Polo Nam Classic Pique', 'ao-polo-nam-classic-pique',
+ 'Áo polo nam chất liệu Cotton Pique cao cấp, form regular fit thoải mái. Thiết kế cổ bẻ thanh lịch, phù hợp đi làm và dạo phố.',
+ 'Cotton Pique 100%', 'Giặt máy ở 30°C, không tẩy, ủi nhẹ',
+ (SELECT id FROM categories WHERE slug = 'ao-polo-nam'), 350000, 299000, TRUE, TRUE, 156, 4.50),
+
+('Áo Polo Nam Coolmax Sport', 'ao-polo-nam-coolmax-sport',
+ 'Áo polo thể thao công nghệ Coolmax, thấm hút mồ hôi nhanh, thoáng mát suốt ngày dài.',
+ 'Polyester Coolmax 92%, Spandex 8%', 'Giặt máy ở 30°C, không sấy',
+ (SELECT id FROM categories WHERE slug = 'ao-polo-nam'), 420000, NULL, TRUE, FALSE, 89, 4.30),
+
+('Áo Polo Nam Bamboo Eco', 'ao-polo-nam-bamboo-eco',
+ 'Áo polo nam sợi tre tự nhiên, kháng khuẩn, thân thiện môi trường.',
+ 'Bamboo Fiber 60%, Cotton 40%', 'Giặt máy ở 30°C, phơi trong bóng râm',
+ (SELECT id FROM categories WHERE slug = 'ao-polo-nam'), 390000, NULL, TRUE, FALSE, 73, 4.10),
+
+-- Áo Thun Nam (category: ao-thun-nam)
+('Áo Thun Nam Basic Cổ Tròn', 'ao-thun-nam-basic-co-tron',
+ 'Áo thun nam basic cotton tự nhiên, form slim fit trẻ trung. Dễ phối đồ, phù hợp mọi dịp.',
+ 'Cotton Compact 95%, Spandex 5%', 'Giặt máy ở 30°C, phơi trong bóng râm',
+ (SELECT id FROM categories WHERE slug = 'ao-thun-nam'), 199000, 169000, TRUE, TRUE, 324, 4.70),
+
+('Áo Thun Nam Oversize Streetwear', 'ao-thun-nam-oversize-streetwear',
+ 'Áo thun oversize phong cách streetwear, in hình độc đáo. Cotton dày dặn 250GSM.',
+ 'Cotton 250GSM', 'Giặt tay hoặc máy nhẹ, lộn trái khi giặt',
+ (SELECT id FROM categories WHERE slug = 'ao-thun-nam'), 280000, NULL, TRUE, FALSE, 201, 4.40),
+
+('Áo Thun Nam Café DriS', 'ao-thun-nam-cafe-dris',
+ 'Áo thun nam công nghệ sợi cà phê S.Café, khử mùi tự nhiên.',
+ 'S.Café Yarn 50%, Cotton 50%', 'Giặt máy ở 30°C',
+ (SELECT id FROM categories WHERE slug = 'ao-thun-nam'), 320000, 279000, TRUE, FALSE, 145, 4.50),
+
+-- Áo Sơ Mi Nam (category: ao-so-mi-nam)
+('Áo Sơ Mi Nam Oxford Trắng', 'ao-so-mi-nam-oxford-trang',
+ 'Áo sơ mi nam chất Oxford dày dặn, cổ button-down lịch lãm. Phù hợp công sở và sự kiện.',
+ 'Cotton Oxford 100%', 'Giặt máy ở 40°C, ủi ở nhiệt độ trung bình',
+ (SELECT id FROM categories WHERE slug = 'ao-so-mi-nam'), 450000, 399000, TRUE, TRUE, 178, 4.60),
+
+('Áo Sơ Mi Nam Linen Casual', 'ao-so-mi-nam-linen-casual',
+ 'Áo sơ mi nam chất linen tự nhiên, thoáng mát cho mùa hè. Kiểu dáng regular fit thoải mái.',
+ 'Linen 70%, Cotton 30%', 'Giặt tay nhẹ nhàng, phơi ngang',
+ (SELECT id FROM categories WHERE slug = 'ao-so-mi-nam'), 520000, NULL, TRUE, FALSE, 67, 4.20),
+
+-- Quần Jeans Nam (category: quan-jeans-nam)
+('Quần Jeans Nam Slim Fit', 'quan-jeans-nam-slim-fit',
+ 'Quần jeans nam slim fit co giãn nhẹ, wash medium blue. Phom dáng chuẩn Hàn Quốc.',
+ 'Cotton 98%, Elastane 2%', 'Giặt máy lộn trái, không tẩy, phơi trong bóng râm',
+ (SELECT id FROM categories WHERE slug = 'quan-jeans-nam'), 550000, 480000, TRUE, TRUE, 245, 4.50),
+
+('Quần Jeans Nam Regular Đen', 'quan-jeans-nam-regular-den',
+ 'Quần jeans nam regular fit màu đen cơ bản, vải denim dày 12oz.',
+ 'Denim 100% Cotton 12oz', 'Giặt riêng lần đầu, giặt máy ở 30°C',
+ (SELECT id FROM categories WHERE slug = 'quan-jeans-nam'), 490000, NULL, TRUE, FALSE, 134, 4.30),
+
+-- Quần Kaki Nam + Short (category: quan-kaki-nam)
+('Quần Kaki Nam Slim Beige', 'quan-kaki-nam-slim-beige',
+ 'Quần kaki nam slim fit màu be, chất kaki co giãn thoải mái. Phù hợp công sở smart casual.',
+ 'Cotton 97%, Spandex 3%', 'Giặt máy ở 30°C, ủi mặt trái',
+ (SELECT id FROM categories WHERE slug = 'quan-kaki-nam'), 420000, 369000, TRUE, FALSE, 98, 4.40),
+
+('Quần Kaki Nam Jogger', 'quan-kaki-nam-jogger',
+ 'Quần kaki jogger nam bo gấu thể thao, chất liệu co giãn 4 chiều.',
+ 'Nylon 85%, Spandex 15%', 'Giặt máy ở 30°C, không sấy',
+ (SELECT id FROM categories WHERE slug = 'quan-kaki-nam'), 380000, NULL, TRUE, FALSE, 156, 4.20),
+
+('Quần Short Nam Chino', 'quan-short-nam-chino',
+ 'Quần short nam chino thanh lịch, dài ngang gối. Phù hợp mùa hè.',
+ 'Cotton Twill 98%, Spandex 2%', 'Giặt máy ở 30°C',
+ (SELECT id FROM categories WHERE slug = 'quan-kaki-nam'), 299000, 249000, TRUE, FALSE, 189, 4.30),
+
+-- Áo Thun Nữ + Khoác (category: ao-thun-nu)
+('Áo Thun Nữ Baby Tee', 'ao-thun-nu-baby-tee',
+ 'Áo thun nữ baby tee ôm form, chất cotton mềm mại. Hot trend 2026.',
+ 'Cotton Combed 100%', 'Giặt máy ở 30°C, phơi trong bóng râm',
+ (SELECT id FROM categories WHERE slug = 'ao-thun-nu'), 180000, 149000, TRUE, TRUE, 412, 4.80),
+
+('Áo Thun Nữ Crop Top', 'ao-thun-nu-crop-top',
+ 'Áo crop top nữ năng động, phối với quần cạp cao cực chuẩn.',
+ 'Cotton Modal 60%, Polyester 40%', 'Giặt máy nhẹ, không vắt',
+ (SELECT id FROM categories WHERE slug = 'ao-thun-nu'), 220000, NULL, TRUE, FALSE, 287, 4.50),
+
+('Áo Khoác Nữ Denim', 'ao-khoac-nu-denim',
+ 'Áo khoác jeans nữ classic, wash medium vintage. Oversize nhẹ thời trang.',
+ 'Denim Cotton 100%', 'Giặt máy lộn trái, phơi trong bóng râm',
+ (SELECT id FROM categories WHERE slug = 'ao-thun-nu'), 680000, 599000, TRUE, TRUE, 78, 4.60),
+
+-- Áo Sơ Mi Nữ (category: ao-so-mi-nu)
+('Áo Sơ Mi Nữ Lụa Cổ V', 'ao-so-mi-nu-lua-co-v',
+ 'Áo sơ mi nữ chất lụa cao cấp, cổ V thanh lịch. Phù hợp công sở và dạo phố.',
+ 'Lụa tơ tằm pha 70%, Polyester 30%', 'Giặt tay nhẹ, ủi ở nhiệt độ thấp',
+ (SELECT id FROM categories WHERE slug = 'ao-so-mi-nu'), 650000, 550000, TRUE, TRUE, 89, 4.60),
+
+-- Quần Jeans Nữ (category: quan-jeans-nu)
+('Quần Jeans Nữ Skinny', 'quan-jeans-nu-skinny',
+ 'Quần jeans nữ skinny fit co giãn cực tốt, tôn dáng. Wash xanh đậm cổ điển.',
+ 'Cotton 92%, Polyester 6%, Elastane 2%', 'Giặt lộn trái ở 30°C',
+ (SELECT id FROM categories WHERE slug = 'quan-jeans-nu'), 480000, 420000, TRUE, FALSE, 198, 4.40),
+
+-- Đầm Liền (category: dam-lien)
+('Đầm Liền Hoa Nhí Vintage', 'dam-lien-hoa-nhi-vintage',
+ 'Đầm liền hoa nhí phong cách vintage, chất voan nhẹ nhàng nữ tính. Dáng xòe ngang gối.',
+ 'Voan Chiffon 100%', 'Giặt tay, phơi trong bóng râm',
+ (SELECT id FROM categories WHERE slug = 'dam-lien'), 580000, 499000, TRUE, TRUE, 167, 4.70),
+
+('Đầm Liền Công Sở', 'dam-lien-cong-so',
+ 'Đầm liền dáng suông thanh lịch, chất liệu cao cấp phù hợp văn phòng.',
+ 'Polyester 65%, Viscose 35%', 'Giặt máy nhẹ, ủi ở nhiệt độ trung bình',
+ (SELECT id FROM categories WHERE slug = 'dam-lien'), 720000, NULL, TRUE, FALSE, 56, 4.30);
