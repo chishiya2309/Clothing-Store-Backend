@@ -1,3 +1,37 @@
+**TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH**
+
+**KHOA CÔNG NGHỆ THÔNG TIN**
+
+![A logo of hands holding a book
+Description automatically generated](media/image1.png){width="1.5666666666666667in" height="2.0in"}
+
+**MÔN HỌC: MẪU THIẾT KẾ PHẦN MỀM**
+
+**[TÊN ĐỀ TÀI:]{.underline}**
+
+**XÂY DỰNG WEBSITE BÁN QUẦN ÁO**
+
+**GVHD: *Ths. Nguyễn Trần Thi Văn***
+
+**Mã LHP: *DEPA330879_03CLC***
+
+**Học kỳ:** *II*
+
+**Năm học: *2025 -- 2026***
+
+**Danh sách sinh viên thực hiện: Nhóm 10**
+
+| **MSSV** | **Họ tên**            |
+|----------|-----------------------|
+| 23110073 | Đào Nguyễn Nhật Anh   |
+| 23110110 | Lê Quang Hưng         |
+| 23110078 | Nguyễn Thái Bảo       |
+| 23110173 | Nguyễn Đoàn Trường Vĩ |
+
+**Thành phố Hồ Chí Minh, tháng 05 năm 2026**
+
+#  {#section .P1}
+
 # 2. Khảo sát hiện trạng {#khảo-sát-hiện-trạng .P1}
 
 # 2.1. Mục đích khảo sát {#mục-đích-khảo-sát .P2}
@@ -13,89 +47,71 @@ Nhóm tiến hành khảo sát bằng phương pháp quan sát trực tiếp (di
 | 1   | YODY         | <https://yody.vn>     | Gia đình, nam nữ, trẻ em    |
 | 2   | Coolmate     | <https://coolmate.me> | Nam nữ, phong cách tối giản |
 
-Tiêu chí khảo sát bao gồm:
-
-Giao diện chính (trang chủ, trang danh mục, trang chi tiết sản phẩm).
-
-Các tính năng dành cho khách hàng (người dùng cuối).
-
-Các tính năng hỗ trợ mua sắm (tìm kiếm, lọc, giỏ hàng, thanh toán).
-
-Chính sách bán hàng (đổi trả, giao hàng, bảo hành).
-
-Tính năng nổi bật và điểm hạn chế.
+Các tiêu chí khảo sát bao gồm: giao diện chính (trang chủ, trang danh mục, trang chi tiết sản phẩm). Các tính năng dành cho khách hàng (người dùng cuối). Các tính năng hỗ trợ mua sắm (tìm kiếm, lọc, giỏ hàng, thanh toán). Chính sách bán hàng (đổi trả, giao hàng, bảo hành). Tính năng nổi bật và điểm hạn chế.
 
 # 2.3. Khảo sát hệ thống YODY (yody.vn) {#khảo-sát-hệ-thống-yody-yody.vn .P2}
 
-YODY là một trong những chuỗi thời trang phổ thông lớn nhất Việt Nam, với hệ thống hơn 272 cửa hàng trên toàn quốc. Website yody.vn đóng vai trò là kênh bán hàng trực tuyến chính thức, tích hợp chặt chẽ với hệ thống cửa hàng vật lý theo mô hình omni-channel (bán hàng đa kênh).
-
-Địa chỉ: https://yody.vn
-
-Đối tượng: Nam, nữ, trẻ em, gia đình
-
-Mô hình: Thương hiệu tự sản xuất -- bán hàng trực tiếp (D2C)
-
-Đặc trưng: Ứng dụng công nghệ vải mới (Nano, Bamboo, Café), phân khúc giá tầm trung.
+YODY là một trong những chuỗi thời trang phổ thông lớn nhất Việt Nam, với hệ thống hơn 272 cửa hàng trên toàn quốc. Website yody.vn đóng vai trò là kênh bán hàng trực tuyến chính thức, tích hợp chặt chẽ với hệ thống cửa hàng vật lý theo mô hình omni-channel (bán hàng đa kênh). Địa chỉ website: <https://yody.vn>. Đối tượng khách hàng: Nam, nữ, trẻ em, gia đình. Về mô hình kinh doanh thì là thương hiệu tự sản xuất -- bán hàng trực tiếp (D2C). Một số đặc trưng có thể thấy là ứng dụng công nghệ vải mới (Nano, Bamboo, Café), phân khúc giá tầm trung.
 
 2.3.1. Trang chủ (Homepage)
 
-![A screenshot of a website
-Description automatically generated](media/image1.png){width="5.07834208223972in" height="2.6710126859142607in"}
+<figure>
+<img src="media/image2.png" style="width:6.02751in;height:2.67101in" alt="A screenshot of a website Description automatically generated" />
+<figcaption><p>Hình 2. . Homepage của website yody.vn</p></figcaption>
+</figure>
 
-![A screenshot of a social media account
-Description automatically generated](media/image2.png){width="5.899486001749781in" height="2.8268372703412075in"}
+<figure>
+<img src="media/image3.png" style="width:5.89949in;height:2.82684in" alt="A screenshot of a social media account Description automatically generated" />
+<figcaption><p>Hình 2. 2. Danh mục sản phẩm của website yody.vn</p></figcaption>
+</figure>
 
-![A screenshot of a website
-Description automatically generated](media/image3.png){width="5.886534339457568in" height="3.1048950131233597in"}
+<figure>
+<img src="media/image4.png" style="width:6.49581in;height:3.11191in" alt="A screenshot of a website Description automatically generated" />
+<figcaption><p>Hình 2. 3. Hình ảnh sản phẩm trên Homepage của website yody.vn</p></figcaption>
+</figure>
 
-![A screenshot of a computer
-Description automatically generated](media/image4.png){width="5.873039151356081in" height="3.088992782152231in"}
+<figure>
+<img src="media/image5.png" style="width:6.56367in;height:3.09301in" alt="A screenshot of a computer Description automatically generated" />
+<figcaption><p>Hình 2. . Footer của website yody.vn</p></figcaption>
+</figure>
 
 Về mặt thiết kế thì sử dụng giao diện hiện đại, sử dụng tông màu nhận diện thương hiệu (vàng -- xanh dương), bố cục rõ ràng. Banner chính với Slider quảng cáo với hình ảnh bắt mắt, cập nhật bộ sưu tập mới và chương trình khuyến mãi.
 
-Thanh điều hướng (Navigation Bar): phân chia theo đối tượng bao gồm Nam -- Nữ -- Trẻ em, kèm theo các liên kết nhanh: \*BST (Bộ sưu tập), Cửa hàng, Tin tức, Mới về, Ưu đãi -50%, Đồng phục\*. Mỗi danh mục chính có menu con chi tiết (Áo polo, Áo khoác, Áo chống nắng, Quần,\...).
-
-Phần nội dung chính: Hiển thị sản phẩm mới, sản phẩm bán chạy, bộ sưu tập theo mùa.
-
-Footer: Thông tin công ty, chính sách, liên kết mạng xã hội, kênh hỗ trợ.
+Thanh điều hướng (Navigation Bar): phân chia theo đối tượng bao gồm Nam -- Nữ -- Trẻ em, kèm theo các liên kết nhanh: \*BST (Bộ sưu tập), Cửa hàng, Tin tức, Mới về, Ưu đãi -50%, Đồng phục\*. Mỗi danh mục chính có menu con chi tiết (Áo polo, Áo khoác, Áo chống nắng, Quần,\...). Phần nội dung chính: Hiển thị sản phẩm mới, sản phẩm bán chạy, bộ sưu tập theo mùa. Footer: Thông tin công ty, chính sách, liên kết mạng xã hội, kênh hỗ trợ.
 
 2.3.2. Trang danh mục sản phẩm
 
-![A screenshot of a computer screen
-Description automatically generated](media/image5.png){width="6.5in" height="3.428472222222222in"}
+<figure>
+<img src="media/image6.png" style="width:6.5in;height:3.42847in" alt="A screenshot of a computer screen Description automatically generated" />
+<figcaption><p>Hình 2. . Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (1)</p></figcaption>
+</figure>
 
-![A screenshot of a website
-Description automatically generated](media/image6.png){width="6.5in" height="3.428472222222222in"}
+<figure>
+<img src="media/image7.png" style="width:6.5in;height:3.20833in" alt="A screenshot of a website Description automatically generated" />
+<figcaption><p>Hình 2. . Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (2)</p></figcaption>
+</figure>
 
 Hiển thị danh sách sản phẩm dạng lưới (grid), mỗi sản phẩm có hình ảnh, tên, giá gốc, giá giảm. Về bộ lọc (Filter) thì hỗ trợ lọc theo kích cỡ, màu sắc, chất liệu, mức giá, kiểu dáng. Sắp xếp (Sort): Theo giá (tăng/giảm), mới nhất, ưu đãi.
 
 2.3.3. Trang chi tiết sản phẩm
 
-![A person smiling in a yellow shirt
-Description automatically generated](media/image7.png){width="6.5in" height="3.41875in"}
+<figure>
+<img src="media/image8.png" style="width:6.5in;height:3.41875in" alt="A person smiling in a yellow shirt Description automatically generated" />
+<figcaption><p>Hình 2. . Trang chi tiết sản phẩm trên website yody.vn (1)</p></figcaption>
+</figure>
 
-![A screenshot of a computer
-Description automatically generated](media/image8.png){width="6.5in" height="3.428472222222222in"}
+<figure>
+<img src="media/image9.png" style="width:6.5in;height:3.21875in" alt="A screenshot of a computer Description automatically generated" />
+<figcaption><p>Hình 2. . Trang chi tiết sản phẩm trên website yody.vn (2)</p></figcaption>
+</figure>
 
-Hình ảnh sản phẩm chất lượng cao, nhiều góc chụp, có ảnh người mẫu mặc thực tế.
+Hình ảnh sản phẩm có chất lượng cao, nhiều góc chụp, có ảnh người mẫu mặc thực tế. Thông tin chi tiết thì có tên sản phẩm, giá bán, mô tả chất liệu, công nghệ vải, hướng dẫn bảo quản. Có vùng để chọn size và màu với giao diện trực quan, hiển thị ô màu sắc và bảng size.
 
-Thông tin chi tiết: tên sản phẩm, giá bán, mô tả chất liệu, công nghệ vải, hướng dẫn bảo quản.
-
-Chọn size và màu: Giao diện trực quan, hiển thị ô màu sắc và bảng size.
-
-Bảng quy đổi kích cỡ (Size Guide): Hướng dẫn chọn size phù hợp theo giới tính, loại đồ.
-
-Kiểm tra tồn kho: Tính năng "Xem cửa hàng còn sản phẩm" giúp kiểm tra tồn kho tại cửa hàng gần nhất.
+Có bảng quy đổi kích cỡ (Size Guide) để hướng dẫn chọn size cho phù hợp theo giới tính, loại đồ. Kiểm tra tồn kho với tính năng "Xem cửa hàng còn sản phẩm" giúp kiểm tra tồn kho tại cửa hàng gần nhất.
 
 2.3.4. Tính năng nổi bật
 
-Công nghệ vải đặc trưng**:** YODY chú trọng giới thiệu công nghệ vải (Nano, Bamboo, Café, Pima) ngay trên trang sản phẩm, giúp khách hàng hiểu rõ chất liệu trước khi mua.
-
-Hệ thống tích điểm thành viên: Chương trình tích điểm (1 điểm = 1.000 VNĐ), phân hạng thành viên với nhiều ưu đãi riêng biệt.
-
-Kết nối đa kênh (Omni-channel): Website liên kết trực tiếp với hệ thống cửa hàng vật lý, hỗ trợ mua online - nhận tại cửa hàng, kiểm tra tồn kho tại cửa hàng gần nhất.
-
-Chính sách đổi trả linh hoạt: Cho phép đổi trả trong 15 ngày, khách hàng được thử đồ trước khi thanh toán với đơn hàng online.
+Công nghệ vải đặc trưng**:** YODY chú trọng giới thiệu công nghệ vải (Nano, Bamboo, Café, Pima) ngay trên trang sản phẩm, giúp khách hàng hiểu rõ chất liệu trước khi mua. Kết nối đa kênh (Omni-channel): Website liên kết trực tiếp với hệ thống cửa hàng vật lý, hỗ trợ mua online - nhận tại cửa hàng, kiểm tra tồn kho tại cửa hàng gần nhất. Chính sách đổi trả linh hoạt: Cho phép đổi trả trong 15 ngày, khách hàng được thử đồ trước khi thanh toán với đơn hàng online.
 
 2.3.5. Điểm hạn chế
 
@@ -111,80 +127,74 @@ Bảng 2. . Điểm hạn chế của YODY
 
 # 2.4. Khảo sát hệ thống COOLMATE (coolmate.me) {#khảo-sát-hệ-thống-coolmate-coolmate.me .P2}
 
-Coolmate là thương hiệu thời trang nổi bật tại Việt Nam, hoạt động theo mô hình D2C (Direct-to-Consumer) - tự thiết kế, sản xuất và bán hàng trực tiếp đến người tiêu dùng qua website. Coolmate được biết đến với phong cách tối giản, tập trung vào trải nghiệm mua sắm tiện lợi và nhanh chóng.
-
-Địa chỉ website <https://coolmate.me>
-
-Đối tượng: Trước đây chủ yếu là hướng đến nam giới, hiện tại đã mở thêm cho nữ giới.
-
-Mô hình: D2C -- Tự sản xuất, bán trực tiếp
-
-Đặc trưng: Lấy công nghệ làm cốt lõi vận hành, chính sách đổi trả 60 ngày đột phá.
+Coolmate là thương hiệu thời trang nổi bật tại Việt Nam, hoạt động theo mô hình D2C (Direct-to-Consumer) - tự thiết kế, sản xuất và bán hàng trực tiếp đến người tiêu dùng qua website. Coolmate được biết đến với phong cách tối giản, tập trung vào trải nghiệm mua sắm tiện lợi và nhanh chóng. Địa chỉ website: <https://coolmate.me>. Về đối tượng khách hàng thì trước đây chủ yếu là hướng đến nam giới, hiện tại đã mở thêm cho nữ giới. Mô hình kinh doanh thực hiện theo D2C -- Tự sản xuất, bán trực tiếp. Đặc trưng: Lấy công nghệ làm cốt lõi vận hành, chính sách đổi trả 60 ngày đột phá.
 
 # 2.4.1. Trang chủ (Homepage) {#trang-chủ-homepage .P2}
 
-![A person in shorts and a person in shorts
-Description automatically generated](media/image9.png){width="6.5in" height="3.423611111111111in"}
+<figure>
+<img src="media/image10.png" style="width:6.5in;height:3.42361in" alt="A person in shorts and a person in shorts Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh homepage trên website coolmate.me (1)</p></figcaption>
+</figure>
 
-![A screenshot of a website
-Description automatically generated](media/image10.png){width="6.5in" height="3.4145833333333333in"}
+<figure>
+<img src="media/image11.png" style="width:6.5in;height:3.41458in" alt="A screenshot of a website Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh homepage trên website coolmate.me (2)</p></figcaption>
+</figure>
 
-![A screenshot of a person\'s body
-Description automatically generated](media/image11.png){width="6.5in" height="3.423611111111111in"}
+<figure>
+<img src="media/image12.png" style="width:6.5in;height:3.42361in" alt="A screenshot of a person&#39;s body Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh homepage trên website coolmate.me (3)</p></figcaption>
+</figure>
 
-Về mặt thiết kế thì sử dụng phong cách tối giản (minimalist), bố cục sạch sẽ, hình ảnh sản phẩm chất lượng cao, tốc độ tải trang nhanh.
-
-Thanh trên cùng (Top bar): Bên trái có các kênh thương hiệu (Về Coolmate, CXP by Coolmate, Care & Share); bên phải có tiện ích (CoolClub, Cửa hàng, Blog, CSKH, Đăng nhập, chuyển đổi ngôn ngữ VN/EN).
-
-Thanh điều hướng chính (Main Nav): Logo ở giữa bên trái, các danh mục chính: NEW, NAM, NỮ, THỂ THAO, PHỤ KIỆN, SALE (-50%).
-
-Widget tương tác: Nút gọi điện / Zalo Chat nổi và widget hỗ trợ khách hàng ở góc phải dưới.
+Về mặt thiết kế thì sử dụng phong cách tối giản (minimalist), bố cục sạch sẽ, hình ảnh sản phẩm chất lượng cao, tốc độ tải trang nhanh. Thanh trên cùng (Top bar): Bên trái có các kênh thương hiệu (Về Coolmate, CXP by Coolmate, Care & Share); bên phải có tiện ích (CoolClub, Cửa hàng, Blog, CSKH, Đăng nhập, chuyển đổi ngôn ngữ VN/EN). Thanh điều hướng chính (Main Nav): Logo ở giữa bên trái, các danh mục chính: NEW, NAM, NỮ, THỂ THAO, PHỤ KIỆN, SALE (-50%). Widget tương tác: Nút gọi điện / Zalo Chat nổi và widget hỗ trợ khách hàng ở góc phải dưới.
 
 2.4.2. Trang danh mục sản phẩm
 
-![A screenshot of a web page
-Description automatically generated](media/image12.png){width="6.5in" height="3.423611111111111in"}
+<figure>
+<img src="media/image13.png" style="width:6.5in;height:3.42361in" alt="A screenshot of a web page Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh danh mục áo polo nam trên website coolmate.me</p></figcaption>
+</figure>
 
-![A screenshot of a computer screen
-Description automatically generated](media/image13.png){width="6.5in" height="3.423611111111111in"}
+<figure>
+<img src="media/image14.png" style="width:6.5in;height:2.92708in" alt="A screenshot of a computer screen Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh các sản phẩm thuộc danh mục áo polo nam trên website coolmate.me</p></figcaption>
+</figure>
 
 Hiển thị dạng lưới, mỗi sản phẩm có hình ảnh rõ ràng, tên sản phẩm, giá, và các biến thể màu sắc. Về bộ lọc thì có phù hợp với (Daily, Home, Active, Office), giới tính, size (XS đến 4XL), màu sắc, khoảng giá. Có tính năng sắp xếp theo: bán chạy, mới nhất, giá tăng dần, giá giảm dần. Filter tags: Hiển thị tag bộ lọc đang áp dụng, có nút "Xóa lọc" nhanh.
 
 2.4.3. Trang chi tiết sản phẩm
 
-# ![A person in a black shirt Description automatically generated](media/image14.png){width="6.5in" height="3.43125in"} {#a-person-in-a-black-shirt-description-automatically-generated .P2}
+<figure>
+<img src="media/image15.png" style="width:6.50456in;height:3.25332in" alt="A person in a black shirt Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (1)</p></figcaption>
+</figure>
 
-#  {#section .P2}
-
-# ![](media/image15.png){width="6.5in" height="3.423611111111111in"} {#section-1 .P2}
+<figure>
+<img src="media/image16.png" style="width:6.42438in;height:2.53429in" alt="A person in a blue shirt Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (2)</p></figcaption>
+</figure>
 
 Về mặt hình ảnh thì có chất lượng cao, gallery sản phẩm đa góc. Thông tin chi tiết: giá, chỉ báo freeship, voucher khả dụng (Giảm 50k, 150k, 10%, 12%). Bên cạnh đó có tích hợp CoolClub để hiển thị số CoolCash được hoàn khi mua (ví dụ: "Được hoàn lên đến 21.000 CoolCash").
 
 Ta có thể chọn size và màu theo nhu cầu bằng nút màu sắc trực quan, lưới size chuẩn. Bên cạnh đó có widget popup \"Hướng dẫn chọn size\" (bảng size chart tĩnh, tính toán tương đối khi nhập chiều cao và cân nặng).
 
-![A screenshot of a computer
-Description automatically generated](media/image16.png){width="6.5in" height="3.428472222222222in"}
+<figure>
+<img src="media/image17.png" style="width:6.5in;height:3.42847in" alt="A screenshot of a computer Description automatically generated" />
+<figcaption><p>Hình 2. . Sticky Buy Bar và vùng đánh giá sản phẩm trên website coolmate.me</p></figcaption>
+</figure>
 
 Có 1 tính năng khá hay là Sticky Buy Bar đó là khi ta cuộn qua khối mua hàng, thanh mua hàng cố định xuất hiện ở trên cùng cho phép chọn size và thêm giỏ hàng mà không cần cuộn lại. Có phần đánh giá sản phẩm với hệ thống review nâng cao - lọc theo số sao (1-5), lọc review đã phản hồi, lọc review có ảnh.
 
-![A screenshot of a computer screen
-Description automatically generated](media/image17.png){width="6.5in" height="3.41875in"}
+<figure>
+<img src="media/image18.png" style="width:6.5in;height:3.41875in" alt="A screenshot of a computer screen Description automatically generated" />
+<figcaption><p>Hình 2. . Hình ảnh gợi ý sản phẩm dựa trên nhiều tiêu chí trên website coolmate.me</p></figcaption>
+</figure>
 
 Sản phẩm gợi ý: Carousel "GỢI Ý SẢN PHẨM" dựa trên lịch sử xem / tiêu chí động.
 
 2.4.4. Tính năng nổi bật
 
-Sticky Buy Bar: Khi người dùng cuộn qua phần mua hàng, một thanh mua hàng cố định xuất hiện ở đầu trang, cho phép chọn size và thêm giỏ hàng ngay - trải nghiệm mua sắm liền mạch, không cần cuộn lại.
-
-Hệ thống review nâng cao: Cho phép lọc đánh giá theo số sao, xem review có ảnh thực tế, xem review đã được shop phản hồi - giúp khách hàng đưa ra quyết định mua hàng tốt hơn.
-
-CoolClub & CoolCash: Chương trình khách hàng thân thiết tích hợp xuyên suốt hành trình mua sắm, hiển thị chính xác số CoolCash được hoàn trên mỗi sản phẩm.
-
-Chính sách đổi trả 60 ngày: Cho phép đổi trả trong 60 ngày với bất kỳ lý do gì, kể cả đã qua sử dụng - chính sách đột phá giúp xóa bỏ rào cản tâm lý khi mua sắm online.
-
-Tìm kiếm thông minh: Modal tìm kiếm hiển thị từ khóa phổ biến, danh mục, và sản phẩm gợi ý ngay khi nhấp vào thanh tìm kiếm, trước khi người dùng gõ bất kỳ ký tự nào.
-
-Voucher hiển thị trên sản phẩm: Trang chi tiết sản phẩm hiển thị rõ các voucher khả dụng (Giảm 50k, 150k,\...) giúp khách hàng biết ngay ưu đãi có thể áp dụng.
+Sticky Buy Bar: khi người dùng cuộn qua phần mua hàng, một thanh mua hàng cố định xuất hiện ở đầu trang, cho phép chọn size và thêm giỏ hàng ngay - trải nghiệm mua sắm liền mạch, không cần cuộn lại. Hệ thống review nâng cao cho phép lọc đánh giá theo số sao, xem review có ảnh thực tế, xem review đã được shop phản hồi - giúp khách hàng đưa ra quyết định mua hàng tốt hơn. CoolClub & CoolCash là chương trình khách hàng thân thiết tích hợp xuyên suốt hành trình mua sắm, hiển thị chính xác số CoolCash được hoàn trên mỗi sản phẩm. Chính sách đổi trả 60 ngày cho phép đổi trả trong 60 ngày với bất kỳ lý do gì, kể cả đã qua sử dụng - chính sách đột phá giúp xóa bỏ rào cản tâm lý khi mua sắm online. Tìm kiếm thông minh với modal tìm kiếm hiển thị từ khóa phổ biến, danh mục, và sản phẩm gợi ý ngay khi nhấp vào thanh tìm kiếm, trước khi người dùng gõ bất kỳ ký tự nào. Voucher hiển thị trên sản phẩm: Trang chi tiết sản phẩm hiển thị rõ các voucher khả dụng (Giảm 50k, 150k,\...) giúp khách hàng biết ngay ưu đãi có thể áp dụng.
 
 2.4.5. Hạn chế
 
@@ -426,20 +436,37 @@ Bảng 3. . Danh sách yêu cầu chức năng hệ thống
 
 Bảng 3. . Danh sách yêu cầu chất lượng / phi chức năng
 
-![A diagram of a diagram
-Description automatically generated](media/image18.png){width="6.5in" height="7.458333333333333in"}
+<figure>
+<img src="media/image19.png" style="width:6.5in;height:7.45833in" alt="A diagram of a diagram Description automatically generated" />
+<figcaption><p>Hình 2. . Usecase tổng quát của hệ thống</p></figcaption>
+</figure>
 
-![](media/image19.png){width="6.5in" height="3.978882327209099in"}
+<figure>
+<img src="media/image20.png" style="width:6.5in;height:3.97888in" />
+<figcaption><p>Hình 2. . Usecase chi tiết module quản lý đơn hàng</p></figcaption>
+</figure>
 
-![A diagram of a company
-Description automatically generated with medium confidence](media/image20.png){width="6.5in" height="4.3537849956255466in"}
+<figure>
+<img src="media/image21.png" style="width:6.49953in;height:4.01042in" alt="A diagram of a company Description automatically generated with medium confidence" />
+<figcaption><p>Hình 2. . Usecase chi tiết module quản lý sản phẩm</p></figcaption>
+</figure>
 
-![A diagram of a company
-Description automatically generated](media/image21.png){width="6.489583333333333in" height="3.656071741032371in"}
+<figure>
+<img src="media/image22.png" style="width:6.48958in;height:3.65607in" alt="A diagram of a company Description automatically generated" />
+<figcaption><p>Hình 2. . Usecase chi tiết module đặt hàng</p></figcaption>
+</figure>
 
-![](media/image22.png){width="6.46875in" height="4.454861111111111in"}
+<figure>
+<img src="media/image23.png" style="width:6.46875in;height:4.33333in" />
+<figcaption><p>Hình 2. . Usecase chi tiết module quản lý người dùng</p></figcaption>
+</figure>
 
-![](media/image23.png){width="6.5in" height="4.138888888888889in"}
+<figure>
+<img src="media/image24.png" style="width:6.5in;height:4.13889in" />
+<figcaption><p>Hình 2. . Usecase chi tiết module về tài khoản</p></figcaption>
+</figure>
 
-![A diagram of a diagram
-Description automatically generated](media/image24.png){width="6.510416666666667in" height="3.78125in"}
+<figure>
+<img src="media/image25.png" style="width:6.51042in;height:3.78125in" alt="A diagram of a diagram Description automatically generated" />
+<figcaption><p>Hình 2. . Usecase chi tiết module thống kê</p></figcaption>
+</figure>
