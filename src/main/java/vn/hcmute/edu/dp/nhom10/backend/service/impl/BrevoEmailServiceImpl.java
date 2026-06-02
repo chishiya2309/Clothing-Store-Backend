@@ -61,9 +61,9 @@ public class BrevoEmailServiceImpl implements EmailService {
         }
     }
 
-        private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
-                String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
-                String verificationLink = backendUrl + "/api/auth/verify-email?token=" + token;
+    private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
+        String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
+        String verificationLink = backendUrl + "/api/auth/verify-email?token=" + token;
 
         return """
                 <html>
