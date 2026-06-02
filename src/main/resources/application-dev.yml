@@ -40,3 +40,17 @@ openapi:
     title: Clothing Store API
     version: 1.0.0
     server: http://localhost:8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000 # 24h
+
+brevo:
+  api-key: ${BREVO_API_KEY}
+  sender-email: lequanghung.work@gmail.com
+  sender-name: Clothing Store
+
+app:
+  backend-url: ${BACKEND_URL:http://localhost:8080}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  verification-token-ttl: 900 # 15 minutes in seconds

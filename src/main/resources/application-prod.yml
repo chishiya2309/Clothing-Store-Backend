@@ -33,3 +33,6 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+app:
+  backend-url: ${BACKEND_URL:http://localhost:8080}
