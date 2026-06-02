@@ -38,7 +38,7 @@ public class AuthController {
 
     @GetMapping("/verify-email")
     public ApiResponse verifyEmail(@RequestParam("token") String token) {
-        log.info("Verifying email with token: {}", token);
+        log.info("Verifying email");
         authService.verifyEmail(token);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
