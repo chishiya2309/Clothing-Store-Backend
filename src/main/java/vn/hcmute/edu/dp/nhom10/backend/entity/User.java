@@ -7,6 +7,8 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 import vn.hcmute.edu.dp.nhom10.backend.enums.GenderType;
 import vn.hcmute.edu.dp.nhom10.backend.enums.UserRole;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -16,8 +18,10 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @SQLRestriction("deleted_at IS NULL")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
 
@@ -38,6 +42,7 @@ public class User {
     private String phone;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "gender_type")
     private GenderType gender;
 
@@ -48,6 +53,7 @@ public class User {
     private String avatarUrl;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "user_role")
     private UserRole role = UserRole.customer;
 

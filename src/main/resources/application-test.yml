@@ -21,6 +21,9 @@ springdoc:
   swagger-ui:
     enabled: true
 
+app:
+  backend-url: ${BACKEND_URL:http://localhost:8080}
+
 openapi:
   service:
     api-docs: clothing-store-api-docs
