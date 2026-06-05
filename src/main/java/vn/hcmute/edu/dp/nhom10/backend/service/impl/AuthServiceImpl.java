@@ -176,9 +176,9 @@ User user = userRepository.findByEmail(request.email())
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (!user.getIsActive() || !user.getEmailVerified()) {
-            throw new AccessDeniedException("Account is inactive or email not verified");
-        }
+if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEmailVerified())) {
+    throw new AccessDeniedException("Account is inactive or email not verified");
+}
 
         String newAccessToken = jwtTokenProvider.generateToken(user.getEmail());
 
