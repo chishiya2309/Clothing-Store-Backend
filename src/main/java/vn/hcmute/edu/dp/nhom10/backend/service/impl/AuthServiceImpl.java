@@ -129,8 +129,8 @@ private long refreshTokenTtl;
     @Transactional
     @Override
     public TokenResponse login(LoginRequest request, String ipAddress, String userAgent) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.email()));
+User user = userRepository.findByEmail(request.email())
+        .orElseThrow(() -> new BadCredentialsException("Email or password is incorrect"));
 
         if (Boolean.FALSE.equals(user.getIsActive())) {
             throw new AccessDeniedException("Account is locked");
