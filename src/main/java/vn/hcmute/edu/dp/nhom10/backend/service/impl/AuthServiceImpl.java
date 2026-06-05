@@ -48,8 +48,8 @@ public class AuthServiceImpl implements AuthService {
     @Value("${app.verification-token-ttl}")
     private long verificationTokenTtl;
 
-    @Value("${app.refresh-token-ttl}")
-    private long refreshTokenTtl;
+@Value("${app.refresh-token-ttl:604800}")
+private long refreshTokenTtl;
 
     private static final String VERIFY_PREFIX = "email_verify:";
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
