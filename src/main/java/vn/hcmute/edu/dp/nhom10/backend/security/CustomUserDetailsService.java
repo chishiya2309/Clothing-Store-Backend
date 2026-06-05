@@ -26,11 +26,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPasswordHash() != null ? user.getPasswordHash() : "")
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name().toUpperCase())))
+                .authorities(Collections
+                        .singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name().toUpperCase())))
                 .accountExpired(false)
                 .accountLocked(!user.getIsActive())
                 .credentialsExpired(false)
-                .disabled(false) // You can link this to emailVerified if you want to block login before verification
+.disabled(Boolean.FALSE.equals(user.getEmailVerified()))
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package vn.hcmute.edu.dp.nhom10.backend.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
+    @Getter
     @Value("${jwt.expiration}")
     private long jwtExpirationInMs;
 
@@ -30,17 +32,28 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         Objects.requireNonNull(authentication, "Authentication cannot be null");
-        
+
         UserDetails userPrincipal = (UserDetails) Objects.requireNonNull(
-            authentication.getPrincipal(), 
-            "Principal cannot be null"
-        );
+                authentication.getPrincipal(),
+                "Principal cannot be null");
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
+                .issuedAt(new Date())
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String generateToken(String username) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        return Jwts.builder()
+                .subject(username)
                 .issuedAt(new Date())
                 .expiration(expiryDate)
                 .signWith(getSigningKey())

@@ -12,11 +12,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RegisterRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.RefreshTokenRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResendVerificationRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 import vn.hcmute.edu.dp.nhom10.backend.exception.GlobalExceptionHandling;
 import vn.hcmute.edu.dp.nhom10.backend.service.AuthService;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -86,5 +92,61 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("Verification email resent successfully"));
+    }
+
+    @Test
+    void login_success() throws Exception {
+        LoginRequest request = new LoginRequest("test@test.com", "Password123");
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .accessToken("access_token")
+                .refreshToken("refresh_token")
+                .expiresIn(900L)
+                .build();
+
+        when(authService.login(eq(request), any(), any())).thenReturn(tokenResponse);
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Login successful"))
+                .andExpect(jsonPath("$.data.accessToken").value("access_token"))
+                .andExpect(jsonPath("$.data.refreshToken").value("refresh_token"))
+                .andExpect(jsonPath("$.data.expiresIn").value(900));
+    }
+
+    @Test
+    void refreshToken_success() throws Exception {
+        RefreshTokenRequest request = new RefreshTokenRequest("refresh_token_string");
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .accessToken("new_access_token")
+                .refreshToken("refresh_token_string")
+                .expiresIn(900L)
+                .build();
+
+        when(authService.refreshToken(request.refreshToken())).thenReturn(tokenResponse);
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Token refreshed successfully"))
+                .andExpect(jsonPath("$.data.accessToken").value("new_access_token"));
+    }
+
+    @Test
+    void logout_success() throws Exception {
+        RefreshTokenRequest request = new RefreshTokenRequest("refresh_token_string");
+
+        doNothing().when(authService).logout(request.refreshToken());
+
+        mockMvc.perform(post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Logged out successfully"));
     }
 }

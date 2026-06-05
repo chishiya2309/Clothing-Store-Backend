@@ -43,7 +43,7 @@ openapi:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000 # 24h
+  expiration: 900000 # 15 minutes in ms
 
 brevo:
   api-key: ${BREVO_API_KEY}
@@ -54,3 +54,4 @@ app:
   backend-url: ${BACKEND_URL:http://localhost:8080}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
   verification-token-ttl: 900 # 15 minutes in seconds
+  refresh-token-ttl: 604800 # 7 days in seconds
