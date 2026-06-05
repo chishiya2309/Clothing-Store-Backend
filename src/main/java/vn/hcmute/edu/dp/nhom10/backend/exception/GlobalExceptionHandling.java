@@ -203,7 +203,7 @@ public class GlobalExceptionHandling {
                                     """
                             ))})
     })
-    public ErrorResponse handleInternalAuthenticationServiceException(Exception e, WebRequest req) {
+public ErrorResponse handleAuthenticationException(Exception e, WebRequest req) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
