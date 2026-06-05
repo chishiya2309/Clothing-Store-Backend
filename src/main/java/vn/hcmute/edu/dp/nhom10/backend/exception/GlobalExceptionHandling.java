@@ -185,9 +185,9 @@ public class GlobalExceptionHandling {
     }
 
 
-    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    @ExceptionHandler({InternalAuthenticationServiceException.class, org.springframework.security.authentication.BadCredentialsException.class})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "401", description = "Unauthorized",
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
                             examples = @ExampleObject(
                                     name = "401 Response",
@@ -203,7 +203,7 @@ public class GlobalExceptionHandling {
                                     """
                             ))})
     })
-    public ErrorResponse handleInternalAuthenticationServiceException(InternalAuthenticationServiceException e, WebRequest req) {
+    public ErrorResponse handleInternalAuthenticationServiceException(Exception e, WebRequest req) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
