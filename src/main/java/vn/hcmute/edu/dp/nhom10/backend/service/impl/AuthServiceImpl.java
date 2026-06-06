@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     @Value("${app.remember-me-token-ttl:2592000}")
     private long rememberMeTokenTtl;
 
-    @Value("${google.client-id}")
+    @Value("${google.client-id:}")
     private String googleClientId;
 
     private static final String VERIFY_PREFIX = "email_verify:";
