@@ -240,6 +240,9 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
             if (Boolean.FALSE.equals(user.getIsActive())) {
                 throw new AccessDeniedException("Account is locked");
             }
+            if (Boolean.FALSE.equals(user.getEmailVerified())) {
+                user.setEmailVerified(true);
+            }
         }
 
         String accessToken = jwtTokenProvider.generateToken(user.getEmail());
