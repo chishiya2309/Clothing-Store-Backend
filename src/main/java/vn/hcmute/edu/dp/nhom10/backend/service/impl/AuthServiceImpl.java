@@ -222,8 +222,8 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
         User user = userRepository.findByEmail(email).orElse(null);
 
         if (user == null) {
-            MembershipTier bronzeTier = membershipTierRepository.findById(1L).orElse(null);
-
+            MembershipTier bronzeTier = membershipTierRepository.findBySlug("dong")
+                    .orElseThrow(() -> new IllegalStateException("Default membership tier 'dong' not found"));
             user = User.builder()
                     .email(email)
                     .fullName(fullName != null ? fullName : email.split("@")[0])
