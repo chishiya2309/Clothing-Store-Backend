@@ -33,3 +33,5 @@ build/
 .vscode/
 
 .env
+
+src/main/resources/client_secret_548173697719-l06aa24s5toso12kqheq5ir8mbhtr791.apps.googleusercontent.com.json

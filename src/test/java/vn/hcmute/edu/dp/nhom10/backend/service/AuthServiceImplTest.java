@@ -68,6 +68,8 @@ class AuthServiceImplTest {
     void setUp() {
         ReflectionTestUtils.setField(authService, "verificationTokenTtl", 900L);
         ReflectionTestUtils.setField(authService, "refreshTokenTtl", 604800L);
+        ReflectionTestUtils.setField(authService, "rememberMeTokenTtl", 2592000L);
+        ReflectionTestUtils.setField(authService, "googleClientId", "test-google-client-id");
     }
 
     @Test
@@ -183,7 +185,7 @@ class AuthServiceImplTest {
 
     @Test
     void login_success() {
-        LoginRequest request = new LoginRequest("test@test.com", "Password123");
+        LoginRequest request = new LoginRequest("test@test.com", "Password123", false);
         User user = new User();
         user.setId(1L);
         user.setEmail(request.email());
@@ -212,15 +214,15 @@ class AuthServiceImplTest {
 
     @Test
     void login_invalidEmail_throwsException() {
-        LoginRequest request = new LoginRequest("wrong@test.com", "Password123");
+        LoginRequest request = new LoginRequest("wrong@test.com", "Password123", false);
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> authService.login(request, null, null));
+        assertThrows(BadCredentialsException.class, () -> authService.login(request, null, null));
     }
 
     @Test
     void login_inactiveAccount_throwsException() {
-        LoginRequest request = new LoginRequest("test@test.com", "Password123");
+        LoginRequest request = new LoginRequest("test@test.com", "Password123", false);
         User user = new User();
         user.setIsActive(false);
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
@@ -230,7 +232,7 @@ class AuthServiceImplTest {
 
     @Test
     void login_unverifiedEmail_throwsException() {
-        LoginRequest request = new LoginRequest("test@test.com", "Password123");
+        LoginRequest request = new LoginRequest("test@test.com", "Password123", false);
         User user = new User();
         user.setIsActive(true);
         user.setEmailVerified(false);
@@ -241,7 +243,7 @@ class AuthServiceImplTest {
 
     @Test
     void login_wrongPassword_throwsException() {
-        LoginRequest request = new LoginRequest("test@test.com", "WrongPass");
+        LoginRequest request = new LoginRequest("test@test.com", "WrongPass", false);
         User user = new User();
         user.setId(1L);
         user.setPasswordHash("hashed_password");
@@ -294,5 +296,28 @@ class AuthServiceImplTest {
         String token = "refresh_token_to_delete";
         authService.logout(token);
         verify(redisTemplate).delete("refresh_token:" + token);
+    }
+
+    @Test
+    void login_withRememberMe_usesLongerTtl() {
+        LoginRequest request = new LoginRequest("test@test.com", "Password123", true);
+        User user = new User();
+        user.setId(1L);
+        user.setEmail(request.email());
+        user.setPasswordHash("hashed_password");
+        user.setIsActive(true);
+        user.setEmailVerified(true);
+
+        when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches(request.password(), user.getPasswordHash())).thenReturn(true);
+        when(jwtTokenProvider.generateToken(user.getEmail())).thenReturn("access_token");
+        when(jwtTokenProvider.getJwtExpirationInMs()).thenReturn(900000L);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+        TokenResponse response = authService.login(request, "127.0.0.1", "userAgent");
+
+        assertNotNull(response);
+        // Verify that remember-me TTL (30 days = 2592000s) is used instead of default 7 days
+        verify(valueOperations).set(anyString(), eq("1"), eq(2592000L), eq(TimeUnit.SECONDS));
     }
 }

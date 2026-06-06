@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RegisterRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RefreshTokenRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResendVerificationRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
@@ -69,6 +70,22 @@ public class AuthController {
         String userAgent = httpRequest.getHeader("User-Agent");
 
         TokenResponse tokenResponse = authService.login(request, ipAddress, userAgent);
+
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Login successful")
+                .data(tokenResponse)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PostMapping("/google")
+    public ApiResponse loginWithGoogle(@Valid @RequestBody GoogleAuthRequest request, HttpServletRequest httpRequest) {
+        log.info("Google OAuth login attempt");
+        String ipAddress = httpRequest.getRemoteAddr();
+        String userAgent = httpRequest.getHeader("User-Agent");
+
+        TokenResponse tokenResponse = authService.loginWithGoogle(request, ipAddress, userAgent);
 
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())

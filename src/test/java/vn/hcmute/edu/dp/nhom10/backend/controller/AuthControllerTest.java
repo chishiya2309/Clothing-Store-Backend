@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RegisterRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RefreshTokenRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResendVerificationRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
@@ -96,7 +97,7 @@ class AuthControllerTest {
 
     @Test
     void login_success() throws Exception {
-        LoginRequest request = new LoginRequest("test@test.com", "Password123");
+        LoginRequest request = new LoginRequest("test@test.com", "Password123", false);
         TokenResponse tokenResponse = TokenResponse.builder()
                 .accessToken("access_token")
                 .refreshToken("refresh_token")
@@ -148,5 +149,25 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("Logged out successfully"));
+    }
+
+    @Test
+    void loginWithGoogle_success() throws Exception {
+        GoogleAuthRequest request = new GoogleAuthRequest("valid_google_id_token");
+        TokenResponse tokenResponse = TokenResponse.builder()
+                .accessToken("google_access_token")
+                .refreshToken("google_refresh_token")
+                .expiresIn(900L)
+                .build();
+
+        when(authService.loginWithGoogle(eq(request), any(), any())).thenReturn(tokenResponse);
+
+        mockMvc.perform(post("/api/auth/google")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Login successful"))
+                .andExpect(jsonPath("$.data.accessToken").value("google_access_token"));
     }
 }

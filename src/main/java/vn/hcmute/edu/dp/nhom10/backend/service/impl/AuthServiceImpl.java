@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RegisterRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ActivityLog;
 import vn.hcmute.edu.dp.nhom10.backend.entity.MembershipTier;
@@ -26,7 +27,13 @@ import vn.hcmute.edu.dp.nhom10.backend.service.EmailService;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,8 +55,14 @@ public class AuthServiceImpl implements AuthService {
     @Value("${app.verification-token-ttl}")
     private long verificationTokenTtl;
 
-@Value("${app.refresh-token-ttl:604800}")
-private long refreshTokenTtl;
+    @Value("${app.refresh-token-ttl:604800}")
+    private long refreshTokenTtl;
+
+    @Value("${app.remember-me-token-ttl:2592000}")
+    private long rememberMeTokenTtl;
+
+    @Value("${google.client-id:}")
+    private String googleClientId;
 
     private static final String VERIFY_PREFIX = "email_verify:";
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
@@ -148,8 +161,9 @@ User user = userRepository.findByEmail(request.email())
         String accessToken = jwtTokenProvider.generateToken(user.getEmail());
         String refreshToken = UUID.randomUUID().toString();
         
+        long ttl = Boolean.TRUE.equals(request.rememberMe()) ? rememberMeTokenTtl : refreshTokenTtl;
         String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        redisTemplate.opsForValue().set(key, user.getId().toString(), refreshTokenTtl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, user.getId().toString(), ttl, TimeUnit.SECONDS);
 
         user.setLastLoginAt(OffsetDateTime.now());
         userRepository.save(user);
@@ -193,6 +207,82 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
     public void logout(String refreshToken) {
         if (refreshToken != null) {
             redisTemplate.delete(REFRESH_TOKEN_PREFIX + refreshToken);
+        }
+    }
+
+    @Transactional
+    @Override
+    public TokenResponse loginWithGoogle(GoogleAuthRequest request, String ipAddress, String userAgent) {
+        GoogleIdToken.Payload payload = verifyGoogleIdToken(request.idToken());
+
+        String email = payload.getEmail();
+        String fullName = (String) payload.get("name");
+        String avatarUrl = (String) payload.get("picture");
+
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            MembershipTier bronzeTier = membershipTierRepository.findBySlug("dong")
+                    .orElseThrow(() -> new IllegalStateException("Default membership tier 'dong' not found"));
+            user = User.builder()
+                    .email(email)
+                    .fullName(fullName != null ? fullName : email.split("@")[0])
+                    .avatarUrl(avatarUrl)
+                    .role(UserRole.customer)
+                    .membershipTier(bronzeTier)
+                    .authProvider("google")
+                    .emailVerified(true)
+                    .isActive(true)
+                    .loyaltyPoints(0)
+                    .build();
+            userRepository.save(user);
+        } else {
+            if (Boolean.FALSE.equals(user.getIsActive())) {
+                throw new AccessDeniedException("Account is locked");
+            }
+            if (Boolean.FALSE.equals(user.getEmailVerified())) {
+                user.setEmailVerified(true);
+            }
+        }
+
+        String accessToken = jwtTokenProvider.generateToken(user.getEmail());
+        String refreshToken = UUID.randomUUID().toString();
+
+        String key = REFRESH_TOKEN_PREFIX + refreshToken;
+        redisTemplate.opsForValue().set(key, user.getId().toString(), refreshTokenTtl, TimeUnit.SECONDS);
+
+        user.setLastLoginAt(OffsetDateTime.now());
+        userRepository.save(user);
+
+        logActivity(user, "login_google", ipAddress, userAgent);
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .expiresIn(jwtTokenProvider.getJwtExpirationInMs() / 1000)
+                .build();
+    }
+
+    private GoogleIdToken.Payload verifyGoogleIdToken(String idTokenString) {
+        try {
+            if (googleClientId == null || googleClientId.isBlank()) {
+                throw new IllegalStateException("google.client-id is not configured");
+            }
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(), GsonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new BadCredentialsException("Invalid Google ID token");
+            }
+            return idToken.getPayload();
+        } catch (BadCredentialsException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Google token verification failed", e);
+            throw new BadCredentialsException("Failed to verify Google ID token");
         }
     }
 
