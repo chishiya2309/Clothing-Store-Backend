@@ -262,6 +262,9 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
 
     private GoogleIdToken.Payload verifyGoogleIdToken(String idTokenString) {
         try {
+            if (googleClientId == null || googleClientId.isBlank()) {
+                throw new IllegalStateException("google.client-id is not configured");
+            }
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     new NetHttpTransport(), GsonFactory.getDefaultInstance())
                     .setAudience(Collections.singletonList(googleClientId))
