@@ -3,6 +3,8 @@ package vn.hcmute.edu.dp.nhom10.backend.service;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RegisterRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ForgotPasswordRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResetPasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 
 public interface AuthService {
@@ -19,4 +21,8 @@ public interface AuthService {
     TokenResponse refreshToken(String refreshToken);
 
     void logout(String refreshToken);
+
+    void forgotPassword(ForgotPasswordRequest request);
+
+    void resetPassword(ResetPasswordRequest request);
 }
