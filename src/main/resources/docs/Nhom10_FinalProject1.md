@@ -57,7 +57,7 @@ YODY là một trong những chuỗi thời trang phổ thông lớn nhất Vi�
 
 <figure>
 <img src="media/image2.png" style="width:6.02751in;height:2.67101in" alt="A screenshot of a website Description automatically generated" />
-<figcaption><p>Hình 2. . Homepage của website yody.vn</p></figcaption>
+<figcaption><p>Hình 2. 1. Homepage của website yody.vn</p></figcaption>
 </figure>
 
 <figure>
@@ -72,7 +72,7 @@ YODY là một trong những chuỗi thời trang phổ thông lớn nhất Vi�
 
 <figure>
 <img src="media/image5.png" style="width:6.56367in;height:3.09301in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p>Hình 2. . Footer của website yody.vn</p></figcaption>
+<figcaption><p>Hình 2. 4. Footer của website yody.vn</p></figcaption>
 </figure>
 
 Về mặt thiết kế thì sử dụng giao diện hiện đại, sử dụng tông màu nhận diện thương hiệu (vàng -- xanh dương), bố cục rõ ràng. Banner chính với Slider quảng cáo với hình ảnh bắt mắt, cập nhật bộ sưu tập mới và chương trình khuyến mãi.
@@ -83,12 +83,12 @@ Thanh điều hướng (Navigation Bar): phân chia theo đối tượng bao g�
 
 <figure>
 <img src="media/image6.png" style="width:6.5in;height:3.42847in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p>Hình 2. . Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (1)</p></figcaption>
+<figcaption><p>Hình 2. 5. Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image7.png" style="width:6.5in;height:3.20833in" alt="A screenshot of a website Description automatically generated" />
-<figcaption><p>Hình 2. . Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (2)</p></figcaption>
+<figcaption><p>Hình 2. 6. Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (2)</p></figcaption>
 </figure>
 
 Hiển thị danh sách sản phẩm dạng lưới (grid), mỗi sản phẩm có hình ảnh, tên, giá gốc, giá giảm. Về bộ lọc (Filter) thì hỗ trợ lọc theo kích cỡ, màu sắc, chất liệu, mức giá, kiểu dáng. Sắp xếp (Sort): Theo giá (tăng/giảm), mới nhất, ưu đãi.
@@ -97,12 +97,12 @@ Hiển thị danh sách sản phẩm dạng lưới (grid), mỗi sản phẩm c
 
 <figure>
 <img src="media/image8.png" style="width:6.5in;height:3.41875in" alt="A person smiling in a yellow shirt Description automatically generated" />
-<figcaption><p>Hình 2. . Trang chi tiết sản phẩm trên website yody.vn (1)</p></figcaption>
+<figcaption><p>Hình 2. 7. Trang chi tiết sản phẩm trên website yody.vn (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image9.png" style="width:6.5in;height:3.21875in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p>Hình 2. . Trang chi tiết sản phẩm trên website yody.vn (2)</p></figcaption>
+<figcaption><p>Hình 2. 8. Trang chi tiết sản phẩm trên website yody.vn (2)</p></figcaption>
 </figure>
 
 Hình ảnh sản phẩm có chất lượng cao, nhiều góc chụp, có ảnh người mẫu mặc thực tế. Thông tin chi tiết thì có tên sản phẩm, giá bán, mô tả chất liệu, công nghệ vải, hướng dẫn bảo quản. Có vùng để chọn size và màu với giao diện trực quan, hiển thị ô màu sắc và bảng size.
@@ -123,7 +123,7 @@ Công nghệ vải đặc trưng**:** YODY chú trọng giới thiệu công ngh
 | 4 | Chưa có tính năng gợi ý bằng AI | Chưa phân tích hành vi cá nhân để gợi ý sản phẩm phù hợp |
 | 5 | Tính năng so sánh sản phẩm chưa có | Khách hàng không thể so sánh trực tiếp hai hoặc nhiều sản phẩm cùng lúc |
 
-Bảng 2. . Điểm hạn chế của YODY
+Bảng 2. 1. Điểm hạn chế của YODY
 
 # 2.4. Khảo sát hệ thống COOLMATE (coolmate.me) {#khảo-sát-hệ-thống-coolmate-coolmate.me .P2}
 
@@ -133,17 +133,17 @@ Coolmate là thương hiệu thời trang nổi bật tại Việt Nam, hoạt �
 
 <figure>
 <img src="media/image10.png" style="width:6.5in;height:3.42361in" alt="A person in shorts and a person in shorts Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh homepage trên website coolmate.me (1)</p></figcaption>
+<figcaption><p>Hình 2. 9. Hình ảnh homepage trên website coolmate.me (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image11.png" style="width:6.5in;height:3.41458in" alt="A screenshot of a website Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh homepage trên website coolmate.me (2)</p></figcaption>
+<figcaption><p>Hình 2. 10. Hình ảnh homepage trên website coolmate.me (2)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image12.png" style="width:6.5in;height:3.42361in" alt="A screenshot of a person&#39;s body Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh homepage trên website coolmate.me (3)</p></figcaption>
+<figcaption><p>Hình 2. 11. Hình ảnh homepage trên website coolmate.me (3)</p></figcaption>
 </figure>
 
 Về mặt thiết kế thì sử dụng phong cách tối giản (minimalist), bố cục sạch sẽ, hình ảnh sản phẩm chất lượng cao, tốc độ tải trang nhanh. Thanh trên cùng (Top bar): Bên trái có các kênh thương hiệu (Về Coolmate, CXP by Coolmate, Care & Share); bên phải có tiện ích (CoolClub, Cửa hàng, Blog, CSKH, Đăng nhập, chuyển đổi ngôn ngữ VN/EN). Thanh điều hướng chính (Main Nav): Logo ở giữa bên trái, các danh mục chính: NEW, NAM, NỮ, THỂ THAO, PHỤ KIỆN, SALE (-50%). Widget tương tác: Nút gọi điện / Zalo Chat nổi và widget hỗ trợ khách hàng ở góc phải dưới.
@@ -152,12 +152,12 @@ Về mặt thiết kế thì sử dụng phong cách tối giản (minimalist), 
 
 <figure>
 <img src="media/image13.png" style="width:6.5in;height:3.42361in" alt="A screenshot of a web page Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh danh mục áo polo nam trên website coolmate.me</p></figcaption>
+<figcaption><p>Hình 2. 12. Hình ảnh danh mục áo polo nam trên website coolmate.me</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image14.png" style="width:6.5in;height:2.92708in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh các sản phẩm thuộc danh mục áo polo nam trên website coolmate.me</p></figcaption>
+<figcaption><p>Hình 2. 13. Hình ảnh các sản phẩm thuộc danh mục áo polo nam trên website coolmate.me</p></figcaption>
 </figure>
 
 Hiển thị dạng lưới, mỗi sản phẩm có hình ảnh rõ ràng, tên sản phẩm, giá, và các biến thể màu sắc. Về bộ lọc thì có phù hợp với (Daily, Home, Active, Office), giới tính, size (XS đến 4XL), màu sắc, khoảng giá. Có tính năng sắp xếp theo: bán chạy, mới nhất, giá tăng dần, giá giảm dần. Filter tags: Hiển thị tag bộ lọc đang áp dụng, có nút "Xóa lọc" nhanh.
@@ -166,12 +166,12 @@ Hiển thị dạng lưới, mỗi sản phẩm có hình ảnh rõ ràng, tên 
 
 <figure>
 <img src="media/image15.png" style="width:6.50456in;height:3.25332in" alt="A person in a black shirt Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (1)</p></figcaption>
+<figcaption><p>Hình 2. 14. Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image16.png" style="width:6.42438in;height:2.53429in" alt="A person in a blue shirt Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (2)</p></figcaption>
+<figcaption><p>Hình 2. 15. Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (2)</p></figcaption>
 </figure>
 
 Về mặt hình ảnh thì có chất lượng cao, gallery sản phẩm đa góc. Thông tin chi tiết: giá, chỉ báo freeship, voucher khả dụng (Giảm 50k, 150k, 10%, 12%). Bên cạnh đó có tích hợp CoolClub để hiển thị số CoolCash được hoàn khi mua (ví dụ: "Được hoàn lên đến 21.000 CoolCash").
@@ -180,14 +180,14 @@ Ta có thể chọn size và màu theo nhu cầu bằng nút màu sắc trực q
 
 <figure>
 <img src="media/image17.png" style="width:6.5in;height:3.42847in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p>Hình 2. . Sticky Buy Bar và vùng đánh giá sản phẩm trên website coolmate.me</p></figcaption>
+<figcaption><p>Hình 2. 16. Sticky Buy Bar và vùng đánh giá sản phẩm trên website coolmate.me</p></figcaption>
 </figure>
 
 Có 1 tính năng khá hay là Sticky Buy Bar đó là khi ta cuộn qua khối mua hàng, thanh mua hàng cố định xuất hiện ở trên cùng cho phép chọn size và thêm giỏ hàng mà không cần cuộn lại. Có phần đánh giá sản phẩm với hệ thống review nâng cao - lọc theo số sao (1-5), lọc review đã phản hồi, lọc review có ảnh.
 
 <figure>
 <img src="media/image18.png" style="width:6.5in;height:3.41875in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p>Hình 2. . Hình ảnh gợi ý sản phẩm dựa trên nhiều tiêu chí trên website coolmate.me</p></figcaption>
+<figcaption><p>Hình 2. 17. Hình ảnh gợi ý sản phẩm dựa trên nhiều tiêu chí trên website coolmate.me</p></figcaption>
 </figure>
 
 Sản phẩm gợi ý: Carousel "GỢI Ý SẢN PHẨM" dựa trên lịch sử xem / tiêu chí động.
@@ -204,7 +204,7 @@ Sticky Buy Bar: khi người dùng cuộn qua phần mua hàng, một thanh mua 
 | 2 | Tính năng tìm kiếm vẫn còn gây khó chịu cho người dùng | Khi nhập từ khóa và nhấn enter trong bàn phím thì không hiển thị được |
 | 3 | Chưa có tính năng so sánh sản phẩm | Không hỗ trợ so sánh trực tiếp nhiều sản phẩm |
 
-Bảng 2. . Hạn chế của Coolmate
+Bảng 2. 2. Hạn chế của Coolmate
 
 # 3. Phân tích yêu cầu {#phân-tích-yêu-cầu .P1}
 
@@ -274,95 +274,103 @@ Xuất hóa đơn điện tử cho khách hàng.
 
 **Bộ phận: Quản trị viên (Admin) - Mã: AD**
 
-| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
-|----|----|----|----|----|----|
-| 1 | Thêm sản phẩm mới | Lưu trữ | QĐ1 |  | Bao gồm tên, mô tả, chất liệu, hình ảnh (tối thiểu 3 ảnh), giá, danh mục |
-| 2 | Thêm biến thể sản phẩm (size, màu, số lượng tồn) | Lưu trữ | QĐ2 |  | Mỗi biến thể có SKU riêng |
-| 3 | Cập nhật thông tin sản phẩm | Lưu trữ | QĐ3 |  | Không được thay đổi mã SP |
-| 4 | Xóa / Ẩn sản phẩm | Lưu trữ | QĐ4 |  | Xóa logic (ẩn / xóa mềm), không xóa vật lý nếu đã có đơn hàng |
-| 5 | Quản lý danh mục sản phẩm (CRUD) | Lưu trữ | QĐ5 |  | Hỗ trợ danh mục đa cấp (Ví dụ: Nam \> Áo \> Áo Polo) |
-| 6 | Quản lý bộ sưu tập (CRUD) | Lưu trữ |  |  | Gắn SP vào BST, đặt banner, thời gian hiển thị |
-| 7 | Cập nhật số lượng tồn kho | Lưu trữ | QĐ6 |  | Tự động giảm khi có đơn hàng, tăng khi hủy đơn |
-| 8 | Tra cứu sản phẩm | Tra cứu |  |  | Tìm theo mã, tên, danh mục, trạng thái |
-| 9 | Xem báo cáo tồn kho | Tra cứu, Kết xuất |  | BM3 | Cảnh báo sản phẩm sắp hết hàng (\< ngưỡng) |
-| 10 | Tạo / Quản lý voucher khuyến mãi | Lưu trữ | QĐ7 |  | Thiết lập loại, giá trị, điều kiện, thời hạn |
-| 11 | Quản lý đơn hàng (xác nhận, cập nhật trạng thái, hủy) | Lưu trữ | QĐ8 | BM4 | Trạng thái: Chờ xác nhận → Đang xử lý → Đang giao → Hoàn thành / Đã hủy |
-| 12 | Xem chi tiết đơn hàng | Tra cứu |  |  | Thông tin KH, danh sách SP, tổng tiền, trạng thái |
-| 13 | Duyệt / Xóa đánh giá sản phẩm | Lưu trữ | QĐ9 |  | Duyệt review, phản hồi review, xóa review vi phạm |
-| 14 | Quản lý thông tin khách hàng | Tra cứu |  |  | Xem, tìm kiếm, phân hạng thành viên |
-| 15 | Thống kê doanh thu | Tính toán, Kết xuất | CT1 | BM1 | Theo ngày/tuần/tháng/năm, theo danh mục |
-| 16 | Thống kê sản phẩm bán chạy | Tra cứu, Kết xuất |  | BM2 | Top SP theo số lượng bán, doanh thu |
-| 17 | Quản lý banner / slider trang chủ | Lưu trữ |  |  | Upload hình, đặt link, thứ tự, thời gian hiển thị |
-| 18 | Quản lý bài viết blog / tin tức | Lưu trữ |  |  | CRUD bài viết, gắn tag, danh mục tin |
-| 19 | Báo cáo khách hàng thân thiết | Kết xuất |  | BM5 | Danh sách KH theo hạng, điểm tích lũy |
+| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** |
+|----|----|----|----|----|
+| 1 | Quản lý tài khoản người dùng (xem, khóa/mở khóa, phân quyền) | Lưu trữ | Xem danh sách tài khoản; khóa/mở khóa tài khoản; cấp/thu hồi vai trò Nhân viên |  |
+| 2 | Thống kê doanh thu | Tính toán, Kết xuất | CT1 | BM1 |
+| 3 | Thống kê sản phẩm bán chạy | Tra cứu, Kết xuất | Top SP theo số lượng bán và doanh thu | BM2 |
+| 4 | Báo cáo khách hàng thân thiết | Kết xuất | Danh sách KH theo hạng, điểm tích lũy | BM5 |
 
-Bảng 3. . Danh sách các chức năng của Quản trị viên
+Bảng 3. 1. Danh sách các chức năng của Quản trị viên
+
+**Bộ phận: Nhân viên cửa hàng (Staff) - Mã: NV**
+
+| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** |
+|----|----|----|----|----|
+| 1 | Thêm sản phẩm mới | Lưu trữ | QĐ1 |  |
+| 2 | Thêm biến thể sản phẩm (size, màu, số lượng tồn) | Lưu trữ | QĐ2 |  |
+| 3 | Cập nhật thông tin sản phẩm | Lưu trữ | QĐ3 |  |
+| 4 | Xóa / Ẩn sản phẩm | Lưu trữ | QĐ4 |  |
+| 5 | Quản lý danh mục sản phẩm (CRUD) | Lưu trữ | QĐ5 |  |
+| 6 | Quản lý bộ sưu tập (CRUD) | Lưu trữ | Gắn SP vào BST, đặt banner, thời gian hiển thị |  |
+| 7 | Cập nhật số lượng tồn kho | Lưu trữ | QĐ6 |  |
+| 8 | Tra cứu sản phẩm | Tra cứu | Tìm theo mã, tên, danh mục, trạng thái |  |
+| 9 | Xem báo cáo tồn kho | Tra cứu, Kết xuất | Cảnh báo sản phẩm sắp hết hàng (\< ngưỡng) | BM3 |
+| 10 | Tạo / Quản lý voucher khuyến mãi | Lưu trữ | QĐ7 |  |
+| 11 | Quản lý đơn hàng (xác nhận, cập nhật trạng thái, hủy) | Lưu trữ | QĐ8 | BM4 |
+| 12 | Xem chi tiết đơn hàng | Tra cứu | Thông tin KH, danh sách SP, tổng tiền, trạng thái |  |
+| 13 | Duyệt / Xóa đánh giá sản phẩm | Lưu trữ | QĐ9 |  |
+| 14 | Quản lý thông tin khách hàng | Tra cứu | Xem, tìm kiếm, phân hạng thành viên |  |
+| 15 | Quản lý banner / slider trang chủ | Lưu trữ | Upload hình, đặt link, thứ tự, thời gian hiển thị |  |
+| 16 | Quản lý bài viết blog / tin tức | Lưu trữ | CRUD bài viết, gắn tag, danh mục tin |  |
+
+Bảng 3. 2. Danh sách các chức năng của nhân viên cửa hàng
 
 **Bộ phận: Khách hàng đã đăng ký - Mã: KH**
 
-| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
-|----|----|----|----|----|----|
-| 1 | Xem danh sách sản phẩm theo danh mục | Tra cứu |  |  | Hiển thị dạng lưới, có phân trang |
-| 2 | Tìm kiếm sản phẩm | Tra cứu |  |  | Tìm theo từ khóa, có autocomplete gợi ý |
-| 3 | Lọc sản phẩm (size, màu, giá) | Tra cứu |  |  | Đa tiêu chí, hiển thị filter tags |
-| 4 | Sắp xếp sản phẩm | Tra cứu |  |  | Theo giá, mới nhất, bán chạy |
-| 5 | Xem chi tiết sản phẩm | Tra cứu |  |  | Hình ảnh đa góc, mô tả, chất liệu, bảng size |
-| 6 | Chọn biến thể (size, màu) và thêm vào giỏ hàng | Lưu trữ | QĐ10 |  | Kiểm tra tồn kho trước khi thêm |
-| 7 | Quản lý giỏ hàng (thêm, sửa SL, xóa SP) | Lưu trữ |  |  | Mini cart hiển thị nhanh, cập nhật tổng tiền realtime |
-| 8 | Áp dụng mã giảm giá / voucher | Tính toán | QĐ11, CT2 |  | Kiểm tra điều kiện áp dụng, hiển thị số tiền giảm |
-| 9 | Đặt hàng và thanh toán | Lưu trữ, Tính toán | CT1 |  | COD, MoMo, VNPay, ZaloPay, Visa/Mastercard, ATM |
-| 10 | Xem lịch sử đơn hàng | Tra cứu |  |  | Danh sách đơn, trạng thái, chi tiết |
-| 11 | Hủy đơn hàng | Lưu trữ | QĐ12 |  | Chỉ hủy khi trạng thái "Chờ xác nhận" |
-| 12 | Đánh giá sản phẩm (rating + bình luận + ảnh) | Lưu trữ | QĐ13 |  | Chỉ đánh giá SP đã mua, lọc theo sao/có ảnh |
-| 13 | Lưu sản phẩm yêu thích (Wishlist) | Lưu trữ |  |  | Thêm/xóa SP khỏi danh sách yêu thích |
-| 14 | Quản lý thông tin cá nhân | Lưu trữ | QĐ14 |  | Sửa tên, SĐT, ngày sinh, giới tính. Không sửa email |
-| 15 | Quản lý địa chỉ giao hàng (nhiều địa chỉ) | Lưu trữ |  |  | Thêm, sửa, xóa, đặt mặc định |
-| 16 | Đổi mật khẩu | Lưu trữ | QĐ15 |  | Xác thực mật khẩu cũ trước khi đổi |
-| 17 | Xem điểm tích lũy và hạng thành viên | Tra cứu |  |  | Hiển thị điểm, hạng, ưu đãi của hạng |
-| 18 | Xem sản phẩm gợi ý | Tra cứu |  |  | Dựa trên lịch sử xem/mua |
+| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** |
+|----|----|----|----|----|
+| 1 | Xem danh sách sản phẩm theo danh mục | Tra cứu | Hiển thị dạng lưới, có phân trang |  |
+| 2 | Tìm kiếm sản phẩm | Tra cứu | Tìm theo từ khóa, có autocomplete gợi ý |  |
+| 3 | Lọc sản phẩm (size, màu, giá) | Tra cứu | Đa tiêu chí, hiển thị filter tags |  |
+| 4 | Sắp xếp sản phẩm | Tra cứu | Theo giá, mới nhất, bán chạy |  |
+| 5 | Xem chi tiết sản phẩm | Tra cứu | Hình ảnh đa góc, mô tả, chất liệu, bảng size |  |
+| 6 | Chọn biến thể (size, màu) và thêm vào giỏ hàng | Lưu trữ | QĐ10 |  |
+| 7 | Quản lý giỏ hàng (thêm, sửa SL, xóa SP) | Lưu trữ | Mini cart hiển thị nhanh, cập nhật tổng tiền realtime |  |
+| 8 | Áp dụng mã giảm giá / voucher | Tính toán | QĐ11, CT2 |  |
+| 9 | Đặt hàng và thanh toán | Lưu trữ, Tính toán | CT1 |  |
+| 10 | Xem lịch sử đơn hàng | Tra cứu | Danh sách đơn, trạng thái, chi tiết |  |
+| 11 | Hủy đơn hàng | Lưu trữ | QĐ12 |  |
+| 12 | Đánh giá sản phẩm (rating + bình luận + ảnh) | Lưu trữ | QĐ13 |  |
+| 13 | Lưu sản phẩm yêu thích (Wishlist) | Lưu trữ | Thêm/xóa SP khỏi danh sách yêu thích |  |
+| 14 | Quản lý thông tin cá nhân | Lưu trữ | QĐ14 |  |
+| 15 | Quản lý địa chỉ giao hàng (nhiều địa chỉ) | Lưu trữ | Thêm, sửa, xóa, đặt mặc định |  |
+| 16 | Đổi mật khẩu | Lưu trữ | QĐ15 |  |
+| 17 | Xem điểm tích lũy và hạng thành viên | Tra cứu | Hiển thị điểm, hạng, ưu đãi của hạng |  |
+| 18 | Xem sản phẩm gợi ý | Tra cứu | Dựa trên lịch sử xem/mua |  |
 
-Bảng 3. . Danh sách các chức năng của Khách hàng đã đăng ký
+Bảng 3. 3. Danh sách các chức năng của Khách hàng đã đăng ký
 
 **Bộ phận: Khách vãng lai (chưa đăng ký) - Mã: KVL**
 
-| **STT** | **Công việc** | **Loại công việc** | **Quy định / Công thức liên quan** | **Biểu mẫu liên quan** | **Ghi chú** |
-|----|----|----|----|----|----|
-| 1 | Xem trang chủ (banner, BST, SP nổi bật) | Tra cứu |  |  |  |
-| 2 | Duyệt danh mục sản phẩm | Tra cứu |  |  |  |
-| 3 | Tìm kiếm và lọc sản phẩm | Tra cứu |  |  | Tương tự KH nhưng không lưu lịch sử |
-| 4 | Xem chi tiết sản phẩm | Tra cứu |  |  |  |
-| 5 | Xem đánh giá sản phẩm | Tra cứu |  |  | Chỉ xem, không được đánh giá |
-| 6 | Thêm SP vào giỏ hàng (session-based) | Lưu trữ |  |  | Giỏ hàng lưu trên session/localStorage |
-| 7 | Đăng ký tài khoản | Lưu trữ | QĐ16 |  | Đăng ký bằng Email, Google. |
-| 8 | Xem blog / tin tức thời trang | Tra cứu |  |  |  |
-| 9 | Liên hệ hỗ trợ (Zalo Chat / hotline) |  |  |  | Widget chat cố định góc phải |
+| STT | Công việc | Loại công việc | Quy định / Công thức liên quan | Biểu mẫu liên quan |
+|----|----|----|----|----|
+| 1 | Xem trang chủ (banner, BST, SP nổi bật) | Tra cứu |  |  |
+| 2 | Duyệt danh mục sản phẩm | Tra cứu |  |  |
+| 3 | Tìm kiếm và lọc sản phẩm | Tra cứu | Tương tự KH nhưng không lưu lịch sử |  |
+| 4 | Xem chi tiết sản phẩm | Tra cứu |  |  |
+| 5 | Xem đánh giá sản phẩm | Tra cứu | Chỉ xem, không được đánh giá |  |
+| 6 | Thêm SP vào giỏ hàng (session-based) | Lưu trữ | Giỏ hàng lưu trên session/localStorage |  |
+| 7 | Đăng ký tài khoản | Lưu trữ | QĐ16 |  |
+| 8 | Xem blog / tin tức thời trang | Tra cứu |  |  |
+| 9 | Liên hệ hỗ trợ (Zalo Chat / hotline) |  | Widget chat cố định góc phải màn hình |  |
 
-Bảng 3. . Danh sách các chức năng của Khách vãng lai
+Bảng 3. 4. Danh sách các chức năng của Khách vãng lai
 
 **Bảng Quy định / Công thức liên quan**
 
-| **STT** | **Mã số** | **Tên Quy định / Công thức** | **Mô tả chi tiết** | **Ghi chú** |
-|----|----|----|----|----|
-| 1 | QĐ1 | Quy định thêm sản phẩm | Mã SP tự sinh, tên SP không trùng trong cùng danh mục, phải có ít nhất 1 hình ảnh và 1 biến thể |  |
-| 2 | QĐ2 | Quy định biến thể sản phẩm | Mỗi biến thể (size + màu) phải có SKU duy nhất, số lượng tồn ≥ 0 |  |
-| 3 | QĐ3 | Quy định cập nhật SP | Không được thay đổi mã SP. Giá mới áp dụng cho đơn hàng mới, không ảnh hưởng đơn cũ |  |
-| 4 | QĐ4 | Quy định xóa/ẩn SP | SP đã có trong đơn hàng chỉ được ẩn (xóa logic / xóa mềm), không xóa vật lý khỏi DB |  |
-| 5 | QĐ5 | Quy định danh mục | Danh mục hỗ trợ đa cấp (tối đa 3 cấp). Không xóa danh mục còn SP |  |
-| 6 | QĐ6 | Quy định tồn kho | Tồn kho tự động giảm khi đặt hàng thành công, tự động hoàn khi hủy đơn. Cảnh báo khi tồn \< 10 |  |
-| 7 | QĐ7 | Quy định voucher | Voucher có mã duy nhất, thời hạn sử dụng, điều kiện đơn tối thiểu, giới hạn số lần sử dụng |  |
-| 8 | QĐ8 | Quy định xử lý đơn hàng | Trạng thái đơn: Chờ xác nhận → Đang xử lý → Đang giao → Hoàn thành. Có thể hủy khi ở "Chờ xác nhận" |  |
-| 9 | QĐ9 | Quy định đánh giá | Chỉ KH đã mua SP và đơn hàng "Hoàn thành" mới được đánh giá. Mỗi SP chỉ đánh giá 1 lần/đơn |  |
-| 10 | QĐ10 | Quy định thêm giỏ hàng | Kiểm tra tồn kho biến thể trước khi thêm. Số lượng thêm không vượt quá tồn kho |  |
-| 11 | QĐ11 | Quy định áp dụng voucher | Mỗi đơn hàng chỉ áp dụng 1 voucher. Kiểm tra: còn hạn, đủ điều kiện đơn tối thiểu, chưa hết lượt |  |
-| 12 | QĐ12 | Quy định hủy đơn hàng | Chỉ hủy khi trạng thái "Chờ xác nhận". Hoàn tồn kho, hoàn voucher (nếu có). Đơn COD không cần hoàn tiền |  |
-| 13 | QĐ13 | Quy định review SP | Đánh giá 1--5 sao, nội dung tối thiểu 10 ký tự, hỗ trợ đính kèm tối đa 5 ảnh |  |
-| 14 | QĐ14 | Quy định thông tin KH | Không được sửa email đăng ký. Được sửa: họ tên, SĐT, ngày sinh, giới tính |  |
-| 15 | QĐ15 | Quy định đổi mật khẩu | Phải nhập đúng mật khẩu cũ. Mật khẩu mới tối thiểu 8 ký tự, có chữ hoa + số |  |
-| 16 | QĐ16 | Quy định đăng ký | Email không trùng. Hỗ trợ đăng ký bằng Email, Google. Xác thực email bắt buộc. |  |
-| 17 | CT1 | Công thức tính tổng đơn hàng | Tổng tiền = Σ(đơn giá × số lượng) + phí vận chuyển -- giá trị voucher (nếu có) |  |
-| 18 | CT2 | Công thức giảm giá voucher | Nếu loại %: Giảm = Tổng SP × %. Nếu loại cố định: Giảm = Giá trị voucher. Giảm tối đa không vượt tổng SP |  |
+| **STT** | **Mã số** | **Tên Quy định / Công thức** | **Mô tả chi tiết** |
+|----|----|----|----|
+| 1 | QĐ1 | Quy định thêm sản phẩm | Mã SP tự sinh, tên SP không trùng trong cùng danh mục, phải có ít nhất 1 hình ảnh và 1 biến thể |
+| 2 | QĐ2 | Quy định biến thể sản phẩm | Mỗi biến thể (size + màu) phải có SKU duy nhất, số lượng tồn ≥ 0 |
+| 3 | QĐ3 | Quy định cập nhật SP | Không được thay đổi mã SP. Giá mới áp dụng cho đơn hàng mới, không ảnh hưởng đơn cũ |
+| 4 | QĐ4 | Quy định xóa/ẩn SP | SP đã có trong đơn hàng chỉ được ẩn (xóa logic / xóa mềm), không xóa vật lý khỏi DB |
+| 5 | QĐ5 | Quy định danh mục | Danh mục hỗ trợ đa cấp (tối đa 3 cấp). Không xóa danh mục còn SP |
+| 6 | QĐ6 | Quy định tồn kho | Tồn kho tự động giảm khi đặt hàng thành công, tự động hoàn khi hủy đơn. Cảnh báo khi tồn \< 10 |
+| 7 | QĐ7 | Quy định voucher | Voucher có mã duy nhất, thời hạn sử dụng, điều kiện đơn tối thiểu, giới hạn số lần sử dụng |
+| 8 | QĐ8 | Quy định xử lý đơn hàng | Trạng thái đơn: Chờ xác nhận → Đang xử lý → Đang giao → Hoàn thành. Có thể hủy khi ở "Chờ xác nhận" |
+| 9 | QĐ9 | Quy định đánh giá | Chỉ KH đã mua SP và đơn hàng "Hoàn thành" mới được đánh giá. Mỗi SP chỉ đánh giá 1 lần/đơn |
+| 10 | QĐ10 | Quy định thêm giỏ hàng | Kiểm tra tồn kho biến thể trước khi thêm. Số lượng thêm không vượt quá tồn kho |
+| 11 | QĐ11 | Quy định áp dụng voucher | Mỗi đơn hàng chỉ áp dụng 1 voucher. Kiểm tra: còn hạn, đủ điều kiện đơn tối thiểu, chưa hết lượt |
+| 12 | QĐ12 | Quy định hủy đơn hàng | Chỉ hủy khi trạng thái "Chờ xác nhận". Hoàn tồn kho, hoàn voucher (nếu có). Đơn COD không cần hoàn tiền |
+| 13 | QĐ13 | Quy định review SP | Đánh giá 1--5 sao, nội dung tối thiểu 10 ký tự, hỗ trợ đính kèm tối đa 5 ảnh |
+| 14 | QĐ14 | Quy định thông tin KH | Không được sửa email đăng ký. Được sửa: họ tên, SĐT, ngày sinh, giới tính |
+| 15 | QĐ15 | Quy định đổi mật khẩu | Phải nhập đúng mật khẩu cũ. Mật khẩu mới tối thiểu 8 ký tự, có chữ hoa + số |
+| 16 | QĐ16 | Quy định đăng ký | Email không trùng. Hỗ trợ đăng ký bằng Email, Google. Xác thực email bắt buộc. |
+| 17 | CT1 | Công thức tính tổng đơn hàng | Tổng tiền = Σ(đơn giá × số lượng) + phí vận chuyển -- giá trị voucher (nếu có) |
+| 18 | CT2 | Công thức giảm giá voucher | Nếu loại %: Giảm = Tổng SP × %. Nếu loại cố định: Giảm = Giá trị voucher. Giảm tối đa không vượt tổng SP |
 
-Bảng 3. . Danh sách các quy định / công thức
+Bảng 3. 5. Danh sách các quy định / công thức
 
 **Bảng các biểu mẫu**
 
@@ -400,73 +408,73 @@ Bảng 3. . Danh sách các quy định / công thức
 
 3.1.2. Yêu cầu chức năng hệ thống
 
-| **STT** | **Chức năng** | **Mô tả chi tiết** | **Ghi chú** |
-|----|----|----|----|
-| 1 | Đăng ký tài khoản | Đăng ký bằng Email, Google. Gửi email xác thực kích hoạt tài khoản |  |
-| 2 | Đăng nhập / Đăng xuất | Đăng nhập bằng email + mật khẩu hoặc OAuth (Google). Hỗ trợ "Ghi nhớ đăng nhập" |  |
-| 3 | Phân quyền người dùng | 3 vai trò: Admin, Khách hàng đã đăng ký, Khách vãng lai. Mỗi vai trò có quyền truy cập khác nhau |  |
-| 4 | Quản lý người dùng | Admin quản lý danh sách tài khoản: xem, khóa/mở khóa tài khoản, phân quyền |  |
-| 5 | Quên mật khẩu / Cấp lại mật khẩu | Gửi link đặt lại mật khẩu qua email đã đăng ký. Link có thời hạn 15 phút |  |
-| 6 | Sao lưu dữ liệu | Hệ thống tự động sao lưu CSDL định kỳ (hàng ngày). Admin có thể sao lưu thủ công |  |
-| 7 | Phục hồi hệ thống | Khôi phục dữ liệu từ bản sao lưu gần nhất khi có sự cố |  |
-| 8 | Gửi thông báo tự động qua email | Tự động gửi email khi: đặt hàng thành công, cập nhật trạng thái đơn, voucher sắp hết hạn |  |
-| 9 | Ghi log hoạt động | Ghi lại các thao tác quan trọng: đăng nhập, thay đổi dữ liệu, xử lý đơn hàng (phục vụ audit) |  |
-| 10 | Quản lý session | Tự động đăng xuất sau thời gian không hoạt động. Giới hạn số phiên đăng nhập đồng thời |  |
-| 11 | Tự động cập nhật trạng thái đơn hàng | Liên kết API đơn vị vận chuyển để tự động cập nhật trạng thái giao hàng |  |
-| 12 | Tự động gửi nhắc nhở đánh giá | Sau khi đơn hàng hoàn thành 3 ngày, tự động gửi email mời khách đánh giá sản phẩm |  |
+| **STT** | **Chức năng** | **Mô tả chi tiết** |
+|----|----|----|
+| 1 | Đăng ký tài khoản | Đăng ký bằng Email, Google. Gửi email xác thực kích hoạt tài khoản |
+| 2 | Đăng nhập / Đăng xuất | Đăng nhập bằng email + mật khẩu hoặc OAuth (Google). Hỗ trợ "Ghi nhớ đăng nhập" |
+| 3 | Phân quyền người dùng | 3 vai trò: Admin, Khách hàng đã đăng ký, Khách vãng lai. Mỗi vai trò có quyền truy cập khác nhau |
+| 4 | Quản lý người dùng | Admin quản lý danh sách tài khoản: xem, khóa/mở khóa tài khoản, phân quyền |
+| 5 | Quên mật khẩu / Cấp lại mật khẩu | Gửi link đặt lại mật khẩu qua email đã đăng ký. Link có thời hạn 15 phút |
+| 6 | Sao lưu dữ liệu | Hệ thống tự động sao lưu CSDL định kỳ (hàng ngày). Admin có thể sao lưu thủ công |
+| 7 | Phục hồi hệ thống | Khôi phục dữ liệu từ bản sao lưu gần nhất khi có sự cố |
+| 8 | Gửi thông báo tự động qua email | Tự động gửi email khi: đặt hàng thành công, cập nhật trạng thái đơn, voucher sắp hết hạn |
+| 9 | Ghi log hoạt động | Ghi lại các thao tác quan trọng: đăng nhập, thay đổi dữ liệu, xử lý đơn hàng (phục vụ audit) |
+| 10 | Quản lý session | Tự động đăng xuất sau thời gian không hoạt động. Giới hạn số phiên đăng nhập đồng thời |
+| 11 | Tự động cập nhật trạng thái đơn hàng | Liên kết API đơn vị vận chuyển để tự động cập nhật trạng thái giao hàng |
+| 12 | Tự động gửi nhắc nhở đánh giá | Sau khi đơn hàng hoàn thành 3 ngày, tự động gửi email mời khách đánh giá sản phẩm |
 
-Bảng 3. . Danh sách yêu cầu chức năng hệ thống
+Bảng 3. 6. Danh sách yêu cầu chức năng hệ thống
 
 # 3.2. Yêu cầu phi chức năng / Yêu cầu chất lượng {#yêu-cầu-phi-chức-năng-yêu-cầu-chất-lượng .P2}
 
-| **STT** | **Nội dung** | **Tiêu chuẩn** | **Mô tả chi tiết** | **Ghi chú** |
-|----|----|----|----|----|
-| 1 | Tốc độ tải trang nhanh | Hiệu quả | Trang chủ tải trong ≤ 3s. Tìm kiếm trả kết quả trong ≤ 2s. API response ≤ 500ms | Core Web Vitals |
-| 2 | Hỗ trợ responsive đa thiết bị | Tiện dụng | Giao diện tương thích tốt trên Desktop, Tablet, Mobile (breakpoint: 768px, 1024px) |  |
-| 3 | Giao diện thân thiện, hiện đại | Tiện dụng | Thiết kế trực quan, bố cục rõ ràng, người dùng mọi lứa tuổi đều dễ sử dụng. Tuân thủ UI/UX best practices |  |
-| 4 | Bảo mật thông tin người dùng | Hiệu quả | Mã hóa mật khẩu (bcrypt), truyền dữ liệu qua HTTPS, bảo vệ CSRF/XSS/SQL Injection |  |
-| 5 | Bảo mật thanh toán | Hiệu quả | Tích hợp cổng thanh toán uy tín (VNPay, MoMo). Không lưu trữ thông tin thẻ trực tiếp | PCI DSS |
-| 6 | Khả năng mở rộng hệ thống | Tiến hóa | Kiến trúc cho phép thêm module mới (chat, AI gợi ý, loyalty nâng cao) mà không ảnh hưởng hệ thống hiện tại |  |
-| 7 | Dễ dàng thay đổi công thức tính toán | Tiến hóa | Admin có thể thay đổi: đơn giá ship, quy tắc tích điểm, ngưỡng hạng thành viên qua giao diện quản trị |  |
-| 8 | Hỗ trợ đa trình duyệt | Tương thích | Hoạt động tốt trên Chrome, Firefox, Safari, Edge (2 phiên bản mới nhất) |  |
-| 9 | Tối ưu SEO | Hiệu quả | URL thân thiện, meta tags đầy đủ, sitemap tự động, hỗ trợ Open Graph cho chia sẻ mạng xã hội |  |
-| 10 | Uptime cao | Hiệu quả | Hệ thống hoạt động ổn định ≥ 99.5% thời gian. Có cơ chế failover khi có sự cố |  |
-| 11 | Dễ thao tác cho Admin | Tiện dụng | Dashboard quản trị trực quan, thao tác CRUD đơn giản, hỗ trợ bulk actions (cập nhật nhiều SP cùng lúc) |  |
-| 12 | Tái sử dụng mã nguồn | Tiến hóa | Kiến trúc component-based, code modular, có thể tái sử dụng cho các dự án tương tự | Dành cho dev |
+| **STT** | **Nội dung** | **Tiêu chuẩn** | **Mô tả chi tiết** |
+|----|----|----|----|
+| 1 | Tốc độ tải trang nhanh | Hiệu quả | Trang chủ tải trong ≤ 3s. Tìm kiếm trả kết quả trong ≤ 2s. API response ≤ 500ms |
+| 2 | Hỗ trợ responsive đa thiết bị | Tiện dụng | Giao diện tương thích tốt trên Desktop, Tablet, Mobile (breakpoint: 768px, 1024px) |
+| 3 | Giao diện thân thiện, hiện đại | Tiện dụng | Thiết kế trực quan, bố cục rõ ràng, người dùng mọi lứa tuổi đều dễ sử dụng. Tuân thủ UI/UX best practices |
+| 4 | Bảo mật thông tin người dùng | Hiệu quả | Mã hóa mật khẩu (bcrypt), truyền dữ liệu qua HTTPS, bảo vệ CSRF/XSS/SQL Injection |
+| 5 | Bảo mật thanh toán | Hiệu quả | Tích hợp cổng thanh toán uy tín (VNPay, MoMo). Không lưu trữ thông tin thẻ trực tiếp |
+| 6 | Khả năng mở rộng hệ thống | Tiến hóa | Kiến trúc cho phép thêm module mới (chat, AI gợi ý, loyalty nâng cao) mà không ảnh hưởng hệ thống hiện tại |
+| 7 | Dễ dàng thay đổi công thức tính toán | Tiến hóa | Admin có thể thay đổi: đơn giá ship, quy tắc tích điểm, ngưỡng hạng thành viên qua giao diện quản trị |
+| 8 | Hỗ trợ đa trình duyệt | Tương thích | Hoạt động tốt trên Chrome, Firefox, Safari, Edge (2 phiên bản mới nhất) |
+| 9 | Tối ưu SEO | Hiệu quả | URL thân thiện, meta tags đầy đủ, sitemap tự động, hỗ trợ Open Graph cho chia sẻ mạng xã hội |
+| 10 | Uptime cao | Hiệu quả | Hệ thống hoạt động ổn định ≥ 99.5% thời gian. Có cơ chế failover khi có sự cố |
+| 11 | Dễ thao tác cho Admin | Tiện dụng | Dashboard quản trị trực quan, thao tác CRUD đơn giản, hỗ trợ bulk actions (cập nhật nhiều SP cùng lúc) |
+| 12 | Tái sử dụng mã nguồn | Tiến hóa | Kiến trúc component-based, code modular, có thể tái sử dụng cho các dự án tương tự |
 
-Bảng 3. . Danh sách yêu cầu chất lượng / phi chức năng
+Bảng 3. 7. Danh sách yêu cầu chất lượng / phi chức năng
 
 <figure>
-<img src="media/image19.png" style="width:6.5in;height:7.45833in" alt="A diagram of a diagram Description automatically generated" />
-<figcaption><p>Hình 2. . Usecase tổng quát của hệ thống</p></figcaption>
+<img src="media/image19.png" style="width:6.5in;height:8.46875in" />
+<figcaption><p>Hình 2. 18. Usecase tổng quát của hệ thống</p></figcaption>
 </figure>
 
 <figure>
-<img src="media/image20.png" style="width:6.5in;height:3.97888in" />
-<figcaption><p>Hình 2. . Usecase chi tiết module quản lý đơn hàng</p></figcaption>
+<img src="media/image20.png" style="width:6.48958in;height:4.16667in" />
+<figcaption><p>Hình 2. 19. Usecase chi tiết module quản lý đơn hàng</p></figcaption>
 </figure>
 
 <figure>
-<img src="media/image21.png" style="width:6.49953in;height:4.01042in" alt="A diagram of a company Description automatically generated with medium confidence" />
-<figcaption><p>Hình 2. . Usecase chi tiết module quản lý sản phẩm</p></figcaption>
+<img src="media/image21.png" style="width:6.51042in;height:3.83333in" />
+<figcaption><p>Hình 2. 20. Usecase chi tiết module quản lý sản phẩm</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image22.png" style="width:6.48958in;height:3.65607in" alt="A diagram of a company Description automatically generated" />
-<figcaption><p>Hình 2. . Usecase chi tiết module đặt hàng</p></figcaption>
+<figcaption><p>Hình 2. 21. Usecase chi tiết module đặt hàng</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image23.png" style="width:6.46875in;height:4.33333in" />
-<figcaption><p>Hình 2. . Usecase chi tiết module quản lý người dùng</p></figcaption>
+<figcaption><p>Hình 2. 22. Usecase chi tiết module quản lý người dùng</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image24.png" style="width:6.5in;height:4.13889in" />
-<figcaption><p>Hình 2. . Usecase chi tiết module về tài khoản</p></figcaption>
+<figcaption><p>Hình 2. 23. Usecase chi tiết module về tài khoản</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image25.png" style="width:6.51042in;height:3.78125in" alt="A diagram of a diagram Description automatically generated" />
-<figcaption><p>Hình 2. . Usecase chi tiết module thống kê</p></figcaption>
+<figcaption><p>Hình 2. 24. Usecase chi tiết module thống kê</p></figcaption>
 </figure>
