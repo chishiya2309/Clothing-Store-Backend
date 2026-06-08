@@ -17,7 +17,7 @@ public class EmailNotificationListener {
     private final EmailService emailService;
 
     @Async
-    @EventListener
+    @org.springframework.transaction.event.TransactionalEventListener(phase = org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT)
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
         log.info("Received UserRegisteredEvent for email: {}", event.getEmail());
         emailService.sendVerificationEmail(event.getEmail(), event.getFullName(), event.getToken());
