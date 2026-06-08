@@ -153,14 +153,10 @@ public class BrevoEmailServiceImpl implements EmailService {
                 .formatted(escapedName, verificationLink, verificationLink);
     }
 
-    private @NonNull String buildPasswordResetEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
-        // Using frontend URL if applicable, but falling back to backend/frontend
-        // standard flow
-        // The frontend should have a route like /reset-password?token=...
-        // For simplicity assuming there is a frontend URL variable or using backend URL
-        String resetLink = backendUrl.replace(":8080", ":3000") + "/reset-password?token=" + token;
-
+        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
+        String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
+        String resetLink = baseUrl + "/reset-password?token=" + encodedToken;
         return """
                 <html>
                                 <body style="margin:0;padding:0;background:#FAFAF8;">
