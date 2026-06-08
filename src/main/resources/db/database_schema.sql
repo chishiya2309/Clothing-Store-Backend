@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";  -- UUID generation, password hashing
 -- ENUM TYPES
 -- ============================================================
 
-CREATE TYPE user_role AS ENUM ('admin', 'customer');
+CREATE TYPE user_role AS ENUM ('admin', 'customer', 'staff');
 CREATE TYPE gender_type AS ENUM ('male', 'female', 'other');
 CREATE TYPE order_status AS ENUM ('pending', 'processing', 'shipping', 'completed', 'cancelled');
 CREATE TYPE payment_method AS ENUM ('cod', 'vnpay', 'momo');

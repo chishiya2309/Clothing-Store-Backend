@@ -165,57 +165,68 @@
 					<type xmi:idref="EAID_64B1E6BF_17B8_4f4c_84C8_842D14C375D5"/>
 				</ownedEnd>
 			</packagedElement>
-			<packagedElement xmi:type="uml:Actor" xmi:id="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" name="Quan tri vien" visibility="public"/>
-			<packagedElement xmi:type="uml:Association" xmi:id="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B" visibility="public">
-				<memberEnd xmi:idref="EAID_dstECBCB6_A723_4c79_AB33_D52D9D329D9B"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dstECBCB6_A723_4c79_AB33_D52D9D329D9B" visibility="public" association="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+			<packagedElement xmi:type="uml:Actor" xmi:id="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" name="Nhan vien cua hang" visibility="public"/>
+			<packagedElement xmi:type="uml:Association" xmi:id="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429" visibility="public">
+				<memberEnd xmi:idref="EAID_dst869E7C_D7D4_47be_A1C0_CFF53587C429"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst869E7C_D7D4_47be_A1C0_CFF53587C429" visibility="public" association="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
 					<type xmi:idref="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC"/>
 				</ownedEnd>
-				<memberEnd xmi:idref="EAID_srcECBCB6_A723_4c79_AB33_D52D9D329D9B"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcECBCB6_A723_4c79_AB33_D52D9D329D9B" visibility="public" association="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251"/>
+				<memberEnd xmi:idref="EAID_src869E7C_D7D4_47be_A1C0_CFF53587C429"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src869E7C_D7D4_47be_A1C0_CFF53587C429" visibility="public" association="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
 				</ownedEnd>
 			</packagedElement>
-			<packagedElement xmi:type="uml:Association" xmi:id="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69" visibility="public">
-				<memberEnd xmi:idref="EAID_dst0BA5CD_98B9_4dfc_89A6_4D193AF74B69"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst0BA5CD_98B9_4dfc_89A6_4D193AF74B69" visibility="public" association="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C"/>
-				</ownedEnd>
-				<memberEnd xmi:idref="EAID_src0BA5CD_98B9_4dfc_89A6_4D193AF74B69"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src0BA5CD_98B9_4dfc_89A6_4D193AF74B69" visibility="public" association="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251"/>
-				</ownedEnd>
-			</packagedElement>
-			<packagedElement xmi:type="uml:Association" xmi:id="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F" visibility="public">
-				<memberEnd xmi:idref="EAID_dst04F176_ADD8_47cf_B97D_03530CB5DB8F"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst04F176_ADD8_47cf_B97D_03530CB5DB8F" visibility="public" association="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D"/>
-				</ownedEnd>
-				<memberEnd xmi:idref="EAID_src04F176_ADD8_47cf_B97D_03530CB5DB8F"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src04F176_ADD8_47cf_B97D_03530CB5DB8F" visibility="public" association="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251"/>
-				</ownedEnd>
-			</packagedElement>
-			<packagedElement xmi:type="uml:Association" xmi:id="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F" visibility="public">
-				<memberEnd xmi:idref="EAID_dstAEAADF_5ACD_4299_AF78_EB134117D76F"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dstAEAADF_5ACD_4299_AF78_EB134117D76F" visibility="public" association="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+			<packagedElement xmi:type="uml:Association" xmi:id="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF" visibility="public">
+				<memberEnd xmi:idref="EAID_dst7906B4_0681_44f2_B058_DF0BE4A6DDCF"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst7906B4_0681_44f2_B058_DF0BE4A6DDCF" visibility="public" association="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
 					<type xmi:idref="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA"/>
 				</ownedEnd>
-				<memberEnd xmi:idref="EAID_srcAEAADF_5ACD_4299_AF78_EB134117D76F"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcAEAADF_5ACD_4299_AF78_EB134117D76F" visibility="public" association="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251"/>
+				<memberEnd xmi:idref="EAID_src7906B4_0681_44f2_B058_DF0BE4A6DDCF"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src7906B4_0681_44f2_B058_DF0BE4A6DDCF" visibility="public" association="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
 				</ownedEnd>
 			</packagedElement>
-			<packagedElement xmi:type="uml:Association" xmi:id="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B" visibility="public">
-				<memberEnd xmi:idref="EAID_dstF379F6_1211_4449_BF32_7C5F2221A61B"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dstF379F6_1211_4449_BF32_7C5F2221A61B" visibility="public" association="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+			<packagedElement xmi:type="uml:Association" xmi:id="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331" visibility="public">
+				<memberEnd xmi:idref="EAID_dst49AB66_8809_4dd3_B020_0F368E51F331"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst49AB66_8809_4dd3_B020_0F368E51F331" visibility="public" association="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C"/>
+				</ownedEnd>
+				<memberEnd xmi:idref="EAID_src49AB66_8809_4dd3_B020_0F368E51F331"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src49AB66_8809_4dd3_B020_0F368E51F331" visibility="public" association="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
+				</ownedEnd>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Association" xmi:id="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F" visibility="public">
+				<memberEnd xmi:idref="EAID_dstFA255F_DB78_4f17_8C80_120CE07CBD5F"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dstFA255F_DB78_4f17_8C80_120CE07CBD5F" visibility="public" association="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82"/>
+				</ownedEnd>
+				<memberEnd xmi:idref="EAID_srcFA255F_DB78_4f17_8C80_120CE07CBD5F"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcFA255F_DB78_4f17_8C80_120CE07CBD5F" visibility="public" association="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
+				</ownedEnd>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Association" xmi:id="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A" visibility="public">
+				<memberEnd xmi:idref="EAID_dst63BCAA_30EB_4d58_9969_B6769AEA2A2A"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst63BCAA_30EB_4d58_9969_B6769AEA2A2A" visibility="public" association="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
 					<type xmi:idref="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773"/>
 				</ownedEnd>
-				<memberEnd xmi:idref="EAID_srcF379F6_1211_4449_BF32_7C5F2221A61B"/>
-				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcF379F6_1211_4449_BF32_7C5F2221A61B" visibility="public" association="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
-					<type xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251"/>
+				<memberEnd xmi:idref="EAID_src63BCAA_30EB_4d58_9969_B6769AEA2A2A"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_src63BCAA_30EB_4d58_9969_B6769AEA2A2A" visibility="public" association="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
 				</ownedEnd>
 			</packagedElement>
+			<packagedElement xmi:type="uml:Association" xmi:id="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B" visibility="public">
+				<memberEnd xmi:idref="EAID_dstFDE1FA_9690_4a3a_B064_B415E4D0683B"/>
+				<memberEnd xmi:idref="EAID_srcFDE1FA_9690_4a3a_B064_B415E4D0683B"/>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_srcFDE1FA_9690_4a3a_B064_B415E4D0683B" visibility="public" association="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D"/>
+				</ownedEnd>
+				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dstFDE1FA_9690_4a3a_B064_B415E4D0683B" visibility="public" association="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
+					<type xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
+				</ownedEnd>
+			</packagedElement>
+			<packagedElement xmi:type="uml:Actor" xmi:id="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" name="Quan tri vien" visibility="public"/>
 			<packagedElement xmi:type="uml:Association" xmi:id="EAID_747C5F75_8E8A_4151_9E82_88C4AC2D6CB7" visibility="public">
 				<memberEnd xmi:idref="EAID_dst7C5F75_8E8A_4151_9E82_88C4AC2D6CB7"/>
 				<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst7C5F75_8E8A_4151_9E82_88C4AC2D6CB7" visibility="public" association="EAID_747C5F75_8E8A_4151_9E82_88C4AC2D6CB7" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
@@ -268,7 +279,7 @@
 			<packagedElement xmi:type="uml:UseCase" xmi:id="EAID_D4BCEC42_C9B8_4800_A168_BD5838D2FD0F" name="Tim kiem san pham" visibility="public"/>
 			<packagedElement xmi:type="uml:UseCase" xmi:id="EAID_650D59B3_5634_41ad_A407_D79A8D6AE51D" name="Xem blog / tin tuc" visibility="public"/>
 			<packagedElement xmi:type="uml:UseCase" xmi:id="EAID_038DC745_38C5_43a3_8C29_8200FACE393E" name="Xem san pham" visibility="public"/>
-			<packagedElement xmi:type="uml:Class" xmi:id="EAID_FC0AC4F2_25D1_479a_B148_83F408E80D15" name="H? th?ng website bán qu?n áo" visibility="public"/>
+			<packagedElement xmi:type="uml:Class" xmi:id="EAID_FC0AC4F2_25D1_479a_B148_83F408E80D15" name="He thong website ban quan ao" visibility="public"/>
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_386A9212_38E8_4fc1_A441_A9E461D44A03" name="UseCase_ChiTiet_DatHang" visibility="public">
 				<packagedElement xmi:type="uml:Actor" xmi:id="EAID_E02B2F65_7BCE_4060_A4CB_C5B6A0BB23AB" name="Khach hang" visibility="public">
 					<ownedAttribute xmi:type="uml:Property" xmi:id="EAID_dst5E9F63_389C_4a5b_8614_C5D9CDB52566" visibility="public" association="EAID_9C5E9F63_389C_4a5b_8614_C5D9CDB52566" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
@@ -300,7 +311,7 @@
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_603D3764_AD67_4a82_9120_FAB3C33626B7" name="Dat hang va thanh toan" visibility="public"/>
 			</packagedElement>
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_26759748_C6E1_4634_BF0E_2A03F75FF4AF" name="UseCase_ChiTiet_QuanLyDonHang" visibility="public">
-				<packagedElement xmi:type="uml:Actor" xmi:id="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873" name="Quan tri vien" visibility="public"/>
+				<packagedElement xmi:type="uml:Actor" xmi:id="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873" name="Nhan vien cua hang" visibility="public"/>
 				<packagedElement xmi:type="uml:Association" xmi:id="EAID_0500B4E7_E65A_4f60_80E2_7CA971A0F702" visibility="public">
 					<memberEnd xmi:idref="EAID_dst00B4E7_E65A_4f60_80E2_7CA971A0F702"/>
 					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst00B4E7_E65A_4f60_80E2_7CA971A0F702" visibility="public" association="EAID_0500B4E7_E65A_4f60_80E2_7CA971A0F702" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
@@ -355,7 +366,7 @@
 				<packagedElement xmi:type="uml:Class" xmi:id="EAID_795EB46C_1070_4e4f_9C0F_1C847508A096" name="Quan li nguoi dung" visibility="public"/>
 			</packagedElement>
 			<packagedElement xmi:type="uml:Package" xmi:id="EAPK_0341C28B_3757_4a84_A79E_538DA0F11107" name="UseCase_ChiTiet_QuanLySanPham" visibility="public">
-				<packagedElement xmi:type="uml:Actor" xmi:id="EAID_B20B7659_56A4_4ae0_AA7B_31324A364580" name="Quan tri vien" visibility="public"/>
+				<packagedElement xmi:type="uml:Actor" xmi:id="EAID_B20B7659_56A4_4ae0_AA7B_31324A364580" name="Nhan vien cua hang" visibility="public"/>
 				<packagedElement xmi:type="uml:Association" xmi:id="EAID_091DC5F6_6260_443d_9525_962DA4533860" visibility="public">
 					<memberEnd xmi:idref="EAID_dst1DC5F6_6260_443d_9525_962DA4533860"/>
 					<ownedEnd xmi:type="uml:Property" xmi:id="EAID_dst1DC5F6_6260_443d_9525_962DA4533860" visibility="public" association="EAID_091DC5F6_6260_443d_9525_962DA4533860" isStatic="false" isReadOnly="false" isDerived="false" isOrdered="false" isUnique="true" isDerivedUnion="false" aggregation="none">
@@ -559,6 +570,24 @@
 					<Association xmi:id="EAID_E05B2E56_8393_4bd9_B163_5331B99A7446" start="EAID_64B1E6BF_17B8_4f4c_84C8_842D14C375D5" end="EAID_D4BCEC42_C9B8_4800_A168_BD5838D2FD0F"/>
 				</links>
 			</element>
+			<element xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" xmi:type="uml:Actor" name="Nhan vien cua hang" scope="public">
+				<model package="EAPK_F86B99E6_5F37_4cbf_A968_055AF5C1FC26" tpos="0" ea_localid="88" ea_eleType="element"/>
+				<properties isSpecification="false" sType="Actor" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
+				<project author="lequa" version="1.0" phase="1.0" created="2026-06-08 15:49:36" modified="2026-06-08 15:49:41" complexity="1" status="Proposed"/>
+				<code gentype="&lt;none&gt;"/>
+				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
+				<tags/>
+				<xrefs/>
+				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
+				<links>
+					<Association xmi:id="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC"/>
+					<Association xmi:id="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA"/>
+					<Association xmi:id="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C"/>
+					<Association xmi:id="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82"/>
+					<Association xmi:id="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773"/>
+					<Association xmi:id="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B" start="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D" end="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
+				</links>
+			</element>
 			<element xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" xmi:type="uml:Actor" name="Quan tri vien" scope="public">
 				<model package="EAPK_F86B99E6_5F37_4cbf_A968_055AF5C1FC26" tpos="0" ea_localid="20" ea_eleType="element"/>
 				<properties isSpecification="false" sType="Actor" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
@@ -569,11 +598,6 @@
 				<xrefs/>
 				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
 				<links>
-					<Association xmi:id="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC"/>
-					<Association xmi:id="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C"/>
-					<Association xmi:id="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D"/>
-					<Association xmi:id="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA"/>
-					<Association xmi:id="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773"/>
 					<Association xmi:id="EAID_747C5F75_8E8A_4151_9E82_88C4AC2D6CB7" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_DB2A1832_7ACC_4ac3_A7ED_9B0716568F2D"/>
 					<Association xmi:id="EAID_88E7F332_5F1E_45e9_B3DF_27CBB0179047" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82"/>
 					<Association xmi:id="EAID_9458DD26_6DDA_4530_9835_EE80D1332F6B" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_04B4EC98_AEF3_4722_9D35_BF28C658A401"/>
@@ -604,6 +628,7 @@
 				<links>
 					<Association xmi:id="EAID_88E7F332_5F1E_45e9_B3DF_27CBB0179047" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82"/>
 					<Association xmi:id="EAID_979C2398_052E_4646_9FCD_6DBF90B996E6" start="EAID_07865AE4_A3B5_4bcf_9FA7_16C32A360BE4" end="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82"/>
+					<Association xmi:id="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82"/>
 				</links>
 			</element>
 			<element xmi:idref="EAID_16AB8F51_1402_4d92_9339_9783A3392D21" xmi:type="uml:UseCase" name="Danh gia san pham" scope="public">
@@ -669,7 +694,7 @@
 				<xrefs/>
 				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
 				<links>
-					<Association xmi:id="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C"/>
+					<Association xmi:id="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C"/>
 				</links>
 			</element>
 			<element xmi:idref="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773" xmi:type="uml:UseCase" name="Quan ly don hang" scope="public">
@@ -683,7 +708,7 @@
 				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
 				<links>
 					<UseCase xmi:id="EAID_F977E06E_5FDD_4561_AC19_32539FC34DAA" start="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773" end="EAID_04B4EC98_AEF3_4722_9D35_BF28C658A401"/>
-					<Association xmi:id="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773"/>
+					<Association xmi:id="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773"/>
 				</links>
 			</element>
 			<element xmi:idref="EAID_65CFC14F_F426_46dc_BC5F_FCFED64BFCC0" xmi:type="uml:UseCase" name="Quan ly gio hang" scope="public">
@@ -710,7 +735,7 @@
 				<xrefs/>
 				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
 				<links>
-					<Association xmi:id="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC"/>
+					<Association xmi:id="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC"/>
 				</links>
 			</element>
 			<element xmi:idref="EAID_DB2A1832_7ACC_4ac3_A7ED_9B0716568F2D" xmi:type="uml:UseCase" name="Quan ly nguoi dung" scope="public">
@@ -736,7 +761,7 @@
 				<xrefs/>
 				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
 				<links>
-					<Association xmi:id="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D"/>
+					<Association xmi:id="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B" start="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D" end="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6"/>
 				</links>
 			</element>
 			<element xmi:idref="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA" xmi:type="uml:UseCase" name="Quan ly san pham" scope="public">
@@ -750,7 +775,7 @@
 				<extendedProperties tagged="0" package_name="UseCaseOverview"/>
 				<links>
 					<UseCase xmi:id="EAID_4C1148B1_CBC2_4ad0_8973_C1430CDE7021" start="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA" end="EAID_04B4EC98_AEF3_4722_9D35_BF28C658A401"/>
-					<Association xmi:id="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F" start="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" end="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA"/>
+					<Association xmi:id="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF" start="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" end="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA"/>
 				</links>
 			</element>
 			<element xmi:idref="EAID_642C24D7_A4C9_4b55_B6DB_A198AB4EFE51" xmi:type="uml:UseCase" name="Quan ly tai khoan ca nhan" scope="public">
@@ -823,10 +848,10 @@
 					<Association xmi:id="EAID_F771A4FA_3E71_46b4_94DA_C7137C967341" start="EAID_07865AE4_A3B5_4bcf_9FA7_16C32A360BE4" end="EAID_038DC745_38C5_43a3_8C29_8200FACE393E"/>
 				</links>
 			</element>
-			<element xmi:idref="EAID_FC0AC4F2_25D1_479a_B148_83F408E80D15" xmi:type="uml:Boundary" name="H? th?ng website bán qu?n áo" scope="public">
+			<element xmi:idref="EAID_FC0AC4F2_25D1_479a_B148_83F408E80D15" xmi:type="uml:Boundary" name="He thong website ban quan ao" scope="public">
 				<model package="EAPK_F86B99E6_5F37_4cbf_A968_055AF5C1FC26" tpos="0" ea_localid="7" ea_eleType="element"/>
 				<properties isSpecification="false" sType="Boundary" nType="0" scope="public"/>
-				<project author="lequa" version="1.0" phase="1.0" created="2026-05-30 22:07:56" modified="2026-05-30 22:08:10" complexity="1" status="Proposed"/>
+				<project author="lequa" version="1.0" phase="1.0" created="2026-05-30 22:07:56" modified="2026-06-08 15:55:11" complexity="1" status="Proposed"/>
 				<code gentype="&lt;none&gt;"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=3;"/>
 				<tags/>
@@ -981,10 +1006,10 @@
 				<times created="2026-05-30 22:34:14" modified="2026-05-30 22:36:35"/>
 				<flags iscontrolled="FALSE" isprotected="FALSE" usedtd="FALSE" logxml="FALSE"/>
 			</element>
-			<element xmi:idref="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873" xmi:type="uml:Actor" name="Quan tri vien" scope="public">
+			<element xmi:idref="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873" xmi:type="uml:Actor" name="Nhan vien cua hang" scope="public">
 				<model package="EAPK_26759748_C6E1_4634_BF0E_2A03F75FF4AF" tpos="0" ea_localid="31" ea_eleType="element"/>
 				<properties isSpecification="false" sType="Actor" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
-				<project author="Admin" version="1.0" phase="1.0" created="2026-05-30 20:27:27" modified="2026-05-30 22:34:49" complexity="1" status="Proposed"/>
+				<project author="Admin" version="1.0" phase="1.0" created="2026-05-30 20:27:27" modified="2026-06-08 15:57:02" complexity="1" status="Proposed"/>
 				<code gentype="&lt;none&gt;"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags/>
@@ -1207,10 +1232,10 @@
 				<times created="2026-05-30 22:38:28" modified="2026-05-30 22:38:28"/>
 				<flags iscontrolled="FALSE" isprotected="FALSE" usedtd="FALSE" logxml="FALSE"/>
 			</element>
-			<element xmi:idref="EAID_B20B7659_56A4_4ae0_AA7B_31324A364580" xmi:type="uml:Actor" name="Quan tri vien" scope="public">
+			<element xmi:idref="EAID_B20B7659_56A4_4ae0_AA7B_31324A364580" xmi:type="uml:Actor" name="Nhan vien cua hang" scope="public">
 				<model package="EAPK_0341C28B_3757_4a84_A79E_538DA0F11107" tpos="0" ea_localid="41" ea_eleType="element"/>
 				<properties isSpecification="false" sType="Actor" nType="0" scope="public" isRoot="false" isLeaf="false" isAbstract="false"/>
-				<project author="Admin" version="1.0" phase="1.0" created="2026-05-30 20:31:36" modified="2026-05-30 22:39:47" complexity="1" status="Proposed"/>
+				<project author="Admin" version="1.0" phase="1.0" created="2026-05-30 20:31:36" modified="2026-06-08 15:57:55" complexity="1" status="Proposed"/>
 				<code gentype="&lt;none&gt;"/>
 				<style appearance="BackColor=-1;BorderColor=-1;BorderWidth=-1;FontColor=-1;VSwimLanes=1;HSwimLanes=1;BorderStyle=0;"/>
 				<tags/>
@@ -2107,9 +2132,9 @@
 				<xrefs/>
 				<tags/>
 			</connector>
-			<connector xmi:idref="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B">
-				<source xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251">
-					<model ea_localid="20" type="Actor" name="Quan tri vien"/>
+			<connector xmi:idref="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429">
+				<source xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6">
+					<model ea_localid="88" type="Actor" name="Nhan vien cua hang"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -2130,7 +2155,7 @@
 					<xrefs/>
 					<tags/>
 				</target>
-				<model ea_localid="25"/>
+				<model ea_localid="71"/>
 				<properties ea_type="Association" direction="Unspecified"/>
 				<modifiers isRoot="false" isLeaf="false"/>
 				<parameterSubstitutions/>
@@ -2142,79 +2167,9 @@
 				<xrefs/>
 				<tags/>
 			</connector>
-			<connector xmi:idref="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69">
-				<source xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251">
-					<model ea_localid="20" type="Actor" name="Quan tri vien"/>
-					<role visibility="Public" targetScope="instance"/>
-					<type aggregation="none" containment="Unspecified"/>
-					<constraints/>
-					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
-					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
-					<documentation/>
-					<xrefs/>
-					<tags/>
-				</source>
-				<target xmi:idref="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C">
-					<model ea_localid="24" type="UseCase" name="Quan ly danh muc"/>
-					<role visibility="Public" targetScope="instance"/>
-					<type aggregation="none" containment="Unspecified"/>
-					<constraints/>
-					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
-					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
-					<documentation/>
-					<xrefs/>
-					<tags/>
-				</target>
-				<model ea_localid="22"/>
-				<properties ea_type="Association" direction="Unspecified"/>
-				<modifiers isRoot="false" isLeaf="false"/>
-				<parameterSubstitutions/>
-				<documentation/>
-				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
-				<labels/>
-				<extendedProperties virtualInheritance="0"/>
-				<style/>
-				<xrefs/>
-				<tags/>
-			</connector>
-			<connector xmi:idref="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F">
-				<source xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251">
-					<model ea_localid="20" type="Actor" name="Quan tri vien"/>
-					<role visibility="Public" targetScope="instance"/>
-					<type aggregation="none" containment="Unspecified"/>
-					<constraints/>
-					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
-					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
-					<documentation/>
-					<xrefs/>
-					<tags/>
-				</source>
-				<target xmi:idref="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D">
-					<model ea_localid="28" type="UseCase" name="Quan ly noi dung"/>
-					<role visibility="Public" targetScope="instance"/>
-					<type aggregation="none" containment="Unspecified"/>
-					<constraints/>
-					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
-					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
-					<documentation/>
-					<xrefs/>
-					<tags/>
-				</target>
-				<model ea_localid="28"/>
-				<properties ea_type="Association" direction="Unspecified"/>
-				<modifiers isRoot="false" isLeaf="false"/>
-				<parameterSubstitutions/>
-				<documentation/>
-				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
-				<labels/>
-				<extendedProperties virtualInheritance="0"/>
-				<style/>
-				<xrefs/>
-				<tags/>
-			</connector>
-			<connector xmi:idref="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F">
-				<source xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251">
-					<model ea_localid="20" type="Actor" name="Quan tri vien"/>
+			<connector xmi:idref="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF">
+				<source xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6">
+					<model ea_localid="88" type="Actor" name="Nhan vien cua hang"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -2235,7 +2190,7 @@
 					<xrefs/>
 					<tags/>
 				</target>
-				<model ea_localid="20"/>
+				<model ea_localid="68"/>
 				<properties ea_type="Association" direction="Unspecified"/>
 				<modifiers isRoot="false" isLeaf="false"/>
 				<parameterSubstitutions/>
@@ -2247,9 +2202,79 @@
 				<xrefs/>
 				<tags/>
 			</connector>
-			<connector xmi:idref="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B">
-				<source xmi:idref="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251">
-					<model ea_localid="20" type="Actor" name="Quan tri vien"/>
+			<connector xmi:idref="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331">
+				<source xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6">
+					<model ea_localid="88" type="Actor" name="Nhan vien cua hang"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C">
+					<model ea_localid="24" type="UseCase" name="Quan ly danh muc"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="67"/>
+				<properties ea_type="Association" direction="Unspecified"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F">
+				<source xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6">
+					<model ea_localid="88" type="Actor" name="Nhan vien cua hang"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82">
+					<model ea_localid="21" type="UseCase" name="Dang nhap"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="70"/>
+				<properties ea_type="Association" direction="Unspecified"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A">
+				<source xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6">
+					<model ea_localid="88" type="Actor" name="Nhan vien cua hang"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -2270,7 +2295,42 @@
 					<xrefs/>
 					<tags/>
 				</target>
-				<model ea_localid="23"/>
+				<model ea_localid="69"/>
+				<properties ea_type="Association" direction="Unspecified"/>
+				<modifiers isRoot="false" isLeaf="false"/>
+				<parameterSubstitutions/>
+				<documentation/>
+				<appearance linemode="3" linecolor="-1" linewidth="0" seqno="0" headStyle="0" lineStyle="0"/>
+				<labels/>
+				<extendedProperties virtualInheritance="0"/>
+				<style/>
+				<xrefs/>
+				<tags/>
+			</connector>
+			<connector xmi:idref="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B">
+				<source xmi:idref="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D">
+					<model ea_localid="28" type="UseCase" name="Quan ly noi dung"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</source>
+				<target xmi:idref="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6">
+					<model ea_localid="88" type="Actor" name="Nhan vien cua hang"/>
+					<role visibility="Public" targetScope="instance"/>
+					<type aggregation="none" containment="Unspecified"/>
+					<constraints/>
+					<modifiers isOrdered="false" changeable="none" isNavigable="false"/>
+					<style value="Union=0;Derived=0;AllowDuplicates=0;Owned=0;Navigable=Unspecified;"/>
+					<documentation/>
+					<xrefs/>
+					<tags/>
+				</target>
+				<model ea_localid="72"/>
 				<properties ea_type="Association" direction="Unspecified"/>
 				<modifiers isRoot="false" isLeaf="false"/>
 				<parameterSubstitutions/>
@@ -2418,7 +2478,7 @@
 				<labels mb=" &#xA;«extend»"/>
 				<extendedProperties conditional=" &#xA;«extend»" virtualInheritance="0"/>
 				<style/>
-				<xrefs value="$XREFPROP=$XID={64E0E112-9B74-47d4-97BC-BBD5140CB7B0}$XID;$NAM=Stereotypes$NAM;$TYP=connector property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=extend;@ENDSTEREO;$DES;$CLT={F977E06E-5FDD-4561-AC19-32539FC34DAA}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
+				<xrefs value="$XREFPROP=$XID={64E0E112-9B74-47d4-97BC-BBD5140CB7B0}$XID;$NAM=Stereotypes$NAM;$TYP=connector property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=extend;@ENDSTEREO;$DES;$CLT={F977E06E-5FDD-4561-AC19-32539FC34DAA}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;$XREFPROP=$XID={3FBA644B-1D1A-427c-AF2E-D2C0CB80EB19}$XID;$NAM=MOFProps$NAM;$TYP=connector property$TYP;$VIS=Public$VIS;$BEH=extensionLocation$BEH;$PAR=0$PAR;$DES=-1;0;0$DES;$CLT={F977E06E-5FDD-4561-AC19-32539FC34DAA}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
 				<tags/>
 			</connector>
 			<connector xmi:idref="EAID_4C1148B1_CBC2_4ad0_8973_C1430CDE7021">
@@ -2452,7 +2512,7 @@
 				<labels mb=" &#xA;«extend»"/>
 				<extendedProperties conditional=" &#xA;«extend»" virtualInheritance="0"/>
 				<style/>
-				<xrefs value="$XREFPROP=$XID={AA9B0F98-7778-45ac-B720-B34E0439F647}$XID;$NAM=Stereotypes$NAM;$TYP=connector property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=extend;GUID={FFE1DC0B-84E0-4d41-93A2-F75DC35C03DB};@ENDSTEREO;$DES;$CLT={4C1148B1-CBC2-4ad0-8973-C1430CDE7021}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
+				<xrefs value="$XREFPROP=$XID={AA9B0F98-7778-45ac-B720-B34E0439F647}$XID;$NAM=Stereotypes$NAM;$TYP=connector property$TYP;$VIS=Public$VIS;$PAR=0$PAR;$DES=@STEREO;Name=extend;GUID={FFE1DC0B-84E0-4d41-93A2-F75DC35C03DB};@ENDSTEREO;$DES;$CLT={4C1148B1-CBC2-4ad0-8973-C1430CDE7021}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;$XREFPROP=$XID={CEEEE62B-F779-4d89-8D04-CD74AB826A46}$XID;$NAM=MOFProps$NAM;$TYP=connector property$TYP;$VIS=Public$VIS;$BEH=extensionLocation$BEH;$PAR=0$PAR;$DES=-1;0;0$DES;$CLT={4C1148B1-CBC2-4ad0-8973-C1430CDE7021}$CLT;$SUP=&lt;none&gt;$SUP;$ENDXREF;"/>
 				<tags/>
 			</connector>
 			<connector xmi:idref="EAID_9C5E9F63_389C_4a5b_8614_C5D9CDB52566">
@@ -2696,7 +2756,7 @@
 			</connector>
 			<connector xmi:idref="EAID_0500B4E7_E65A_4f60_80E2_7CA971A0F702">
 				<source xmi:idref="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873">
-					<model ea_localid="31" type="Actor" name="Quan tri vien"/>
+					<model ea_localid="31" type="Actor" name="Nhan vien cua hang"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -3072,7 +3132,7 @@
 			</connector>
 			<connector xmi:idref="EAID_091DC5F6_6260_443d_9525_962DA4533860">
 				<source xmi:idref="EAID_B20B7659_56A4_4ae0_AA7B_31324A364580">
-					<model ea_localid="41" type="Actor" name="Quan tri vien"/>
+					<model ea_localid="41" type="Actor" name="Nhan vien cua hang"/>
 					<role visibility="Public" targetScope="instance"/>
 					<type aggregation="none" containment="Unspecified"/>
 					<constraints/>
@@ -3777,36 +3837,37 @@
 			<diagram xmi:id="EAID_3407BA21_370D_4f79_BD41_2EC0713A79C1">
 				<model package="EAPK_F86B99E6_5F37_4cbf_A968_055AF5C1FC26" localID="6" owner="EAPK_F86B99E6_5F37_4cbf_A968_055AF5C1FC26"/>
 				<properties name="UseCaseOverview" type="Use Case"/>
-				<project author="lequa" version="1.0" created="2026-05-30 22:06:30" modified="2026-05-30 22:26:40"/>
+				<project author="lequa" version="1.0" created="2026-05-30 22:06:30" modified="2026-06-08 15:53:40"/>
 				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=850;DocSize.cy=1098;ShowDetails=0;Orientation=P;Zoom=75;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=1;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
-				<style2 value="ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ProfileData=;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;SaveTag=FFD4F0AA;"/>
+				<style2 value="ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ProfileData=;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;SaveTag=0A404EE8;"/>
 				<swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=-1;bold=false;fcol=0;tcol=-1;ofCol=-1;hl=1;cls=0;"/>
 				<matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;"/>
 				<extendedProperties/>
 				<elements>
-					<element geometry="Left=188;Top=874;Right=293;Bottom=944;" subject="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D" seqno="1" style="DUID=919EBD34;"/>
-					<element geometry="Left=440;Top=856;Right=545;Bottom=926;" subject="EAID_DB2A1832_7ACC_4ac3_A7ED_9B0716568F2D" seqno="2" style="DUID=68B2D518;"/>
-					<element geometry="Left=560;Top=808;Right=665;Bottom=878;" subject="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC" seqno="3" style="DUID=3D3F1418;"/>
-					<element geometry="Left=413;Top=648;Right=518;Bottom=718;" subject="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773" seqno="4" style="DUID=A311DA1D;"/>
-					<element geometry="Left=277;Top=640;Right=382;Bottom=710;" subject="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C" seqno="5" style="DUID=867944BA;"/>
-					<element geometry="Left=328;Top=538;Right=433;Bottom=608;" subject="EAID_04B4EC98_AEF3_4722_9D35_BF28C658A401" seqno="6" style="DUID=CF7E4540;"/>
-					<element geometry="Left=157;Top=606;Right=262;Bottom=676;" subject="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA" seqno="7" style="DUID=A101D431;"/>
-					<element geometry="Left=511;Top=722;Right=616;Bottom=792;" subject="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82" seqno="8" style="DUID=CB5F0B33;"/>
-					<element geometry="Left=59;Top=794;Right=104;Bottom=884;" subject="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" seqno="9" style="DUID=46F9D2F1;"/>
-					<element geometry="Left=569;Top=614;Right=674;Bottom=684;" subject="EAID_786CD017_6AA2_468d_A73A_E9088C92C871" seqno="10" style="DUID=DA660FBE;"/>
-					<element geometry="Left=574;Top=532;Right=679;Bottom=602;" subject="EAID_40B4423C_DF7F_40e9_A2A4_56C7AE26A31E" seqno="11" style="DUID=29C2C425;"/>
-					<element geometry="Left=460;Top=532;Right=565;Bottom=602;" subject="EAID_642C24D7_A4C9_4b55_B6DB_A198AB4EFE51" seqno="12" style="DUID=8578145C;"/>
-					<element geometry="Left=461;Top=449;Right=566;Bottom=519;" subject="EAID_16AB8F51_1402_4d92_9339_9783A3392D21" seqno="13" style="DUID=A8420826;"/>
-					<element geometry="Left=729;Top=289;Right=774;Bottom=379;" subject="EAID_07865AE4_A3B5_4bcf_9FA7_16C32A360BE4" seqno="14" style="DUID=D6614A96;"/>
-					<element geometry="Left=466;Top=271;Right=571;Bottom=341;" subject="EAID_65CFC14F_F426_46dc_BC5F_FCFED64BFCC0" seqno="15" style="DUID=6ACF704D;"/>
-					<element geometry="Left=464;Top=192;Right=569;Bottom=262;" subject="EAID_650D59B3_5634_41ad_A407_D79A8D6AE51D" seqno="16" style="DUID=5E11AC26;"/>
-					<element geometry="Left=274;Top=449;Right=379;Bottom=519;" subject="EAID_038DC745_38C5_43a3_8C29_8200FACE393E" seqno="17" style="DUID=7E200FE3;"/>
-					<element geometry="Left=273;Top=358;Right=378;Bottom=428;" subject="EAID_D4BCEC42_C9B8_4800_A168_BD5838D2FD0F" seqno="18" style="DUID=7354A68B;"/>
-					<element geometry="Left=270;Top=266;Right=375;Bottom=336;" subject="EAID_A413B692_32BC_4e93_8798_427D57C39F80" seqno="19" style="DUID=C22B3A0F;"/>
-					<element geometry="Left=344;Top=149;Right=449;Bottom=219;" subject="EAID_BC8A6C9A_AEAE_419a_9FFF_819C3111DF66" seqno="20" style="DUID=F9E4909E;"/>
-					<element geometry="Left=61;Top=187;Right=106;Bottom=277;" subject="EAID_64B1E6BF_17B8_4f4c_84C8_842D14C375D5" seqno="21" style="DUID=DEF794EF;"/>
-					<element geometry="Left=136;Top=118;Right=683;Bottom=946;" subject="EAID_FC0AC4F2_25D1_479a_B148_83F408E80D15" seqno="22" style="DUID=9905C24B;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_591A8EA7_F3D0_478e_803C_033CD8613ACA" style="Mode=3;EOID=29C2C425;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="Left=345;Top=977;Right=390;Bottom=1067;" subject="EAID_93168946_1AA6_4c1d_AF81_F752BC9086B6" seqno="1" style="DUID=C9968D0E;"/>
+					<element geometry="Left=151;Top=866;Right=256;Bottom=936;" subject="EAID_FD14E41F_A9B2_4aa1_BB4E_E80C7542204D" seqno="2" style="DUID=919EBD34;"/>
+					<element geometry="Left=459;Top=861;Right=564;Bottom=931;" subject="EAID_DB2A1832_7ACC_4ac3_A7ED_9B0716568F2D" seqno="3" style="DUID=68B2D518;"/>
+					<element geometry="Left=560;Top=808;Right=665;Bottom=878;" subject="EAID_9602C35F_1152_4375_B722_37FB3C87EDDC" seqno="4" style="DUID=3D3F1418;"/>
+					<element geometry="Left=413;Top=648;Right=518;Bottom=718;" subject="EAID_3AA3CBEF_85AB_4c22_9BA1_EC885A99F773" seqno="5" style="DUID=A311DA1D;"/>
+					<element geometry="Left=277;Top=640;Right=382;Bottom=710;" subject="EAID_E7867D1B_B74D_41da_A24D_366DEE3EA43C" seqno="6" style="DUID=867944BA;"/>
+					<element geometry="Left=328;Top=538;Right=433;Bottom=608;" subject="EAID_04B4EC98_AEF3_4722_9D35_BF28C658A401" seqno="7" style="DUID=CF7E4540;"/>
+					<element geometry="Left=157;Top=606;Right=262;Bottom=676;" subject="EAID_D5A48F7C_7EFB_4fad_8F7E_622E772EBBAA" seqno="8" style="DUID=A101D431;"/>
+					<element geometry="Left=511;Top=722;Right=616;Bottom=792;" subject="EAID_65C22A20_3F0E_4e71_B7B8_E89E9FD7BF82" seqno="9" style="DUID=CB5F0B33;"/>
+					<element geometry="Left=59;Top=794;Right=104;Bottom=884;" subject="EAID_90C12EB1_BBC2_41a4_98BF_55ECAE157251" seqno="10" style="DUID=46F9D2F1;"/>
+					<element geometry="Left=569;Top=614;Right=674;Bottom=684;" subject="EAID_786CD017_6AA2_468d_A73A_E9088C92C871" seqno="11" style="DUID=DA660FBE;"/>
+					<element geometry="Left=574;Top=532;Right=679;Bottom=602;" subject="EAID_40B4423C_DF7F_40e9_A2A4_56C7AE26A31E" seqno="12" style="DUID=29C2C425;"/>
+					<element geometry="Left=460;Top=532;Right=565;Bottom=602;" subject="EAID_642C24D7_A4C9_4b55_B6DB_A198AB4EFE51" seqno="13" style="DUID=8578145C;"/>
+					<element geometry="Left=461;Top=449;Right=566;Bottom=519;" subject="EAID_16AB8F51_1402_4d92_9339_9783A3392D21" seqno="14" style="DUID=A8420826;"/>
+					<element geometry="Left=729;Top=289;Right=774;Bottom=379;" subject="EAID_07865AE4_A3B5_4bcf_9FA7_16C32A360BE4" seqno="15" style="DUID=D6614A96;"/>
+					<element geometry="Left=466;Top=271;Right=571;Bottom=341;" subject="EAID_65CFC14F_F426_46dc_BC5F_FCFED64BFCC0" seqno="16" style="DUID=6ACF704D;"/>
+					<element geometry="Left=464;Top=192;Right=569;Bottom=262;" subject="EAID_650D59B3_5634_41ad_A407_D79A8D6AE51D" seqno="17" style="DUID=5E11AC26;"/>
+					<element geometry="Left=274;Top=449;Right=379;Bottom=519;" subject="EAID_038DC745_38C5_43a3_8C29_8200FACE393E" seqno="18" style="DUID=7E200FE3;"/>
+					<element geometry="Left=273;Top=358;Right=378;Bottom=428;" subject="EAID_D4BCEC42_C9B8_4800_A168_BD5838D2FD0F" seqno="19" style="DUID=7354A68B;"/>
+					<element geometry="Left=270;Top=266;Right=375;Bottom=336;" subject="EAID_A413B692_32BC_4e93_8798_427D57C39F80" seqno="20" style="DUID=C22B3A0F;"/>
+					<element geometry="Left=344;Top=149;Right=449;Bottom=219;" subject="EAID_BC8A6C9A_AEAE_419a_9FFF_819C3111DF66" seqno="21" style="DUID=F9E4909E;"/>
+					<element geometry="Left=61;Top=187;Right=106;Bottom=277;" subject="EAID_64B1E6BF_17B8_4f4c_84C8_842D14C375D5" seqno="22" style="DUID=DEF794EF;"/>
+					<element geometry="Left=136;Top=118;Right=683;Bottom=946;" subject="EAID_FC0AC4F2_25D1_479a_B148_83F408E80D15" seqno="23" style="DUID=9905C24B;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=719:-553$;" subject="EAID_3AF50652_15B9_4552_8D55_F6FED5EDFB70" style="Mode=3;EOID=DA660FBE;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_ADD972B8_AAA2_4561_9034_A9355018A107" style="Mode=3;EOID=C22B3A0F;SOID=DEF794EF;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_E05B2E56_8393_4bd9_B163_5331B99A7446" style="Mode=3;EOID=7354A68B;SOID=DEF794EF;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=529:-362$;" subject="EAID_3BF2B6E5_E3FE_4b8f_BE49_9D23F1568A1A" style="Mode=3;EOID=7354A68B;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
@@ -3817,21 +3878,22 @@
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=350:-241$;" subject="EAID_7977997E_985B_42b4_8ABA_0BE31D40DD7E" style="Mode=3;EOID=6ACF704D;SOID=DEF794EF;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_BBE2D8CF_55BD_4c8e_BC9A_0581FCCD5420" style="Mode=3;EOID=6ACF704D;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_79B8B1EE_CFB4_40dd_8FFD_452881F76DDD" style="Mode=3;EOID=A8420826;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=14;SY=6;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=544:-183$;" subject="EAID_31010F21_3381_43b4_8C4C_92763C7C095E" style="Mode=3;EOID=F9E4909E;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_0D987CD0_7B61_48fd_BD4A_C35005348D01" style="Mode=3;EOID=F9E4909E;SOID=DEF794EF;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=591:-485$;" subject="EAID_16AE41A1_6651_4fb9_A2BC_27167F7EAFFB" style="Mode=3;EOID=8578145C;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_5204F176_ADD8_47cf_B97D_03530CB5DB8F" style="Mode=3;EOID=919EBD34;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=719:-553$;" subject="EAID_3AF50652_15B9_4552_8D55_F6FED5EDFB70" style="Mode=3;EOID=DA660FBE;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_591A8EA7_F3D0_478e_803C_033CD8613ACA" style="Mode=3;EOID=29C2C425;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=611:-995$;" subject="EAID_3C869E7C_D7D4_47be_A1C0_CFF53587C429" style="Mode=3;EOID=3D3F1418;SOID=C9968D0E;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=750:-718$;" subject="EAID_979C2398_052E_4646_9FCD_6DBF90B996E6" style="Mode=3;EOID=CB5F0B33;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_88E7F332_5F1E_45e9_B3DF_27CBB0179047" style="Mode=3;EOID=CB5F0B33;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_5BAEAADF_5ACD_4299_AF78_EB134117D76F" style="Mode=3;EOID=A101D431;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_E063BCAA_30EB_4d58_9969_B6769AEA2A2A" style="Mode=3;EOID=A311DA1D;SOID=C9968D0E;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_4C1148B1_CBC2_4ad0_8973_C1430CDE7021" style="Mode=3;EOID=CF7E4540;SOID=A101D431;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_190BA5CD_98B9_4dfc_89A6_4D193AF74B69" style="Mode=3;EOID=867944BA;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_71F379F6_1211_4449_BF32_7C5F2221A61B" style="Mode=3;EOID=A311DA1D;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_F977E06E_5FDD_4561_AC19_32539FC34DAA" style="Mode=3;EOID=CF7E4540;SOID=A311DA1D;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_16ECBCB6_A723_4c79_AB33_D52D9D329D9B" style="Mode=3;EOID=3D3F1418;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_747C5F75_8E8A_4151_9E82_88C4AC2D6CB7" style="Mode=3;EOID=68B2D518;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=471:-844$;" subject="EAID_CFFA255F_DB78_4f17_8C80_120CE07CBD5F" style="Mode=3;EOID=CB5F0B33;SOID=C9968D0E;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_59FDE1FA_9690_4a3a_B064_B415E4D0683B" style="Mode=3;EOID=C9968D0E;SOID=919EBD34;Color=-1;LWidth=0;Hidden=0;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=81:-573$;" subject="EAID_9458DD26_6DDA_4530_9835_EE80D1332F6B" style="Mode=3;EOID=CF7E4540;SOID=46F9D2F1;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=14;SY=6;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=544:-183$;" subject="EAID_31010F21_3381_43b4_8C4C_92763C7C095E" style="Mode=3;EOID=F9E4909E;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_CD49AB66_8809_4dd3_B020_0F368E51F331" style="Mode=3;EOID=867944BA;SOID=C9968D0E;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_9B7906B4_0681_44f2_B058_DF0BE4A6DDCF" style="Mode=3;EOID=A101D431;SOID=C9968D0E;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=591:-485$;" subject="EAID_16AE41A1_6651_4fb9_A2BC_27167F7EAFFB" style="Mode=3;EOID=8578145C;SOID=D6614A96;Color=-1;LWidth=0;Hidden=0;"/>
 				</elements>
 			</diagram>
 			<diagram xmi:id="EAID_B5E08BA1_5055_4cb9_9DD4_36EF35C3AC6C">
@@ -3865,9 +3927,9 @@
 			<diagram xmi:id="EAID_387646C4_5C01_45ab_88EB_13848D8667F0">
 				<model package="EAPK_26759748_C6E1_4634_BF0E_2A03F75FF4AF" localID="7" owner="EAPK_26759748_C6E1_4634_BF0E_2A03F75FF4AF"/>
 				<properties name="UseCase_ChiTiet_QuanLyDonHang" type="Use Case"/>
-				<project author="Admin" version="1.0" created="2026-05-30 20:25:12" modified="2026-05-30 22:36:47"/>
-				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=0;PPgs.cy=0;DocSize.cx=850;DocSize.cy=1098;ShowDetails=0;Orientation=P;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=1;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
-				<style2 value="SaveTag=F03579D1;ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ProfileData=;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;"/>
+				<project author="Admin" version="1.0" created="2026-05-30 20:25:12" modified="2026-06-08 15:57:05"/>
+				<style1 value="ShowPrivate=1;ShowProtected=1;ShowPublic=1;HideRelationships=0;Locked=0;Border=1;HighlightForeign=1;PackageContents=1;SequenceNotes=0;ScalePrintImage=0;PPgs.cx=1;PPgs.cy=1;DocSize.cx=850;DocSize.cy=1098;ShowDetails=0;Orientation=P;Zoom=100;ShowTags=0;OpParams=1;VisibleAttributeDetail=0;ShowOpRetType=1;ShowIcons=1;CollabNums=0;HideProps=0;ShowReqs=0;ShowCons=0;PaperSize=1;HideParents=0;UseAlias=0;HideAtts=0;HideOps=0;HideStereo=0;HideElemStereo=0;ShowTests=0;ShowMaint=0;ConnectorNotation=UML 2.1;ExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ShowNotes=0;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;"/>
+				<style2 value="ExcludeRTF=0;DocAll=0;HideQuals=0;AttPkg=1;ShowTests=0;ShowMaint=0;SuppressFOC=1;MatrixActive=0;SwimlanesActive=1;KanbanActive=0;MatrixLineWidth=1;MatrixLocked=0;TConnectorNotation=UML 2.1;TExplicitNavigability=0;AdvancedElementProps=1;AdvancedFeatureProps=1;AdvancedConnectorProps=1;ProfileData=;MDGDgm=;STBLDgm=;ShowNotes=0;VisibleAttributeDetail=0;ShowOpRetType=1;SuppressBrackets=0;SuppConnectorLabels=0;PrintPageHeadFoot=0;ShowAsList=0;SuppressedCompartments=;SaveTag=3B7A13DD;"/>
 				<swimlanes value="locked=false;orientation=0;width=0;inbar=false;names=false;color=-1;bold=false;fcol=0;tcol=-1;ofCol=-1;hl=1;cls=0;"/>
 				<matrixitems value="locked=false;matrixactive=false;swimlanesactive=true;kanbanactive=false;width=1;"/>
 				<extendedProperties/>
@@ -3878,14 +3940,14 @@
 					<element geometry="Left=541;Top=148;Right=635;Bottom=211;" subject="EAID_C0B45D71_D2F6_4ff0_ADB8_379D8B56FC2C" seqno="4" style="DUID=C150BC3C;"/>
 					<element geometry="Left=428;Top=85;Right=522;Bottom=148;" subject="EAID_E456B680_9424_4744_86BA_A7AAC8FED3F3" seqno="5" style="DUID=9FC0008A;"/>
 					<element geometry="Left=242;Top=207;Right=347;Bottom=277;" subject="EAID_2C085DD4_2925_46a8_9DE4_B711CB98FB3A" seqno="6" style="DUID=30C00D52;"/>
-					<element geometry="Left=71;Top=187;Right=116;Bottom=277;" subject="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873" seqno="7" style="DUID=18A00462;"/>
+					<element geometry="Left=70;Top=187;Right=115;Bottom=277;" subject="EAID_8CBEC56A_F68E_45b0_AF77_1E84203C1873" seqno="7" style="DUID=18A00462;"/>
 					<element geometry="Left=175;Top=45;Right=708;Bottom=441;" subject="EAID_FAB76B7D_C0DF_4640_B1B6_CC7C213BDD42" seqno="8" style="DUID=769AD048;font=Calibri;fontsz=100;bold=1;black=0;italic=0;ul=0;charset=0;pitch=34;"/>
 					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=2;$LLB=;LLT=;LMT=;LMB=;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_0500B4E7_E65A_4f60_80E2_7CA971A0F702" style="Mode=3;EOID=30C00D52;SOID=18A00462;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=CX=38:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_5DF6740B_AFC0_4286_ABDB_1ED1BE3FF33B" style="Mode=3;EOID=30C00D52;SOID=640B3D39;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=CX=38:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_99F3256C_63BD_4d83_B285_1CD37DC7076E" style="Mode=3;EOID=30C00D52;SOID=8D5B74A1;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=CX=38:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_EB15BE12_0AD6_4a1b_B899_E18D524E215C" style="Mode=3;EOID=30C00D52;SOID=C150BC3C;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=CX=38:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_6A7AD8CE_B6F6_4bdd_AA74_C75436B77C18" style="Mode=3;EOID=30C00D52;SOID=DDAB5E7F;Color=-1;LWidth=0;Hidden=0;"/>
-					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=CX=38:CY=14:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_04A802FE_741D_4404_974E_61CAAFBBF884" style="Mode=3;EOID=30C00D52;SOID=9FC0008A;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=1;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_5DF6740B_AFC0_4286_ABDB_1ED1BE3FF33B" style="Mode=3;EOID=30C00D52;SOID=640B3D39;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_99F3256C_63BD_4d83_B285_1CD37DC7076E" style="Mode=3;EOID=30C00D52;SOID=8D5B74A1;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_EB15BE12_0AD6_4a1b_B899_E18D524E215C" style="Mode=3;EOID=30C00D52;SOID=C150BC3C;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=4;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_6A7AD8CE_B6F6_4bdd_AA74_C75436B77C18" style="Mode=3;EOID=30C00D52;SOID=DDAB5E7F;Color=-1;LWidth=0;Hidden=0;"/>
+					<element geometry="SX=0;SY=0;EX=0;EY=0;EDGE=3;$LLB=;LLT=;LMT=;LMB=CX=44:CY=13:OX=0:OY=0:HDN=0:BLD=0:ITA=0:UND=0:CLR=-1:ALN=1:DIR=0:ROT=0;LRT=;LRB=;IRHS=;ILHS=;Path=;" subject="EAID_04A802FE_741D_4404_974E_61CAAFBBF884" style="Mode=3;EOID=30C00D52;SOID=9FC0008A;Color=-1;LWidth=0;Hidden=0;"/>
 				</elements>
 			</diagram>
 			<diagram xmi:id="EAID_0FF8CE86_8A90_42eb_9D3A_78C8CD8F1A23">
