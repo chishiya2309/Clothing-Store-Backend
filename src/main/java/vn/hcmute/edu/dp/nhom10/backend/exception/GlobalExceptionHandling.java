@@ -22,24 +22,43 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestControllerAdvice
 public class GlobalExceptionHandling {
 
-    @ExceptionHandler({ConstraintViolationException.class,
-            MissingServletRequestParameterException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler(InsufficientStockException.class)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "Bad Request",
-                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
-                            examples = @ExampleObject(
-                                    name = "Handle exception when the data invalid. (@RequestBody, @RequestParam)",
-                                    summary = "Handle Bad Request",
-                                    value = """
-                                    {
-                                        "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                        "status": 400,
-                                        "path": "/api/v1/...",
-                                        "error": "Invalid payload",
-                                        "message": "{data} must not be blank"
-                                    }
-                                    """
-                            ))})
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "Insufficient Stock Response", summary = "Handle exception when product has insufficient stock", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 400,
+                                "path": "/api/customer/cart/items",
+                                "error": "Bad Request",
+                                "message": "Sản phẩm không đủ số lượng tồn kho"
+                            }
+                            """)) })
+    })
+    public ErrorResponse handleInsufficientStockException(InsufficientStockException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(BAD_REQUEST.value());
+        errorResponse.setError(BAD_REQUEST.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+
+        return errorResponse;
+    }
+
+    @ExceptionHandler({ ConstraintViolationException.class,
+            MissingServletRequestParameterException.class, MethodArgumentNotValidException.class })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "Handle exception when the data invalid. (@RequestBody, @RequestParam)", summary = "Handle Bad Request", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 400,
+                                "path": "/api/v1/...",
+                                "error": "Invalid payload",
+                                "message": "{data} must not be blank"
+                            }
+                            """)) })
     })
     public ErrorResponse handleValidationException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -54,13 +73,13 @@ public class GlobalExceptionHandling {
             message = message.substring(start, end);
             errorResponse.setError("Invalid Payload");
             errorResponse.setMessage(message);
-        }else if(e instanceof MissingServletRequestParameterException) {
+        } else if (e instanceof MissingServletRequestParameterException) {
             errorResponse.setError("Invalid Parameter");
             errorResponse.setMessage(message);
-        }else if(e instanceof ConstraintViolationException) {
+        } else if (e instanceof ConstraintViolationException) {
             errorResponse.setError("Invalid Parameter");
             errorResponse.setMessage(message.substring(message.indexOf(" ") + 1));
-        }else {
+        } else {
             errorResponse.setError("Invalid Data");
             errorResponse.setMessage(message);
         }
@@ -70,21 +89,16 @@ public class GlobalExceptionHandling {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "404", description = "Bad Request",
-                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
-                            examples = @ExampleObject(
-                                    name = "404 Response",
-                                    summary = "Handle exception when resouce not found",
-                                    value = """
-                                    {
-                                        "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                        "status": 404,
-                                        "path": "/api/v1/...",
-                                        "error": "Not Found",
-                                        "message": "{data} not found"
-                                    }
-                                    """
-                            ))})
+            @ApiResponse(responseCode = "404", description = "Bad Request", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "404 Response", summary = "Handle exception when resouce not found", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 404,
+                                "path": "/api/v1/...",
+                                "error": "Not Found",
+                                "message": "{data} not found"
+                            }
+                            """)) })
     })
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -99,23 +113,19 @@ public class GlobalExceptionHandling {
 
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
-                            examples = @ExampleObject(
-                                    name = "500 Response",
-                                    summary = "Handle exception when server error",
-                                    value = """
-                                    {
-                                        "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                        "status": 500,
-                                        "path": "/api/v1/...",
-                                        "error": "Internal Server Error",
-                                        "message": "Connection timeout, please try again"
-                                    }
-                                    """
-                            ))})
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "500 Response", summary = "Handle exception when server error", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 500,
+                                "path": "/api/v1/...",
+                                "error": "Internal Server Error",
+                                "message": "Connection timeout, please try again"
+                            }
+                            """)) })
     })
-    public ErrorResponse handleInternalServerErrorException(HttpServerErrorException.InternalServerError e, WebRequest request) {
+    public ErrorResponse handleInternalServerErrorException(HttpServerErrorException.InternalServerError e,
+            WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
@@ -128,21 +138,16 @@ public class GlobalExceptionHandling {
 
     @ExceptionHandler(InvalidDataException.class)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "409", description = "Conflict",
-                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
-                            examples = @ExampleObject(
-                                    name = "409 Response",
-                                    summary = "Handle exception when input data is conflicted",
-                                    value = """
-                                    {
-                                        "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                        "status": 409,
-                                        "path": "/api/v1/...",
-                                        "error": "Conflict",
-                                        "message": "{data} exists. Please try again"
-                                    }
-                                    """
-                            ))})
+            @ApiResponse(responseCode = "409", description = "Conflict", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "409 Response", summary = "Handle exception when input data is conflicted", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 409,
+                                "path": "/api/v1/...",
+                                "error": "Conflict",
+                                "message": "{data} exists. Please try again"
+                            }
+                            """)) })
     })
     public ErrorResponse handleDuplicateKeyException(InvalidDataException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -155,23 +160,18 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
-    @ExceptionHandler({AccessDeniedException.class})
+    @ExceptionHandler({ AccessDeniedException.class })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "403", description = "Forbidden",
-                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
-                            examples = @ExampleObject(
-                                    name = "403 Response",
-                                    summary = "Handle exception when access forbidden",
-                                    value = """
-                                    {
-                                        "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                        "status": 403,
-                                        "path": "/api/v1/...",
-                                        "error": "Forbidden",
-                                        "message": "Access denied! {reason}"
-                                    }
-                                    """
-                            ))})
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "403 Response", summary = "Handle exception when access forbidden", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 403,
+                                "path": "/api/v1/...",
+                                "error": "Forbidden",
+                                "message": "Access denied! {reason}"
+                            }
+                            """)) })
     })
     public ErrorResponse handleAccessDeniedException(AccessDeniedException e, WebRequest req) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -184,26 +184,21 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
-
-    @ExceptionHandler({InternalAuthenticationServiceException.class, org.springframework.security.authentication.BadCredentialsException.class})
+    @ExceptionHandler({ InternalAuthenticationServiceException.class,
+            org.springframework.security.authentication.BadCredentialsException.class })
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                    content = {@Content(mediaType = APPLICATION_JSON_VALUE,
-                            examples = @ExampleObject(
-                                    name = "401 Response",
-                                    summary = "Handle exception when user not authenticated",
-                                    value = """
-                                    {
-                                        "timestamp": "2023-10-19T06:07:35.321+00:00",
-                                        "status": 401,
-                                        "path": "/api/v1/...",
-                                        "error": "Unauthorized",
-                                        "message": "Username or password is incorrect"
-                                    }
-                                    """
-                            ))})
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "401 Response", summary = "Handle exception when user not authenticated", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 401,
+                                "path": "/api/v1/...",
+                                "error": "Unauthorized",
+                                "message": "Username or password is incorrect"
+                            }
+                            """)) })
     })
-public ErrorResponse handleAuthenticationException(Exception e, WebRequest req) {
+    public ErrorResponse handleAuthenticationException(Exception e, WebRequest req) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
