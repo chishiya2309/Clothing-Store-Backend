@@ -24,8 +24,13 @@ import vn.hcmute.edu.dp.nhom10.backend.security.JwtTokenProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ForgotPasswordRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResetPasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ActivityLog;
+import org.springframework.context.ApplicationEventPublisher;
+import vn.hcmute.edu.dp.nhom10.backend.event.UserRegisteredEvent;
+import vn.hcmute.edu.dp.nhom10.backend.event.PasswordResetRequestedEvent;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +52,7 @@ class AuthServiceImplTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private EmailService emailService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
@@ -69,6 +74,7 @@ class AuthServiceImplTest {
         ReflectionTestUtils.setField(authService, "verificationTokenTtl", 900L);
         ReflectionTestUtils.setField(authService, "refreshTokenTtl", 604800L);
         ReflectionTestUtils.setField(authService, "rememberMeTokenTtl", 2592000L);
+        ReflectionTestUtils.setField(authService, "passwordResetTokenTtl", 900L);
         ReflectionTestUtils.setField(authService, "googleClientId", "test-google-client-id");
     }
 
@@ -94,7 +100,7 @@ class AuthServiceImplTest {
 
         verify(userRepository).save(any(User.class));
         verify(valueOperations).set(anyString(), eq("1"), eq(900L), eq(TimeUnit.SECONDS));
-        verify(emailService).sendVerificationEmail(eq("test@test.com"), eq("Test User"), anyString());
+        verify(eventPublisher).publishEvent(any(UserRegisteredEvent.class));
     }
 
     @Test
@@ -167,7 +173,7 @@ class AuthServiceImplTest {
         authService.resendVerificationEmail(email);
 
         verify(valueOperations).set(anyString(), eq("1"), eq(900L), eq(TimeUnit.SECONDS));
-        verify(emailService).sendVerificationEmail(eq(email), eq("Test User"), anyString());
+        verify(eventPublisher).publishEvent(any(UserRegisteredEvent.class));
     }
 
     @Test
@@ -180,7 +186,7 @@ class AuthServiceImplTest {
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
         assertThrows(InvalidDataException.class, () -> authService.resendVerificationEmail(email));
-        verify(emailService, never()).sendVerificationEmail(any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -317,7 +323,77 @@ class AuthServiceImplTest {
         TokenResponse response = authService.login(request, "127.0.0.1", "userAgent");
 
         assertNotNull(response);
-        // Verify that remember-me TTL (30 days = 2592000s) is used instead of default 7 days
+        // Verify that remember-me TTL (30 days = 2592000s) is used instead of default 7
+        // days
         verify(valueOperations).set(anyString(), eq("1"), eq(2592000L), eq(TimeUnit.SECONDS));
+    }
+
+    @Test
+    void forgotPassword_success() {
+        ForgotPasswordRequest request = new ForgotPasswordRequest("test@test.com");
+        User user = new User();
+        user.setId(1L);
+        user.setEmail(request.email());
+        user.setFullName("Test User");
+
+        when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+        authService.forgotPassword(request);
+
+        verify(valueOperations).set(startsWith("password_reset:"), eq("1"), eq(900L), eq(TimeUnit.SECONDS));
+        verify(eventPublisher).publishEvent(any(PasswordResetRequestedEvent.class));
+    }
+
+    @Test
+    void forgotPassword_emailNotFound_doesNothingSilently() {
+        ForgotPasswordRequest request = new ForgotPasswordRequest("notfound@test.com");
+
+        when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
+
+        authService.forgotPassword(request);
+
+        verify(redisTemplate, never()).opsForValue();
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void resetPassword_success() {
+        ResetPasswordRequest request = new ResetPasswordRequest("valid_token", "NewPass123", "NewPass123");
+        String key = "password_reset:" + request.token();
+        User user = new User();
+        user.setId(1L);
+        user.setPasswordHash("old_hash");
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(key)).thenReturn("1");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(request.newPassword())).thenReturn("new_hash");
+
+        authService.resetPassword(request);
+
+        assertEquals("new_hash", user.getPasswordHash());
+        verify(userRepository).save(user);
+        verify(redisTemplate).delete(key);
+        verify(redisTemplate).keys("refresh_token:*");
+    }
+
+    @Test
+    void resetPassword_passwordsDoNotMatch_throwsException() {
+        ResetPasswordRequest request = new ResetPasswordRequest("valid_token", "NewPass123", "DifferentPass");
+
+        assertThrows(InvalidDataException.class, () -> authService.resetPassword(request));
+        verify(redisTemplate, never()).opsForValue();
+    }
+
+    @Test
+    void resetPassword_invalidToken_throwsException() {
+        ResetPasswordRequest request = new ResetPasswordRequest("invalid_token", "NewPass123", "NewPass123");
+        String key = "password_reset:" + request.token();
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get(key)).thenReturn(null);
+
+        assertThrows(InvalidDataException.class, () -> authService.resetPassword(request));
     }
 }

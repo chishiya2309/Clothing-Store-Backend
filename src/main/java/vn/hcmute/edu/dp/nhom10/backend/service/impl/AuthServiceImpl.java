@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RegisterRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ForgotPasswordRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResetPasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ActivityLog;
 import vn.hcmute.edu.dp.nhom10.backend.entity.MembershipTier;
@@ -23,7 +25,9 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.MembershipTierRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.security.JwtTokenProvider;
 import vn.hcmute.edu.dp.nhom10.backend.service.AuthService;
-import vn.hcmute.edu.dp.nhom10.backend.service.EmailService;
+import org.springframework.context.ApplicationEventPublisher;
+import vn.hcmute.edu.dp.nhom10.backend.event.UserRegisteredEvent;
+import vn.hcmute.edu.dp.nhom10.backend.event.PasswordResetRequestedEvent;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -48,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
     private final MembershipTierRepository membershipTierRepository;
     private final ActivityLogRepository activityLogRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
     private final RedisTemplate<String, Object> redisTemplate;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -61,11 +65,15 @@ public class AuthServiceImpl implements AuthService {
     @Value("${app.remember-me-token-ttl:2592000}")
     private long rememberMeTokenTtl;
 
+    @Value("${app.password-reset-token-ttl:900}")
+    private long passwordResetTokenTtl;
+
     @Value("${google.client-id:}")
     private String googleClientId;
 
     private static final String VERIFY_PREFIX = "email_verify:";
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
+    private static final String PASSWORD_RESET_PREFIX = "password_reset:";
 
     @Transactional
     @Override
@@ -92,7 +100,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         String token = generateAndSaveVerificationToken(user.getId());
-        emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), token);
+        eventPublisher.publishEvent(new UserRegisteredEvent(this, user.getEmail(), user.getFullName(), token));
     }
 
     @Transactional
@@ -129,7 +137,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = generateAndSaveVerificationToken(user.getId());
-        emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), token);
+        eventPublisher.publishEvent(new UserRegisteredEvent(this, user.getEmail(), user.getFullName(), token));
     }
 
     private String generateAndSaveVerificationToken(Long userId) {
@@ -142,8 +150,8 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public TokenResponse login(LoginRequest request, String ipAddress, String userAgent) {
-User user = userRepository.findByEmail(request.email())
-        .orElseThrow(() -> new BadCredentialsException("Email or password is incorrect"));
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new BadCredentialsException("Email or password is incorrect"));
 
         if (Boolean.FALSE.equals(user.getIsActive())) {
             throw new AccessDeniedException("Account is locked");
@@ -160,7 +168,7 @@ User user = userRepository.findByEmail(request.email())
 
         String accessToken = jwtTokenProvider.generateToken(user.getEmail());
         String refreshToken = UUID.randomUUID().toString();
-        
+
         long ttl = Boolean.TRUE.equals(request.rememberMe()) ? rememberMeTokenTtl : refreshTokenTtl;
         String key = REFRESH_TOKEN_PREFIX + refreshToken;
         redisTemplate.opsForValue().set(key, user.getId().toString(), ttl, TimeUnit.SECONDS);
@@ -190,9 +198,9 @@ User user = userRepository.findByEmail(request.email())
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEmailVerified())) {
-    throw new AccessDeniedException("Account is inactive or email not verified");
-}
+        if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new AccessDeniedException("Account is inactive or email not verified");
+        }
 
         String newAccessToken = jwtTokenProvider.generateToken(user.getEmail());
 
@@ -207,6 +215,55 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
     public void logout(String refreshToken) {
         if (refreshToken != null) {
             redisTemplate.delete(REFRESH_TOKEN_PREFIX + refreshToken);
+        }
+    }
+
+    @Override
+    public void forgotPassword(ForgotPasswordRequest request) {
+        userRepository.findByEmail(request.email()).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            String key = PASSWORD_RESET_PREFIX + token;
+            redisTemplate.opsForValue().set(key, user.getId().toString(), passwordResetTokenTtl, TimeUnit.SECONDS);
+            eventPublisher.publishEvent(new PasswordResetRequestedEvent(this, user.getEmail(), user.getFullName(), token));
+        });
+    }
+
+    @Transactional
+    @Override
+    public void resetPassword(ResetPasswordRequest request) {
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new InvalidDataException("Passwords do not match");
+        }
+
+        String key = PASSWORD_RESET_PREFIX + request.token();
+        Object userIdObj = redisTemplate.opsForValue().get(key);
+
+        if (userIdObj == null) {
+            throw new InvalidDataException("Token expired or invalid");
+        }
+
+        Long userId = Long.valueOf(userIdObj.toString());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        redisTemplate.delete(key);
+
+        // Revoke all existing sessions
+        try {
+            java.util.Set<String> keys = redisTemplate.keys(REFRESH_TOKEN_PREFIX + "*");
+            if (keys != null && !keys.isEmpty()) {
+                for (String tokenKey : keys) {
+                    Object cachedUserId = redisTemplate.opsForValue().get(tokenKey);
+                    if (cachedUserId != null && Long.valueOf(cachedUserId.toString()).equals(userId)) {
+                        redisTemplate.delete(tokenKey);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to revoke refresh tokens for user: " + userId, e);
         }
     }
 
@@ -288,8 +345,10 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
 
     private void logActivity(User user, String action, String ipAddress, String userAgent) {
         Map<String, Object> newData = new HashMap<>();
-        if (ipAddress != null) newData.put("ip", ipAddress);
-        if (userAgent != null) newData.put("userAgent", userAgent);
+        if (ipAddress != null)
+            newData.put("ip", ipAddress);
+        if (userAgent != null)
+            newData.put("userAgent", userAgent);
 
         ActivityLog log = ActivityLog.builder()
                 .user(user)
@@ -300,7 +359,7 @@ if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEma
                 .ipAddress(ipAddress)
                 .userAgent(userAgent)
                 .build();
-                
+
         activityLogRepository.save(log);
     }
 }

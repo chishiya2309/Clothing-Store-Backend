@@ -11,6 +11,8 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.request.LoginRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.RefreshTokenRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResendVerificationRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ForgotPasswordRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResetPasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 import vn.hcmute.edu.dp.nhom10.backend.service.AuthService;
@@ -116,6 +118,30 @@ public class AuthController {
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Logged out successfully")
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        log.info("Forgot password requested for email: {}", request.email());
+        authService.forgotPassword(request);
+
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("If your email is registered, a password reset link has been sent.")
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    public ApiResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        log.info("Reset password requested");
+        authService.resetPassword(request);
+
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Password reset successfully. All previous sessions have been revoked.")
                 .timestamp(OffsetDateTime.now())
                 .build();
     }
