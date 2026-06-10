@@ -140,7 +140,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with ID: " + itemId));
 
         if (!cartItem.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("This cart item does not belong to the authenticated user");
+            throw new org.springframework.security.access.AccessDeniedException("This cart item does not belong to the authenticated user");
         }
 
         cartItemRepository.delete(cartItem);
