@@ -46,8 +46,8 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
-    @ExceptionHandler({ ConstraintViolationException.class,
-            MissingServletRequestParameterException.class, MethodArgumentNotValidException.class })
+    @ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class,
+            MethodArgumentNotValidException.class, IllegalArgumentException.class })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "Handle exception when the data invalid. (@RequestBody, @RequestParam)", summary = "Handle Bad Request", value = """
