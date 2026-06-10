@@ -189,6 +189,7 @@ public class BrevoEmailServiceImpl implements EmailService {
                                \s"""
                 .formatted(escapedName, verificationLink, verificationLink);
     }
+
     private @NonNull String buildPasswordResetEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
         String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
