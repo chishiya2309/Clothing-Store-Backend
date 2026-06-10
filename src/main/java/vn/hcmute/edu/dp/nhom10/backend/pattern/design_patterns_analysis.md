@@ -65,3 +65,10 @@ Dưới đây là các Design Pattern đã được áp dụng, cũng như các 
 ---
 
 **Kết luận:** Nếu báo cáo cần trình bày đa dạng mẫu thiết kế, tôi khuyến nghị bạn nên **triển khai sớm Strategy Pattern cho Thanh toán** và **Observer Pattern cho Gửi Email** để làm nổi bật kỹ thuật lập trình nâng cao trong đồ án.
+
+4 Design Patterns áp dụng
+Pattern	Áp dụng cho	Lợi ích
+Strategy	Chính sách hủy đơn	Mở rộng dễ — thêm admin cancel không sửa code cũ
+Observer	Sự kiện sau khi hủy đơn	Tách hoàn kho + gửi email riêng biệt
+Builder	DTO Response (Lombok @Builder)	Đã có sẵn, tiếp tục áp dụng
+Repository	Spring Data JPA	Đã có sẵn, bổ sung custom query
