@@ -89,8 +89,8 @@ public class GlobalExceptionHandling {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "404", description = "Bad Request", content = {
-                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "404 Response", summary = "Handle exception when resouce not found", value = """
+            @ApiResponse(responseCode = "404", description = "Not Found", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "404 Response", summary = "Handle exception when resource not found", value = """
                             {
                                 "timestamp": "2023-10-19T06:07:35.321+00:00",
                                 "status": 404,
