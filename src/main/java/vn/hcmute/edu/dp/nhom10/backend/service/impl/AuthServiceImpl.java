@@ -154,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new BadCredentialsException("Email or password is incorrect"));
 
         if (Boolean.FALSE.equals(user.getIsActive())) {
-            throw new AccessDeniedException("Account is locked");
+            throw new AccessDeniedException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên");
         }
 
         if (Boolean.FALSE.equals(user.getEmailVerified())) {
@@ -295,7 +295,7 @@ public class AuthServiceImpl implements AuthService {
             userRepository.save(user);
         } else {
             if (Boolean.FALSE.equals(user.getIsActive())) {
-                throw new AccessDeniedException("Account is locked");
+                throw new AccessDeniedException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên");
             }
             if (Boolean.FALSE.equals(user.getEmailVerified())) {
                 user.setEmailVerified(true);

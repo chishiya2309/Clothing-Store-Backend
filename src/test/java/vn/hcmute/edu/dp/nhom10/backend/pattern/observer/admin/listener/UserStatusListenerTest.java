@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.EmailService;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,6 +38,12 @@ class UserStatusListenerTest {
 
     @Mock
     private EmailService emailService;
+
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
 
     @InjectMocks
     private UserStatusListener userStatusListener;
@@ -106,6 +115,44 @@ class UserStatusListenerTest {
         userStatusListener.handleAuditLog(event);
         
         verify(activityLogRepository, never()).save(any(ActivityLog.class));
+    }
+
+    @Test
+    void handleSessionRevocation_lockUser_revokesSessions() {
+        UserStatusChangedEvent event = new UserStatusChangedEvent(this, 1L, "user@test.com", true, false);
+        Set<String> keys = Set.of("refresh_token:token123", "refresh_token:token456");
+
+        when(redisTemplate.keys("refresh_token:*")).thenReturn(keys);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.get("refresh_token:token123")).thenReturn("1"); // locked user ID
+        when(valueOperations.get("refresh_token:token456")).thenReturn("2"); // other user ID
+
+        userStatusListener.handleSessionRevocation(event);
+
+        verify(redisTemplate).delete("refresh_token:token123");
+        verify(redisTemplate, never()).delete("refresh_token:token456");
+    }
+
+    @Test
+    void handleSessionRevocation_unlockUser_doesNothing() {
+        UserStatusChangedEvent event = new UserStatusChangedEvent(this, 1L, "user@test.com", false, true);
+
+        userStatusListener.handleSessionRevocation(event);
+
+        verify(redisTemplate, never()).keys(anyString());
+        verify(redisTemplate, never()).delete(anyString());
+    }
+
+    @Test
+    void handleSessionRevocation_exceptionHandledGracefully() {
+        UserStatusChangedEvent event = new UserStatusChangedEvent(this, 1L, "user@test.com", true, false);
+
+        when(redisTemplate.keys("refresh_token:*")).thenThrow(new RuntimeException("Redis connection error"));
+
+        // No exception should escape
+        userStatusListener.handleSessionRevocation(event);
+
+        verify(redisTemplate, never()).delete(anyString());
     }
 
     @Test

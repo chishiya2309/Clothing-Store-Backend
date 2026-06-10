@@ -3,6 +3,7 @@ package vn.hcmute.edu.dp.nhom10.backend.pattern.observer.admin.listener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,9 @@ public class UserStatusListener {
     private final ActivityLogRepository activityLogRepository;
     private final UserRepository userRepository;
     private final vn.hcmute.edu.dp.nhom10.backend.service.EmailService emailService;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
 
     /**
      * Đồng bộ: Ghi log lịch sử hoạt động khi trạng thái User thay đổi.
@@ -55,6 +59,31 @@ public class UserStatusListener {
             log.info("Audit log for user status change saved successfully.");
         } catch (Exception e) {
             log.error("Failed to save audit log for user status change", e);
+        }
+    }
+
+    /**
+     * Đồng bộ: Thu hồi tất cả phiên đăng nhập (refresh tokens) trong Redis khi tài khoản bị khóa.
+     * Đảm bảo tài khoản bị khóa sẽ lập tức bị đăng xuất ở mọi thiết bị.
+     */
+    @EventListener
+    public void handleSessionRevocation(UserStatusChangedEvent event) {
+        if (Boolean.FALSE.equals(event.getNewStatus())) {
+            log.info("Revoking all active sessions for locked user id: {}", event.getUserId());
+            try {
+                java.util.Set<String> keys = redisTemplate.keys(REFRESH_TOKEN_PREFIX + "*");
+                if (keys != null && !keys.isEmpty()) {
+                    for (String tokenKey : keys) {
+                        Object cachedUserId = redisTemplate.opsForValue().get(tokenKey);
+                        if (cachedUserId != null && Long.valueOf(cachedUserId.toString()).equals(event.getUserId())) {
+                            redisTemplate.delete(tokenKey);
+                            log.info("Revoked session token key: {}", tokenKey);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to revoke refresh tokens for user: " + event.getUserId(), e);
+            }
         }
     }
 
