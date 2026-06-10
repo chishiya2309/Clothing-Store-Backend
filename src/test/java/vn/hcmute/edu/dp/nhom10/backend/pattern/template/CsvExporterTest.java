@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.BestsellerReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.BestsellerCsvExporter;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.LoyaltyCustomerCsvExporter;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.RevenueCsvExporter;
 
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 

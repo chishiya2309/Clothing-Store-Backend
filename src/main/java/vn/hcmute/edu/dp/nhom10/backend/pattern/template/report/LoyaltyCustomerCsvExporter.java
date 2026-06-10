@@ -1,6 +1,7 @@
-package vn.hcmute.edu.dp.nhom10.backend.pattern.template;
+package vn.hcmute.edu.dp.nhom10.backend.pattern.template.report;
 
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse;
+
 import java.io.IOException;
 import java.io.Writer;
 

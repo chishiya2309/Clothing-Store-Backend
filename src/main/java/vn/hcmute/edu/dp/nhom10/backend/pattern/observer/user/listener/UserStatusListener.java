@@ -1,4 +1,4 @@
-package vn.hcmute.edu.dp.nhom10.backend.pattern.observer.admin.listener;
+package vn.hcmute.edu.dp.nhom10.backend.pattern.observer.user.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ActivityLog;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.observer.admin.event.UserStatusChangedEvent;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.observer.user.event.UserStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ActivityLogRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 
