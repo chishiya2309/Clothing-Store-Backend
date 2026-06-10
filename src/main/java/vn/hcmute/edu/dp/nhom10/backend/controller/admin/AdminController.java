@@ -1,5 +1,6 @@
 package vn.hcmute.edu.dp.nhom10.backend.controller.admin;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.time.OffsetDateTime;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')") // Proxy Pattern (Security AOP)
+@Tag(name = "Admin User", description = "Quản trị người dùng")
 @Slf4j(topic = "ADMIN-CONTROLLER")
 public class AdminController {
 
