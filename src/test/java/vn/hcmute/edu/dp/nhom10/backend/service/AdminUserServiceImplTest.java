@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.AdminUserResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.enums.UserRole;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.observer.admin.event.UserStatusChangedEvent;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.observer.user.event.UserStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;

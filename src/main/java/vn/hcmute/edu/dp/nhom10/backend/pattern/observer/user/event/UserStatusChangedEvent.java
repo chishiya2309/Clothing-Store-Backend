@@ -1,4 +1,4 @@
-package vn.hcmute.edu.dp.nhom10.backend.pattern.observer.admin.event;
+package vn.hcmute.edu.dp.nhom10.backend.pattern.observer.user.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
