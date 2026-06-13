@@ -1,0 +1,256 @@
+@startuml UC01_DangKyTaiKhoan
+!theme plain
+title **UC-01: Đăng ký tài khoản**\nHệ thống Website Bán Quần Áo - Nhóm 10
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 280
+skinparam sequenceGroupBorderThickness 1
+skinparam noteBorderColor #888888
+
+actor "Khách vãng lai\n(KVL)" as Client #LightYellow
+
+box "Frontend" #F0F8FF
+    participant "Browser\n(React App)" as Browser #LightSkyBlue
+end box
+
+box "Backend (Spring Boot)" #FFFFF0
+    participant "AuthController\n(/api/auth)" as Controller #LightGreen
+    participant "AuthServiceImpl" as Service #LightGreen
+    participant "UserRepository\n(PostgreSQL)" as UserRepo #Wheat
+    participant "PasswordEncoder\n(BCrypt)" as Encoder #Wheat
+    participant "RedisTemplate\n(Token Store)" as Redis #Salmon
+    participant "EventPublisher\n(ApplicationEventPublisher)" as EventPub #Plum
+end box
+
+box "Async Processing" #FFF0F5
+    participant "EmailNotification\nListener" as Listener #Orchid
+end box
+
+box "External Service" #F0FFF0
+    participant "Brevo API\n(Email Service)" as Brevo #MediumSeaGreen
+    participant "Google OAuth\n(Google API)" as Google #Coral
+end box
+
+== LUỒNG CHÍNH: Đăng ký bằng Email ==
+
+Client -> Browser : Chọn "Đăng ký"\nvà nhập thông tin
+activate Browser
+Browser -> Controller : **POST /api/auth/register**\n{ fullName, email, password }
+activate Controller
+
+note right of Controller
+  **@Valid RegisterRequest** kiểm tra:
+  - Email: không trống, đúng format
+  - Password: ≥ 8 ký tự, có chữ hoa + số
+  - FullName: không trống, ≤ 100 ký tự
+end note
+
+Controller -> Service : register(request)
+activate Service
+
+Service -> UserRepo : existsByEmail(email)
+activate UserRepo
+UserRepo --> Service : false (chưa tồn tại)
+deactivate UserRepo
+
+Service -> Encoder : encode(password)
+activate Encoder
+Encoder --> Service : passwordHash (BCrypt)
+deactivate Encoder
+
+Service -> UserRepo : save(user)
+activate UserRepo
+note right of UserRepo
+  User được tạo với:
+  - emailVerified = **false**
+  - role = **customer**
+  - authProvider = "**email**"
+  - membershipTier = **Đồng** (Bronze)
+  - loyaltyPoints = 0
+  - isActive = true
+end note
+UserRepo --> Service : savedUser (có userId)
+deactivate UserRepo
+
+Service -> Redis : SET email_verify:{token}\n→ userId, TTL = verificationTokenTtl
+activate Redis
+note right of Redis
+  Token = UUID.randomUUID()
+  Lưu vào Redis với key:
+  "email_verify:{uuid-token}"
+end note
+Redis --> Service : OK
+deactivate Redis
+
+Service -> EventPub : publishEvent(\nUserRegisteredEvent)
+activate EventPub
+note right of EventPub
+  Event chứa: email, fullName, token
+  Sẽ được xử lý **bất đồng bộ**
+  sau khi Transaction COMMIT
+end note
+EventPub --> Service
+deactivate EventPub
+
+Service --> Controller : void (thành công)
+deactivate Service
+
+Controller --> Browser : **201 Created**\n"Please check your email\nto verify your account"
+deactivate Controller
+
+Browser --> Client : Hiển thị thông báo\n"Đăng ký thành công,\nvui lòng kiểm tra email"
+
+...Sau khi Transaction COMMIT...
+
+EventPub -[#blue]> Listener : **@Async** @TransactionalEventListener\n(AFTER_COMMIT)
+activate Listener #LightBlue
+Listener -> Brevo : sendVerificationEmail(\nemail, fullName, token)
+activate Brevo
+note right of Brevo
+  Gửi email chứa link xác thực:
+  {frontendUrl}/verify-email?token={token}
+end note
+Brevo --> Listener : Email đã gửi
+deactivate Brevo
+deactivate Listener
+
+== LUỒNG XÁC THỰC EMAIL (Verification) ==
+
+Client -> Browser : Mở email,\nnhấn link xác thực
+Browser -> Controller : **GET /api/auth/verify-email**\n?token={token}
+activate Controller
+
+Controller -> Service : verifyEmail(token)
+activate Service
+
+Service -> Redis : GET email_verify:{token}
+activate Redis
+
+alt #LightGreen Token hợp lệ (còn hạn)
+    Redis --> Service : userId
+    deactivate Redis
+
+    Service -> UserRepo : findById(userId)
+    activate UserRepo
+    UserRepo --> Service : user
+    deactivate UserRepo
+
+    Service -> Service : Kiểm tra emailVerified\n== false
+
+    Service -> UserRepo : save(user)\n[emailVerified = **true**]
+    activate UserRepo
+    UserRepo --> Service : OK
+    deactivate UserRepo
+
+    Service -> Redis : DELETE email_verify:{token}
+    activate Redis
+    Redis --> Service : OK
+    deactivate Redis
+
+    Service --> Controller : void (thành công)
+    deactivate Service
+
+    Controller --> Browser : **200 OK**\n"Email verified successfully"
+    deactivate Controller
+    Browser --> Client : Hiển thị "Xác thực thành công"\nChuyển đến trang đăng nhập
+
+else #LightCoral Token hết hạn hoặc không hợp lệ
+    Redis --> Service : null
+    Service --> Controller : !! InvalidDataException\n"Token expired or invalid"
+    Controller --> Browser : **400 Bad Request**\n"Token expired or invalid"
+    Browser --> Client : Hiển thị lỗi\n"Mã xác thực đã hết hạn"
+    note right of Browser
+      Cho phép nhấn **"Gửi lại"**
+      để yêu cầu OTP mới
+    end note
+end
+
+== LUỒNG THAY THẾ 2a: Đăng ký bằng Google OAuth ==
+
+Client -> Browser : Chọn "Đăng ký\nbằng Google"
+activate Browser
+Browser -> Google : Mở Google Sign-In popup
+activate Google
+Google --> Browser : idToken (Google ID Token)
+deactivate Google
+
+Browser -> Controller : **POST /api/auth/google**\n{ idToken }
+activate Controller
+
+Controller -> Service : loginWithGoogle(\nrequest, ipAddress, userAgent)
+activate Service
+
+Service -> Google : verify(idToken)\nvia GoogleIdTokenVerifier
+activate Google
+Google --> Service : Payload\n{ email, name, picture }
+deactivate Google
+
+Service -> UserRepo : findByEmail(email)
+activate UserRepo
+UserRepo --> Service : null (chưa có tài khoản)
+deactivate UserRepo
+
+note right of Service #LightBlue
+  **Tạo tài khoản tự động:**
+  - authProvider = "**google**"
+  - emailVerified = **true** (bỏ qua xác thực)
+  - fullName = name từ Google
+  - avatarUrl = picture từ Google
+  - role = customer
+  - membershipTier = Đồng
+end note
+
+Service -> UserRepo : save(newUser)
+activate UserRepo
+UserRepo --> Service : savedUser
+deactivate UserRepo
+
+Service -> Service : generateToken(email)\n→ Access Token (JWT)
+Service -> Redis : SET refresh_token:{uuid}\n→ userId, TTL = refreshTokenTtl
+activate Redis
+Redis --> Service : OK
+deactivate Redis
+
+Service --> Controller : TokenResponse\n{ accessToken, refreshToken, expiresIn }
+deactivate Service
+
+Controller --> Browser : **200 OK**\n+ TokenResponse
+deactivate Controller
+Browser --> Client : Đăng ký + Đăng nhập\nthành công
+deactivate Browser
+
+== LUỒNG NGOẠI LỆ ==
+
+alt #Pink 3a: Email đã tồn tại trong hệ thống
+    Client -> Browser : Nhập email đã đăng ký
+    Browser -> Controller : POST /api/auth/register
+    activate Controller
+    Controller -> Service : register(request)
+    activate Service
+    Service -> UserRepo : existsByEmail(email)
+    activate UserRepo
+    UserRepo --> Service : **true** (đã tồn tại)
+    deactivate UserRepo
+    Service --> Controller : !! InvalidDataException\n"Email is already registered"
+    deactivate Service
+    Controller --> Browser : **400 Bad Request**\n"Email đã được đăng ký"
+    deactivate Controller
+    Browser --> Client : Hiển thị lỗi\n"Email đã được đăng ký"
+
+else #Pink 3b: Mật khẩu không đủ yêu cầu
+    Client -> Browser : Nhập password yếu\n(thiếu chữ hoa hoặc số)
+    Browser -> Controller : POST /api/auth/register
+    activate Controller
+    note right of Controller
+      **@Valid** reject tại Bean Validation:
+      @Pattern: "Password must contain
+      at least one uppercase letter
+      and one digit"
+    end note
+    Controller --> Browser : **400 Bad Request**\nValidation error details
+    deactivate Controller
+    Browser --> Client : Hiển thị lỗi chi tiết\nvề yêu cầu mật khẩu
+end
+
+@enduml
