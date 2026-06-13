@@ -1,0 +1,289 @@
+@startuml UC04_QuenMatKhau
+!theme plain
+title **UC-04: Quên mật khẩu / Đặt lại mật khẩu**\nHệ thống Website Bán Quần Áo - Nhóm 10
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 280
+skinparam sequenceGroupBorderThickness 1
+skinparam noteBorderColor #888888
+
+actor "Người dùng\n(KVL / KH)" as Client #LightYellow
+
+box "Frontend" #F0F8FF
+    participant "Browser\n(React App)" as Browser #LightSkyBlue
+end box
+
+box "Backend (Spring Boot)" #FFFFF0
+    participant "AuthController\n(/api/auth)" as Controller #LightGreen
+    participant "AuthServiceImpl" as Service #LightGreen
+    participant "UserRepository\n(PostgreSQL)" as UserRepo #Wheat
+    participant "PasswordEncoder\n(BCrypt)" as Encoder #Wheat
+    participant "RedisTemplate\n(Token Store)" as Redis #Salmon
+    participant "EventPublisher\n(ApplicationEventPublisher)" as EventPub #Plum
+end box
+
+box "Async Processing" #FFF0F5
+    participant "EmailNotification\nListener" as Listener #Orchid
+end box
+
+box "External Service" #F0FFF0
+    participant "Brevo API\n(Email Service)" as Brevo #MediumSeaGreen
+end box
+
+== PHẦN 1: YÊU CẦU ĐẶT LẠI MẬT KHẨU ==
+
+Client -> Browser : Nhấn "Quên mật khẩu"\nở trang đăng nhập
+activate Browser
+
+note right of Client
+  **Tiền điều kiện:**
+  Người dùng có tài khoản
+  email đã đăng ký trên hệ thống
+end note
+
+Browser -> Controller : **POST /api/auth/forgot-password**\n{ email }
+activate Controller
+
+Controller -> Service : forgotPassword(request)
+activate Service
+
+Service -> UserRepo : findByEmail(email)
+activate UserRepo
+
+alt #LightGreen Email tồn tại trong hệ thống
+    UserRepo --> Service : Optional<User> — **present**
+    deactivate UserRepo
+
+    ' --- Tạo reset token ---
+    Service -> Service : token = UUID.randomUUID()
+
+    Service -> Redis : SET password_reset:{token}\n→ userId
+    activate Redis
+    note right of Redis #LightYellow
+      **TTL = 900 giây (15 phút)**
+      Key: "password_reset:{uuid-token}"
+      Value: userId
+      Sau 15 phút token tự động hết hạn
+    end note
+    Redis --> Service : OK
+    deactivate Redis
+
+    ' --- Publish event gửi email ---
+    Service -> EventPub : publishEvent(\nPasswordResetRequestedEvent)
+    activate EventPub
+    note right of EventPub
+      Event chứa:
+      - email
+      - fullName
+      - token (reset token)
+    end note
+    EventPub --> Service
+    deactivate EventPub
+
+else #Khaki Email KHÔNG tồn tại (Ngoại lệ 3a)
+    UserRepo --> Service : Optional<User> — **empty**
+
+    note right of Service #LightYellow
+      **Xử lý bảo mật:**
+      ifPresent() → không làm gì cả
+      Không throw exception
+      → Tránh **email enumeration attack**
+    end note
+end
+
+Service --> Controller : void (luôn thành công)
+deactivate Service
+
+Controller --> Browser : **200 OK**\n"If your email is registered,\na password reset link has been sent."
+deactivate Controller
+
+note right of Browser #LightYellow
+  **Lưu ý bảo mật:** Response message
+  giống nhau bất kể email tồn tại hay không
+  → Kẻ tấn công không thể xác định
+  email nào đã đăng ký
+end note
+
+Browser --> Client : Hiển thị thông báo\n"Nếu email tồn tại,\nlink đặt lại đã được gửi"
+deactivate Browser
+
+...Xử lý bất đồng bộ...
+
+EventPub -[#blue]> Listener : **@Async** @EventListener
+activate Listener #LightBlue
+Listener -> Brevo : sendPasswordResetEmail(\nemail, fullName, token)
+activate Brevo
+note right of Brevo
+  Gửi email chứa link:
+  **{frontendUrl}/reset-password?token={token}**
+  Link có hiệu lực **15 phút**
+end note
+Brevo --> Listener : Email đã gửi thành công
+deactivate Brevo
+deactivate Listener
+
+== PHẦN 2: ĐẶT LẠI MẬT KHẨU ==
+
+Client -> Browser : Mở email,\nnhấn link đặt lại mật khẩu
+activate Browser
+
+note right of Client
+  Link dạng:
+  {frontendUrl}/reset-password?token={uuid}
+  Frontend hiển thị form nhập
+  mật khẩu mới
+end note
+
+Browser -> Browser : Hiển thị form:\n- Mật khẩu mới\n- Xác nhận mật khẩu
+
+Client -> Browser : Nhập mật khẩu mới\nvà xác nhận
+
+Browser -> Controller : **POST /api/auth/reset-password**\n{ token, newPassword, confirmPassword }
+activate Controller
+
+note right of Controller
+  **@Valid ResetPasswordRequest** kiểm tra:
+  - token: không trống
+  - newPassword: ≥ 8 ký tự, chữ hoa + số
+  - confirmPassword: không trống
+end note
+
+Controller -> Service : resetPassword(request)
+activate Service
+
+' --- Bước 1: Kiểm tra password match ---
+Service -> Service : newPassword == confirmPassword?
+
+' --- Bước 2: Lấy token từ Redis ---
+Service -> Redis : GET password_reset:{token}
+activate Redis
+
+alt #LightGreen Token hợp lệ (chưa hết 15 phút)
+    Redis --> Service : userId
+    deactivate Redis
+
+    ' --- Bước 3: Tìm user ---
+    Service -> UserRepo : findById(userId)
+    activate UserRepo
+    UserRepo --> Service : user
+    deactivate UserRepo
+
+    ' --- Bước 4: Mã hóa mật khẩu mới ---
+    Service -> Encoder : encode(newPassword)
+    activate Encoder
+    Encoder --> Service : newPasswordHash (BCrypt)
+    deactivate Encoder
+
+    ' --- Bước 5: Cập nhật mật khẩu ---
+    Service -> UserRepo : save(user)\n[passwordHash = newPasswordHash]
+    activate UserRepo
+    UserRepo --> Service : OK
+    deactivate UserRepo
+
+    ' --- Bước 6: Xóa reset token đã dùng ---
+    Service -> Redis : DELETE password_reset:{token}
+    activate Redis
+    Redis --> Service : OK
+    deactivate Redis
+
+    ' --- Bước 7: Thu hồi TẤT CẢ phiên đăng nhập cũ ---
+    group #FFF8DC Thu hồi tất cả Refresh Token của user
+        Service -> Redis : KEYS refresh_token:*
+        activate Redis
+        Redis --> Service : Danh sách tất cả\nrefresh token keys
+        deactivate Redis
+
+        loop Với mỗi key trong danh sách
+            Service -> Redis : GET {key}
+            activate Redis
+            Redis --> Service : cachedUserId
+            deactivate Redis
+
+            alt cachedUserId == userId
+                Service -> Redis : DELETE {key}
+                activate Redis
+                note right of Redis
+                  Thu hồi refresh token
+                  của user này
+                  → Buộc đăng nhập lại
+                  trên mọi thiết bị
+                end note
+                Redis --> Service : OK
+                deactivate Redis
+            end
+        end
+    end
+
+    Service --> Controller : void (thành công)
+    deactivate Service
+
+    Controller --> Browser : **200 OK**\n"Password reset successfully.\nAll previous sessions\nhave been revoked."
+    deactivate Controller
+
+    note right of Browser
+      **Hậu điều kiện:**
+      - Mật khẩu đã được cập nhật
+      - Tất cả phiên đăng nhập cũ bị thu hồi
+      - User phải đăng nhập lại
+    end note
+
+    Browser --> Client : Hiển thị thông báo\n"Đặt lại mật khẩu thành công"\nChuyển về trang đăng nhập
+    deactivate Browser
+
+else #LightCoral Token đã hết hạn (Ngoại lệ 4a)
+    Redis --> Service : null (hết hạn > 15 phút)
+
+    Service --> Controller : !! InvalidDataException\n"Token expired or invalid"
+    deactivate Service
+
+    Controller --> Browser : **400 Bad Request**\n"Link đã hết hạn"
+    deactivate Controller
+
+    Browser --> Client : Hiển thị lỗi\n"Link đã hết hạn.\nVui lòng yêu cầu\nđặt lại mật khẩu mới"
+    deactivate Browser
+
+    note right of Browser
+      Hiển thị nút
+      **"Quay lại Quên mật khẩu"**
+      để gửi link mới
+    end note
+end
+
+== LUỒNG NGOẠI LỆ BỔ SUNG ==
+
+alt #Pink 5a: Mật khẩu mới và xác nhận không khớp
+    Client -> Browser : Nhập mật khẩu mới\n≠ xác nhận
+    activate Browser
+    Browser -> Controller : POST /api/auth/reset-password
+    activate Controller
+    Controller -> Service : resetPassword(request)
+    activate Service
+
+    Service -> Service : newPassword ≠ confirmPassword
+
+    Service --> Controller : !! InvalidDataException\n"Passwords do not match"
+    deactivate Service
+    Controller --> Browser : **400 Bad Request**\n"Mật khẩu không khớp"
+    deactivate Controller
+    Browser --> Client : Hiển thị lỗi\n"Mật khẩu xác nhận\nkhông khớp"
+    deactivate Browser
+
+else #Pink 5b: Mật khẩu mới không đủ yêu cầu
+    Client -> Browser : Nhập password yếu\n(< 8 ký tự hoặc thiếu\nchữ hoa/số)
+    activate Browser
+    Browser -> Controller : POST /api/auth/reset-password
+    activate Controller
+    note right of Controller
+      **@Valid** reject tại Bean Validation:
+      @Size: "≥ 8 characters"
+      @Pattern: "must contain at least
+      one uppercase letter and one number"
+    end note
+    Controller --> Browser : **400 Bad Request**\nValidation error details
+    deactivate Controller
+    Browser --> Client : Hiển thị lỗi chi tiết\nvề yêu cầu mật khẩu
+    deactivate Browser
+end
+
+@enduml
