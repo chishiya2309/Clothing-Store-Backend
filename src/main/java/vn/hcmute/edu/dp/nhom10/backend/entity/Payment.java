@@ -28,6 +28,7 @@ public class Payment {
     private Order order;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "payment_method")
     private PaymentMethod method;
 
@@ -35,6 +36,7 @@ public class Payment {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "payment_status")
     private PaymentStatus status = PaymentStatus.pending;
 

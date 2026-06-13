@@ -6,5 +6,7 @@ public interface EmailService {
     void sendPasswordResetEmail(String toEmail, String fullName, String token);
 
     void sendAccountStatusEmail(String toEmail, String fullName, Boolean isActive);
+
+    void sendOrderCancelledEmail(String toEmail, String fullName, String orderCode);
 }
 

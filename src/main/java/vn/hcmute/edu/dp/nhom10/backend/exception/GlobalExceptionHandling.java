@@ -46,6 +46,31 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
+    @ExceptionHandler(OrderCancellationException.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = {
+                    @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "Order Cancellation Response", summary = "Handle exception when order cannot be cancelled", value = """
+                            {
+                                "timestamp": "2023-10-19T06:07:35.321+00:00",
+                                "status": 400,
+                                "path": "/api/customer/orders/1/cancel",
+                                "error": "Bad Request",
+                                "message": "Không thể hủy đơn hàng ở trạng thái: completed"
+                            }
+                            """)) })
+    })
+    public ErrorResponse handleOrderCancellationException(OrderCancellationException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(BAD_REQUEST.value());
+        errorResponse.setError(BAD_REQUEST.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+
+        return errorResponse;
+    }
+
+
     @ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class,
             MethodArgumentNotValidException.class, IllegalArgumentException.class })
     @ApiResponses(value = {

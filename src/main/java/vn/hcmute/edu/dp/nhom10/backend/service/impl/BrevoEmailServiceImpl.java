@@ -123,6 +123,45 @@ public class BrevoEmailServiceImpl implements EmailService {
         }
     }
 
+    @Async
+    @Override
+    public void sendOrderCancelledEmail(String toEmail, String fullName, String orderCode) {
+        String htmlContent = String.format("""
+                <html>
+                <body>
+                    <h2>Thông báo hủy đơn hàng</h2>
+                    <p>Chào %s,</p>
+                    <p>Đơn hàng <strong>#%s</strong> của bạn tại Clothing Store đã được hủy thành công.</p>
+                    <p>Nếu bạn không thực hiện yêu cầu này hoặc có thắc mắc gì, vui lòng liên hệ với bộ phận hỗ trợ khách hàng của chúng tôi.</p>
+                    <br/>
+                    <p>Trân trọng,</p>
+                    <p>Clothing Store Team</p>
+                </body>
+                </html>
+                """, fullName, orderCode);
+
+        Map<String, Object> requestBody = Map.of(
+                "sender", Map.of("name", senderName, "email", senderEmail),
+                "to", List.of(Map.of("email", toEmail, "name", fullName)),
+                "subject", "Clothing Store - Hủy đơn hàng #" + orderCode,
+                "htmlContent", htmlContent);
+
+        try {
+            restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Order cancelled email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send order cancelled email to {}", toEmail, e);
+        }
+    }
+
+
 
     private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
