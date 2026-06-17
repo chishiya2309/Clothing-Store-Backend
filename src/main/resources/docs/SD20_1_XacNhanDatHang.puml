@@ -1,0 +1,166 @@
+@startuml SD20_1_XacNhanDatHang
+title SD20.1 - Xác nhận đặt hàng
+
+autonumber
+hide footbox
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 60
+skinparam sequence {
+  ArrowColor #4F5D75
+  ActorBorderColor #D2691E
+  ActorBackgroundColor #FFF2CC
+  ParticipantBorderColor #5B7C99
+  ParticipantBackgroundColor #DDEEFF
+  DatabaseBorderColor #6B705C
+  DatabaseBackgroundColor #E9EDC9
+}
+
+actor "Khách hàng" as Customer
+boundary "Frontend\nCheckout UI" as Frontend
+control "CheckoutController" as Controller
+control "CheckoutService" as CheckoutService
+control "InventoryReservationService" as InventoryService
+control "VoucherService" as VoucherService
+control "OrderService" as OrderService
+control "PaymentService" as PaymentService
+control "PaymentGatewayAdapterFactory" as AdapterFactory
+control "PaymentGatewayAdapter" as PaymentAdapter
+entity "Repository" as Repository
+database "PostgreSQL" as Database
+participant "Cổng thanh toán" as Gateway
+
+Customer -> Frontend: Nhấn "Xác nhận đặt hàng"
+Frontend -> Controller: POST /api/checkouts\n(addressId, voucherCode, paymentMethod)
+Controller -> CheckoutService: confirmCheckout(requestDTO, customerId)
+
+CheckoutService -> Repository: findCheckoutData(customerId, addressId)
+Repository -> Database: selectCartWithVariantsAndAddress(customerId, addressId)
+Database --> Repository: checkoutData
+Repository --> CheckoutService: cartSnapshot, addressSnapshot
+CheckoutService -> CheckoutService: generateCheckoutCode()\ncalculate expiresAt
+
+critical @Transactional - Khóa và giữ tài nguyên tạm thời
+  CheckoutService -> Repository: createCheckoutSession(checkoutCode, status=CREATING, expiresAt)
+  Repository -> Database: insertCheckoutSession(checkoutCode, status=CREATING, expiresAt)
+  Database --> Repository: checkoutSessionId
+  Repository --> CheckoutService: checkoutSessionId
+
+  CheckoutService -> InventoryService: reserveStock(checkoutSessionId, items, expiresAt)
+  InventoryService -> Repository: lockVariantsAndCheckAvailability(items)
+  Repository -> Database: findAvailableStockForUpdate(items)
+  Database --> Repository: availableQuantities
+
+  alt Không đủ số lượng
+    Repository --> InventoryService: StockNotAvailableException
+    InventoryService --> CheckoutService: StockReservationFailed
+    break Kết thúc xác nhận đặt hàng
+      CheckoutService -> Repository: rollbackReservationTransaction()
+      Repository -> Database: ROLLBACK
+      CheckoutService --> Controller: 409 Không đủ hàng
+      Controller --> Frontend: ErrorResponseDTO
+      Frontend --> Customer: Yêu cầu cập nhật giỏ hàng
+    end
+
+  else Đủ số lượng
+    InventoryService -> Repository: saveInventoryReservations(checkoutSessionId, items, expiresAt)
+    Repository -> Database: insertInventoryReservations(checkout_session_id, status=ACTIVE, expiresAt)
+
+    opt Có voucher
+      CheckoutService -> VoucherService: reserveVoucher(checkoutSessionId, code, subtotal, expiresAt)
+      VoucherService -> Repository: lockVoucherAndCheckAvailability(code)
+      Repository -> Database: findVoucherForUpdate(code)
+      Database --> Repository: voucherAvailability
+
+      alt Voucher không khả dụng
+        Repository --> VoucherService: VoucherUnavailableException
+        VoucherService --> CheckoutService: VoucherReservationFailed
+        break Kết thúc xác nhận đặt hàng
+          CheckoutService -> Repository: rollbackReservationTransaction()
+          Repository -> Database: ROLLBACK
+          CheckoutService --> Controller: 400 Voucher không khả dụng
+          Controller --> Frontend: ErrorResponseDTO
+          Frontend --> Customer: Yêu cầu chọn voucher khác
+        end
+      else Voucher khả dụng
+        VoucherService -> Repository: saveVoucherReservation(checkoutSessionId, code, expiresAt)
+        Repository -> Database: insertVoucherReservation(checkout_session_id, status=ACTIVE, expiresAt)
+        VoucherService --> CheckoutService: discountAmount
+      end
+    end
+
+    CheckoutService -> CheckoutService: calculateTotal(subtotal, shippingFee, discountAmount)
+    CheckoutService -> Repository: saveCheckoutSessionItemsAndMarkReserved(checkoutSessionId, snapshot)
+    Repository -> Database: insertCheckoutSessionItems(), updateCheckoutSession(status=RESERVED)
+    Database --> Repository: checkoutSaved
+    Repository --> CheckoutService: checkoutReserved(checkoutCode)
+  end
+end
+
+note over InventoryService,Database
+  Reservation chỉ giữ quyền mua tạm thời.
+  Chưa trừ stock_quantity, chưa tăng times_used
+  và chưa xóa sản phẩm khỏi giỏ hàng.
+end note
+
+alt Thanh toán COD
+  CheckoutService -> OrderService: createOrder(checkoutCode, COD)
+
+  critical Tạo đơn hàng COD
+    OrderService -> Repository: lockCheckoutAndReservations(checkoutCode)
+    Repository -> Database: findCheckoutAndReservationsForUpdate(checkoutCode)
+    OrderService -> Repository: saveOrderWithItemsAndCodPayment(checkoutCode)
+    Repository -> Database: insertOrder(status=PENDING), items, payment(COD)
+    OrderService -> InventoryService: consumeStockReservation(checkoutCode)
+    InventoryService -> Repository: deductStockAndConsumeReservations(checkoutCode)
+    Repository -> Database: updateStockAndInventoryReservations(status=CONSUMED)
+    opt Có voucher
+      OrderService -> VoucherService: consumeVoucherReservation(checkoutCode)
+      VoucherService -> Repository: consumeVoucher(checkoutCode)
+      Repository -> Database: incrementVoucherUsageAndMarkConsumed()
+    end
+    OrderService -> Repository: deleteCartItemsAndCompleteCheckout(checkoutCode)
+    Repository -> Database: deletePurchasedCartItems(), completeCheckout(), COMMIT
+  end
+
+  OrderService --> CheckoutService: orderResponse
+  CheckoutService --> Controller: OrderResponseDTO
+  Controller --> Frontend: orderCode
+  Frontend --> Customer: Hiển thị đặt hàng thành công
+
+else Thanh toán trực tuyến
+  CheckoutService -> PaymentService: createPaymentAttempt(checkoutSessionId, amount)
+  PaymentService -> Repository: savePaymentAttempt(checkoutSessionId, amount, status=PENDING)
+  Repository -> Database: insertPaymentAttempt(checkout_session_id)
+  Database --> Repository: paymentReference
+  Repository --> PaymentService: paymentAttempt
+  PaymentService -> AdapterFactory: getAdapter(paymentMethod)
+  AdapterFactory --> PaymentService: paymentAdapter
+  PaymentService -> PaymentAdapter: createPaymentUrl(paymentReference, amount, expiresAt)
+  PaymentAdapter -> Gateway: createPaymentTransaction(paymentReference, amount, expiresAt)
+
+  alt Khởi tạo giao dịch thành công
+    Gateway --> PaymentAdapter: paymentUrl
+    PaymentAdapter --> PaymentService: paymentUrl
+    PaymentService --> CheckoutService: paymentUrl
+    CheckoutService --> Controller: CheckoutResponseDTO(paymentUrl)
+    Controller --> Frontend: URL thanh toán
+    Frontend -> Gateway: redirectToPaymentUrl(paymentUrl)
+    Gateway --> Customer: Hiển thị trang thanh toán
+  else Cổng thanh toán lỗi hoặc timeout
+    Gateway --> PaymentAdapter: PaymentGatewayUnavailable
+    PaymentAdapter --> PaymentService: PaymentInitializationFailed
+    PaymentService -> CheckoutService: releaseFailedCheckout(checkoutCode)
+    CheckoutService -> Repository: releaseReservationsAndFailPayment(checkoutCode)
+    Repository -> Database: markReservationsReleasedAndPaymentFailed()
+    CheckoutService --> Controller: 502 Không thể khởi tạo thanh toán
+    Controller --> Frontend: ErrorResponseDTO
+    Frontend --> Customer: Yêu cầu thử lại
+  end
+end
+
+note over CheckoutService,Database
+  Nhánh online kết thúc mà chưa tạo Order.
+  checkoutCode và paymentReference được chuyển tiếp sang SD20.2.
+end note
+
+@enduml

@@ -1,0 +1,156 @@
+@startuml SD20_2_ThanhToanTrucTuyen
+title SD20.2 - Thanh toán trực tuyến và ghi nhận kết quả
+
+autonumber
+hide footbox
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 60
+skinparam sequence {
+  ArrowColor #4F5D75
+  ActorBorderColor #D2691E
+  ActorBackgroundColor #FFF2CC
+  ParticipantBorderColor #5B7C99
+  ParticipantBackgroundColor #DDEEFF
+  DatabaseBorderColor #6B705C
+  DatabaseBackgroundColor #E9EDC9
+}
+
+actor "Khách hàng" as Customer
+boundary "Frontend\nPayment Result UI" as Frontend
+participant "Cổng thanh toán\nVNPay / MoMo" as Gateway
+control "PaymentController" as Controller
+control "PaymentService" as PaymentService
+control "PaymentGatewayAdapterFactory" as AdapterFactory
+control "PaymentGatewayAdapter" as PaymentAdapter
+control "CheckoutService" as CheckoutService
+control "OrderService" as OrderService
+control "InventoryReservationService" as InventoryService
+control "VoucherService" as VoucherService
+entity "Repository" as Repository
+database "PostgreSQL" as Database
+
+Customer -> Gateway: submitPayment()
+
+par Return URL về trình duyệt
+  Gateway --> Frontend: redirectToReturnUrl(paymentReference)
+  Frontend -> Controller: GET /api/payments/{paymentReference}/status
+  Controller -> PaymentService: getPaymentStatus(paymentReference)
+  PaymentService -> Repository: findPaymentAttempt(paymentReference)
+  Repository -> Database: selectPaymentAttemptStatus(paymentReference)
+  Database --> Repository: paymentStatus
+  Repository --> PaymentService: paymentAttempt
+  PaymentService --> Controller: PaymentStatusResponseDTO(paymentStatus)
+  Controller --> Frontend: paymentStatus
+  Frontend --> Customer: displayPaymentStatus(paymentStatus)
+
+else Callback/IPN server-to-server
+  Gateway ->> Controller: POST /api/payments/callback\n(paymentReference, transactionId, amount, result, signature)
+  Controller -> PaymentService: handlePaymentCallback(callbackDTO)
+  PaymentService -> AdapterFactory: getAdapter(callbackDTO.method)
+  AdapterFactory --> PaymentService: paymentAdapter
+  PaymentService -> PaymentAdapter: verifyCallbackSignature(callbackDTO)
+  PaymentAdapter --> PaymentService: signatureVerificationResult
+
+  alt Chữ ký callback không hợp lệ
+    PaymentService --> Controller: PaymentCallbackRejected
+    Controller -->> Gateway: sendGatewayErrorResponse()
+
+  else Chữ ký hợp lệ
+    PaymentService -> PaymentAdapter: parseCallback(callbackDTO)
+    PaymentAdapter --> PaymentService: paymentCallbackResult
+
+    critical Xử lý callback nguyên tử
+      PaymentService -> Repository: findPaymentAttempt(paymentReference)
+      Repository -> Database: selectPaymentAttempt(paymentReference)
+      Database --> Repository: paymentAttempt
+      Repository --> PaymentService: paymentAttempt
+      PaymentService -> Repository: lockCheckoutSession(paymentAttempt.checkoutSessionId)
+      Repository -> Database: findCheckoutSessionForUpdate(checkout_session_id)
+      PaymentService -> Repository: lockPaymentAttempt(paymentReference)
+      Repository -> Database: findPaymentAttemptForUpdate(paymentReference)
+      PaymentService -> PaymentService: validateCallbackAgainstPaymentAttempt(callbackDTO, paymentAttempt)
+
+      alt Sai merchant, reference hoặc số tiền
+        PaymentService --> Controller: PaymentCallbackMismatch
+        Controller -->> Gateway: sendGatewayErrorResponse()
+
+      else Callback đã xử lý trước đó
+        PaymentService --> Controller: idempotentAcknowledgement
+        Controller -->> Gateway: sendGatewayAcknowledgement()
+
+      else Thanh toán thành công và reservation còn hiệu lực
+        PaymentService -> CheckoutService: finalizePaidCheckout(checkoutCode)
+
+        CheckoutService -> Repository: lockReservations(checkoutSessionId)
+        Repository -> Database: findInventoryAndVoucherReservationsForUpdate(checkout_session_id)
+        CheckoutService -> OrderService: createOrderFromSnapshot(checkoutCode)
+        OrderService -> Repository: saveOrderWithItems(checkoutCode)
+        Repository -> Database: insertOrder(status=PENDING), orderItems
+
+        CheckoutService -> InventoryService: consumeStockReservation(checkoutCode)
+        InventoryService -> Repository: deductStockAndConsumeReservations(checkoutCode)
+        Repository -> Database: updateStockAndInventoryReservations(status=CONSUMED)
+
+        opt Có voucher
+          CheckoutService -> VoucherService: consumeVoucherReservation(checkoutCode)
+          VoucherService -> Repository: consumeVoucher(checkoutCode)
+          Repository -> Database: incrementVoucherUsageAndMarkConsumed()
+        end
+
+        CheckoutService -> Repository: completePaidCheckout(checkoutCode, transactionId)
+        Repository -> Database: insertPayment(status=COMPLETED),\nmarkPaymentAttemptCompleted(), deletePurchasedCartItems(),\ncompleteCheckout(), COMMIT
+
+        CheckoutService --> PaymentService: orderCode
+        PaymentService --> Controller: paymentCompletedAcknowledgement
+        Controller -->> Gateway: sendGatewayAcknowledgement()
+
+      else Thanh toán thất bại hoặc bị hủy
+        PaymentService -> CheckoutService: releaseFailedCheckout(checkoutCode)
+
+        CheckoutService -> InventoryService: releaseStockReservation(checkoutCode)
+        InventoryService -> Repository: releaseInventoryReservations(checkoutCode)
+        Repository -> Database: markInventoryReservationsReleased()
+        opt Có voucher reservation
+          CheckoutService -> VoucherService: releaseVoucherReservation(checkoutCode)
+          VoucherService -> Repository: releaseVoucherReservationByCheckout(checkoutCode)
+          Repository -> Database: markVoucherReservationReleased()
+        end
+        CheckoutService -> Repository: failPaymentAttemptAndCheckout(checkoutCode)
+        Repository -> Database: markPaymentAttemptAndCheckoutFailed(), COMMIT
+
+        CheckoutService --> PaymentService: reservationsReleased
+        PaymentService --> Controller: paymentFailureAcknowledgement
+        Controller -->> Gateway: sendGatewayAcknowledgement()
+
+      else Đã thanh toán nhưng reservation hết hạn
+        PaymentService -> Repository: markPaymentRequiresRefund(paymentReference)
+        Repository -> Database: updatePaymentAttempt(status=REQUIRES_REFUND), COMMIT
+        PaymentService --> Controller: paymentRecordedAcknowledgement
+        Controller -->> Gateway: sendGatewayAcknowledgement()
+      end
+    end
+  end
+
+  opt PaymentAttempt ở trạng thái REQUIRES_REFUND
+    PaymentService ->> AdapterFactory: getAdapter(callbackDTO.method)
+    AdapterFactory -->> PaymentService: paymentAdapter
+    PaymentService ->> PaymentAdapter: requestRefundAsync(transactionId)
+    PaymentAdapter -> Gateway: requestRefund(transactionId)
+    Gateway --> PaymentAdapter: refundRequestAccepted
+  end
+end
+
+note over PaymentService,Database
+  Callback/IPN là nguồn kết quả tin cậy và phải idempotent.
+  Return URL chỉ hiển thị trạng thái, không trực tiếp tạo Order.
+  Chỉ ACK thành công sau khi transaction đã COMMIT.
+  Nếu transaction lỗi, trả phản hồi retry theo giao thức của cổng.
+end note
+
+note over CheckoutService,Database
+  Khi thất bại chỉ giải phóng reservation.
+  Không cộng lại stock hay voucher vì dữ liệu thật chưa bị trừ.
+  Reservation hết hạn được tác vụ nền giải phóng theo expiresAt.
+end note
+
+@enduml
