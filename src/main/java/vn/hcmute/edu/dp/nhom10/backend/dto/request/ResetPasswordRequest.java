@@ -9,7 +9,7 @@ import lombok.Builder;
 public record ResetPasswordRequest(
                 @NotBlank(message = "Token cannot be blank") String token,
 
-                @NotBlank(message = "New password cannot be blank") @Size(min = 8, message = "New password must be at least 8 characters long") @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).*$", message = "New password must contain at least one uppercase letter and one number") String newPassword,
+                @NotBlank(message = "New password cannot be blank") @Size(min = 8, message = "Mật khẩu phải có ít nhất 8 ký tự") @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).*$", message = "New password must contain at least one uppercase letter and one number") String newPassword,
 
                 @NotBlank(message = "Confirm password cannot be blank") String confirmPassword) {
 }

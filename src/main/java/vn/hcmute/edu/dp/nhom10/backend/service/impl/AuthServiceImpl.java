@@ -182,6 +182,9 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtTokenProvider.getJwtExpirationInMs() / 1000)
+                .role(user.getRole().name())
+                .name(user.getFullName())
+                .id(user.getId())
                 .build();
     }
 
@@ -317,6 +320,9 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtTokenProvider.getJwtExpirationInMs() / 1000)
+                .role(user.getRole().name())
+                .name(user.getFullName())
+                .id(user.getId())
                 .build();
     }
 

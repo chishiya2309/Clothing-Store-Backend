@@ -35,6 +35,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
     public ErrorResponse handleInsufficientStockException(InsufficientStockException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
@@ -60,6 +61,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
@@ -100,6 +102,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NOT_FOUND)
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
@@ -124,6 +127,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalServerErrorException(HttpServerErrorException.InternalServerError e,
             WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -149,6 +153,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicateKeyException(InvalidDataException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
@@ -173,6 +178,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessDeniedException(AccessDeniedException e, WebRequest req) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
@@ -198,6 +204,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleAuthenticationException(Exception e, WebRequest req) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
