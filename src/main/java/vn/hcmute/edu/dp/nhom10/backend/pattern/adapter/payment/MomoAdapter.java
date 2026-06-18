@@ -17,8 +17,13 @@ public class MomoAdapter implements PaymentGatewayAdapter {
     }
 
     @Override
+    public boolean isAvailable() {
+        return false;
+    }
+
+    @Override
     public GatewayPaymentCreationResult createPayment(GatewayPaymentCreationCommand command) {
-        if (!enabled) {
+        if (!enabled || !isAvailable()) {
             throw new PaymentInitializationException("MoMo adapter is not configured");
         }
         throw new PaymentInitializationException("MoMo sandbox URL creation is not implemented without signed gateway configuration");

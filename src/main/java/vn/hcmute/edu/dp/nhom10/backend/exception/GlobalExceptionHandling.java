@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,7 +18,13 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Date;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestControllerAdvice
@@ -31,19 +39,19 @@ public class GlobalExceptionHandling {
                                 "status": 400,
                                 "path": "/api/customer/cart/items",
                                 "error": "Bad Request",
-                                "message": "Sản phẩm không đủ số lượng tồn kho"
+                                "message": "Product has insufficient stock"
                             }
                             """)) })
     })
-    public ErrorResponse handleInsufficientStockException(InsufficientStockException e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(BAD_REQUEST.value());
-        errorResponse.setError(BAD_REQUEST.getReasonPhrase());
+    public ResponseEntity<ErrorResponse> handleInsufficientStockException(
+            InsufficientStockException e,
+            WebRequest request
+    ) {
+        HttpStatus status = BAD_REQUEST;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
         errorResponse.setMessage(e.getMessage());
 
-        return errorResponse;
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class,
@@ -60,11 +68,9 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ErrorResponse handleValidationException(Exception e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setStatus(BAD_REQUEST.value());
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+    public ResponseEntity<ErrorResponse> handleValidationException(Exception e, WebRequest request) {
+        HttpStatus status = BAD_REQUEST;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
 
         String message = e.getMessage();
         if (e instanceof MethodArgumentNotValidException) {
@@ -84,7 +90,7 @@ public class GlobalExceptionHandling {
             errorResponse.setMessage(message);
         }
 
-        return errorResponse;
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -100,15 +106,15 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(NOT_FOUND.value());
-        errorResponse.setError(NOT_FOUND.getReasonPhrase());
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+            ResourceNotFoundException e,
+            WebRequest request
+    ) {
+        HttpStatus status = NOT_FOUND;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
         errorResponse.setMessage(e.getMessage());
 
-        return errorResponse;
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
@@ -124,16 +130,15 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ErrorResponse handleInternalServerErrorException(HttpServerErrorException.InternalServerError e,
-            WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(INTERNAL_SERVER_ERROR.value());
-        errorResponse.setError(INTERNAL_SERVER_ERROR.getReasonPhrase());
+    public ResponseEntity<ErrorResponse> handleInternalServerErrorException(
+            HttpServerErrorException.InternalServerError e,
+            WebRequest request
+    ) {
+        HttpStatus status = INTERNAL_SERVER_ERROR;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
         errorResponse.setMessage(e.getMessage());
 
-        return errorResponse;
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler(InvalidDataException.class)
@@ -149,15 +154,27 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ErrorResponse handleDuplicateKeyException(InvalidDataException e, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(CONFLICT.value());
-        errorResponse.setError(CONFLICT.getReasonPhrase());
+    public ResponseEntity<ErrorResponse> handleDuplicateKeyException(
+            InvalidDataException e,
+            WebRequest request
+    ) {
+        HttpStatus status = CONFLICT;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
         errorResponse.setMessage(e.getMessage());
 
-        return errorResponse;
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler(PaymentGatewayUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentGatewayUnavailableException(
+            PaymentGatewayUnavailableException e,
+            WebRequest request
+    ) {
+        HttpStatus status = SERVICE_UNAVAILABLE;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
+        errorResponse.setMessage(e.getMessage());
+
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler({ AccessDeniedException.class })
@@ -173,15 +190,15 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ErrorResponse handleAccessDeniedException(AccessDeniedException e, WebRequest req) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(FORBIDDEN.value());
-        errorResponse.setError(FORBIDDEN.getReasonPhrase());
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException e,
+            WebRequest req
+    ) {
+        HttpStatus status = FORBIDDEN;
+        ErrorResponse errorResponse = baseErrorResponse(status, req);
         errorResponse.setMessage(e.getMessage());
 
-        return errorResponse;
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler({ InternalAuthenticationServiceException.class,
@@ -198,14 +215,20 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ErrorResponse handleAuthenticationException(Exception e, WebRequest req) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
-        errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
-        errorResponse.setStatus(UNAUTHORIZED.value());
-        errorResponse.setError(UNAUTHORIZED.getReasonPhrase());
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(Exception e, WebRequest req) {
+        HttpStatus status = UNAUTHORIZED;
+        ErrorResponse errorResponse = baseErrorResponse(status, req);
         errorResponse.setMessage("Username or password is incorrect");
 
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    private ErrorResponse baseErrorResponse(HttpStatus status, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(status.value());
+        errorResponse.setError(status.getReasonPhrase());
         return errorResponse;
     }
 }

@@ -126,7 +126,7 @@ class AdminControllerTest {
         mockMvc.perform(patch("/api/admin/users/{id}/role", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400));
     }
 }

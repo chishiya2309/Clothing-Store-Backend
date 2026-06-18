@@ -6,6 +6,8 @@ public interface PaymentGatewayAdapter {
 
     PaymentMethod supportMethod();
 
+    boolean isAvailable();
+
     GatewayPaymentCreationResult createPayment(
             GatewayPaymentCreationCommand command
     );

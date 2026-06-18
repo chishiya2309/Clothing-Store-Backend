@@ -17,8 +17,13 @@ public class VnPayAdapter implements PaymentGatewayAdapter {
     }
 
     @Override
+    public boolean isAvailable() {
+        return false;
+    }
+
+    @Override
     public GatewayPaymentCreationResult createPayment(GatewayPaymentCreationCommand command) {
-        if (!enabled) {
+        if (!enabled || !isAvailable()) {
             throw new PaymentInitializationException("VNPay adapter is not configured");
         }
         throw new PaymentInitializationException("VNPay sandbox URL creation is not implemented without signed gateway configuration");
