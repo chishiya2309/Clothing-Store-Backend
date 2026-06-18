@@ -126,7 +126,9 @@ public class BrevoEmailServiceImpl implements EmailService {
 
     private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
-        String verificationLink = backendUrl + "/api/auth/verify-email?token=" + token;
+        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
+        String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
+        String verificationLink = baseUrl + "/verify-email?token=" + encodedToken;
 
         return """
                 <html>

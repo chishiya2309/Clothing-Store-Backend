@@ -158,7 +158,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         if (Boolean.FALSE.equals(user.getEmailVerified())) {
-            throw new AccessDeniedException("Email not verified. Please verify your email first.");
+            throw new AccessDeniedException("Email chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.");
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
