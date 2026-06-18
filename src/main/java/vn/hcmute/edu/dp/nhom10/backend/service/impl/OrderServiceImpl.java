@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderResponseDTO;
@@ -13,6 +14,7 @@ import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
+import vn.hcmute.edu.dp.nhom10.backend.event.OrderCreatedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
@@ -44,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
     private final InventoryReservationService inventoryReservationService;
     private final VoucherService voucherService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -88,6 +91,7 @@ public class OrderServiceImpl implements OrderService {
 
         checkoutSession.setStatus(CheckoutSessionStatus.completed);
         checkoutSessionRepository.save(checkoutSession);
+        publishOrderCreatedEvent(savedOrder);
 
         return toOrderResponse(savedOrder);
     }
@@ -155,6 +159,16 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .build();
+    }
+
+    private void publishOrderCreatedEvent(Order order) {
+        eventPublisher.publishEvent(new OrderCreatedEvent(
+                order.getId(),
+                order.getOrderCode(),
+                order.getUser().getId(),
+                order.getTotalAmount(),
+                OffsetDateTime.now()
+        ));
     }
 
     private String normalizeCheckoutCode(String checkoutCode) {

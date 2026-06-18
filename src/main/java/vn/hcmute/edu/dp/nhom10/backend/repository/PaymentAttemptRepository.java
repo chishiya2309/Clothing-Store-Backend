@@ -27,4 +27,15 @@ public interface PaymentAttemptRepository extends JpaRepository<PaymentAttempt, 
     Optional<PaymentAttempt> findByPaymentReferenceForUpdate(
             @Param("paymentReference") String paymentReference
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select pa
+            from PaymentAttempt pa
+            where pa.checkoutSession.id = :checkoutSessionId
+            order by pa.id
+            """)
+    List<PaymentAttempt> findAllByCheckoutSessionIdForUpdate(
+            @Param("checkoutSessionId") Long checkoutSessionId
+    );
 }

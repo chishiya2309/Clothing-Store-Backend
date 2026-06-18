@@ -2,6 +2,7 @@ package vn.hcmute.edu.dp.nhom10.backend.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.context.ApplicationEventPublisher;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
@@ -20,6 +21,7 @@ import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
+import vn.hcmute.edu.dp.nhom10.backend.event.OrderCreatedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
@@ -75,6 +77,9 @@ class OrderServiceImplTest {
 
     @Mock
     private VoucherService voucherService;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -455,6 +460,115 @@ class OrderServiceImplTest {
         inOrder.verify(voucherService).consumeVoucherReservation("CHK-1");
         inOrder.verify(cartItemRepository).deletePurchasedItems(eq(10L), anyCollection());
         inOrder.verify(checkoutSessionRepository).save(any(CheckoutSession.class));
+    }
+
+    @Test
+    void createCodOrder_success_publishesOrderCreatedEvent() {
+        mockSuccessfulFlow(null);
+
+        orderService.createCodOrder("CHK-1", 10L);
+
+        ArgumentCaptor<OrderCreatedEvent> captor = ArgumentCaptor.forClass(OrderCreatedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        OrderCreatedEvent event = captor.getValue();
+        assertEquals(500L, event.orderId());
+        assertEquals(10L, event.userId());
+        assertEquals(money("220000.00"), event.totalAmount());
+        assertNotNull(event.orderCode());
+        assertNotNull(event.occurredAt());
+    }
+
+    @Test
+    void createCodOrder_publishesEventAfterMainBusinessSteps() {
+        mockSuccessfulFlow(Voucher.builder().id(100L).build());
+
+        orderService.createCodOrder("CHK-1", 10L);
+
+        InOrder inOrder = inOrder(orderRepository, orderItemRepository, paymentRepository,
+                inventoryReservationService, voucherService, cartItemRepository, checkoutSessionRepository, eventPublisher);
+        inOrder.verify(orderRepository).save(any(Order.class));
+        inOrder.verify(orderItemRepository).saveAll(any());
+        inOrder.verify(paymentRepository).save(any(Payment.class));
+        inOrder.verify(inventoryReservationService).consumeStockReservation("CHK-1");
+        inOrder.verify(voucherService).consumeVoucherReservation("CHK-1");
+        inOrder.verify(cartItemRepository).deletePurchasedItems(eq(10L), anyCollection());
+        inOrder.verify(checkoutSessionRepository).save(any(CheckoutSession.class));
+        inOrder.verify(eventPublisher).publishEvent(any(OrderCreatedEvent.class));
+    }
+
+    @Test
+    void createCodOrder_saveOrderFails_doesNotPublishEvent() {
+        mockCheckoutAndItems(null);
+        when(orderRepository.existsByOrderCode(any())).thenReturn(false);
+        when(orderRepository.save(any(Order.class))).thenThrow(new IllegalArgumentException("Cannot save order"));
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createCodOrder_saveOrderItemFails_doesNotPublishEvent() {
+        mockSuccessfulFlow(null);
+        when(orderItemRepository.saveAll(any())).thenThrow(new IllegalArgumentException("Cannot save order item"));
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createCodOrder_savePaymentFails_doesNotPublishEvent() {
+        mockSuccessfulFlow(null);
+        when(paymentRepository.save(any(Payment.class))).thenThrow(new IllegalArgumentException("Cannot save payment"));
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createCodOrder_consumeInventoryFails_doesNotPublishEvent() {
+        mockSuccessfulFlow(Voucher.builder().id(100L).build());
+        doThrow(new IllegalArgumentException("Cannot consume inventory"))
+                .when(inventoryReservationService).consumeStockReservation("CHK-1");
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createCodOrder_consumeVoucherFails_doesNotPublishEvent() {
+        mockSuccessfulFlow(Voucher.builder().id(100L).build());
+        doThrow(new IllegalArgumentException("Cannot consume voucher"))
+                .when(voucherService).consumeVoucherReservation("CHK-1");
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createCodOrder_deleteCartFails_doesNotPublishEvent() {
+        mockSuccessfulFlow(null);
+        when(cartItemRepository.deletePurchasedItems(eq(10L), anyCollection()))
+                .thenThrow(new IllegalArgumentException("Cannot delete cart"));
+
+        assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void createCodOrder_checkoutNotCompleted_doesNotPublishEvent() {
+        CheckoutSession checkoutSession = checkoutSession(null, 10L);
+        checkoutSession.setStatus(CheckoutSessionStatus.creating);
+        when(checkoutSessionRepository.findByCheckoutCodeForUpdate("CHK-1")).thenReturn(Optional.of(checkoutSession));
+
+        assertThrows(InvalidDataException.class, () -> orderService.createCodOrder("CHK-1", 10L));
+
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     private void mockSuccessfulFlow(Voucher voucher) {
