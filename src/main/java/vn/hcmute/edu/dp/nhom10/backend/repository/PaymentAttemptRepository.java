@@ -18,6 +18,15 @@ public interface PaymentAttemptRepository extends JpaRepository<PaymentAttempt, 
     List<PaymentAttempt> findAllByCheckoutSessionId(Long checkoutSessionId);
     Optional<PaymentAttempt> findTopByCheckoutSession_IdOrderByCreatedAtDesc(Long checkoutSessionId);
 
+    @Query("""
+            select pa.checkoutSession.id
+            from PaymentAttempt pa
+            where pa.paymentReference = :paymentReference
+            """)
+    Optional<Long> findCheckoutSessionIdByPaymentReference(
+            @Param("paymentReference") String paymentReference
+    );
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select pa

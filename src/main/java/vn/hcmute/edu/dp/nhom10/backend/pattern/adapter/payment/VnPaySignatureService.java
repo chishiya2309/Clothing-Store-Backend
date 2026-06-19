@@ -52,7 +52,8 @@ public class VnPaySignatureService {
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             if (entry.getKey() == null || entry.getKey().isBlank()
                     || entry.getValue() == null || entry.getValue().isBlank()
-                    || "vnp_SecureHash".equals(entry.getKey())) {
+                    || "vnp_SecureHash".equals(entry.getKey())
+                    || "vnp_SecureHashType".equals(entry.getKey())) {
                 continue;
             }
             sortedParameters.put(entry.getKey(), entry.getValue());
