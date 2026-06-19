@@ -100,6 +100,8 @@ public class VnPayIpnTransactionService {
 
         PaymentAttemptStatus status = paymentAttempt.getStatus();
         if (isTerminal(status)) {
+            log.info("VNPay IPN transaction already terminal: paymentReference={}, gatewayTransactionId={}, status={}",
+                    callbackData.paymentReference(), callbackData.transactionNumber(), status);
             return VnPayIpnTransactionResult.alreadyProcessed(alreadyProcessedMessage(status));
         }
         if (!callbackData.isGatewaySuccess()) {
@@ -142,6 +144,9 @@ public class VnPayIpnTransactionService {
             checkoutSession.setStatus(CheckoutSessionStatus.failed);
             checkoutSessionRepository.save(checkoutSession);
         }
+        log.info("VNPay failed payment recorded: checkoutCode={}, paymentReference={}, gatewayTransactionId={}, responseCode={}, transactionStatus={}",
+                checkoutSession.getCheckoutCode(), callbackData.paymentReference(), callbackData.transactionNumber(),
+                callbackData.responseCode(), callbackData.transactionStatus());
         return VnPayIpnTransactionResult.confirmed();
     }
 
@@ -205,6 +210,9 @@ public class VnPayIpnTransactionService {
         paymentAttemptRepository.save(paymentAttempt);
 
         publishOrderCreatedEvent(savedOrder);
+        log.info("VNPay paid checkout finalized: checkoutCode={}, paymentReference={}, gatewayTransactionId={}, orderCode={}",
+                checkoutSession.getCheckoutCode(), callbackData.paymentReference(),
+                callbackData.transactionNumber(), savedOrder.getOrderCode());
         return VnPayIpnTransactionResult.confirmed();
     }
 

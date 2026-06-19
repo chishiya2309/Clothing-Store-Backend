@@ -1,19 +1,21 @@
-# Báo cáo hoàn thiện chức năng Place Order trước khi tích hợp VNPay
+# Báo cáo hoàn thiện chức năng Place Order và VNPay sandbox
 
 ## 4.1. Tổng quan
 
-Báo cáo này tổng hợp trạng thái triển khai chức năng Place Order trên nhánh `feat/place-order` trước khi tích hợp VNPay sandbox thật. Nội dung được đối chiếu từ code hiện tại, schema, repository, service, controller, test và lịch sử commit gần nhất.
+Báo cáo này tổng hợp trạng thái triển khai chức năng Place Order trên nhánh `feat/place-order` sau khi bổ sung VNPay sandbox signed URL, return/IPN, idempotency và hardening phục vụ kiểm thử sandbox. Nội dung được đối chiếu từ code hiện tại, schema, repository, service, controller, test và lịch sử commit gần nhất.
 
 Trạng thái Git trước khi tạo báo cáo:
 
 - Nhánh hiện tại: `feat/place-order`.
 - Worktree trước khi tạo báo cáo: sạch.
-- Commit mới nhất: `1371d72 test(checkout): add postgres integration and concurrency coverage`.
+- Commit mới nhất tại thời điểm cập nhật Phase 3: `216468c feat(vnpay): handle ipn and finalize online payment`.
 
 Các commit chính theo lịch sử gần nhất:
 
 | Commit | Nội dung |
 | --- | --- |
+| `216468c` | Xử lý VNPay IPN và finalize online payment idempotent |
+| `1e85211` | Sinh VNPay sandbox payment URL có chữ ký |
 | `1371d72` | Thêm PostgreSQL integration và concurrency coverage |
 | `6356e0e` | Expire reservation và publish order event |
 | `66caae1` | Thêm orchestration API cho place order |
@@ -44,11 +46,9 @@ Các commit chính theo lịch sử gần nhất:
 
 Chưa triển khai:
 
-- Sinh URL VNPay sandbox có chữ ký thật.
-- Callback/IPN VNPay.
-- Xác nhận payment online thành công/thất bại từ gateway.
 - Refund/reconciliation thực tế.
 - Email/thông báo đơn hàng thật sau event.
+- Sandbox manual evidence bằng tài khoản VNPay/ngrok thật chưa được ghi nhận trong repository.
 
 ## 4.3. Kiến trúc và pattern
 
@@ -140,9 +140,9 @@ sequenceDiagram
     API-->>FE: 200 + order response
 ```
 
-## 4.6. Luồng online payment foundation
+## 4.6. Luồng online payment và VNPay sandbox
 
-Luồng online hiện mới là foundation trước VNPay/MoMo thật:
+Luồng online hiện đã hỗ trợ VNPay sandbox thật cho signed payment URL, return và IPN. MoMo vẫn chỉ là adapter placeholder.
 
 1. `PlaceOrderServiceImpl` preflight gateway bằng `PaymentGatewayAdapterFactory.requireAvailable`.
 2. `CheckoutServiceFacade.prepareCheckout` tạo checkout reserved như COD.
@@ -152,7 +152,7 @@ Luồng online hiện mới là foundation trước VNPay/MoMo thật:
 6. Nếu gateway trả URL hợp lệ, `completeInitialization` lưu payment URL, gateway transaction id và payload đã sanitize.
 7. Nếu gateway lỗi, `failInitialization` chuyển attempt `failed`, release inventory/voucher và checkout `failed`.
 
-`VnPayAdapter` và `MomoAdapter` hiện có class adapter nhưng chưa tạo URL sandbox thật; `isAvailable()` chỉ khả dụng khi cấu hình đủ, và `createPayment` vẫn ném lỗi chưa triển khai signed gateway configuration.
+`VnPayAdapter` sinh URL sandbox đã ký khi cấu hình đủ `payment.vnpay.*` hoặc biến môi trường `VNPAY_*`. `MomoAdapter` vẫn chưa triển khai signed gateway configuration.
 
 ```mermaid
 sequenceDiagram
@@ -412,77 +412,70 @@ Theo commit history, các phase đã được hoàn thiện theo thứ tự:
 | Cleanup reservation hết hạn | Đã có |
 | Order created event sau commit | Đã có |
 | PostgreSQL integration/concurrency test source | Đã có |
-| VNPay signed sandbox URL | Chưa có |
-| VNPay return/callback/IPN | Chưa có |
-| Consume online payment thành công | Chưa có |
+| VNPay signed sandbox URL | Đã có |
+| VNPay return/callback/IPN | Đã có |
+| Consume online payment thành công | Đã có qua IPN thành công |
 | Refund/reconciliation online | Chưa có |
 | Notification đơn hàng thật | Chưa có |
 
 ## 4.18. Rủi ro còn lại
 
-- VNPay adapter hiện chưa ký tham số và chưa sinh URL sandbox thật.
-- Chưa có callback/IPN nên online order chưa chuyển sang trạng thái hoàn tất sau thanh toán.
-- Cần thiết kế idempotency cho callback/IPN và double submit từ frontend.
-- Cần xác định cách tạo order online: tạo order sau payment success hay tạo order pending trước payment callback.
-- Cần xác minh bảo mật payload gateway: chữ ký, return URL, callback URL, amount, order info.
+- Chưa triển khai refund API hoặc reconciliation/querydr; các callback thành công đến muộn được đánh dấu `requires_refund` để xử lý vận hành.
+- Chưa có bằng chứng sandbox manual với tài khoản VNPay/ngrok thật được lưu trong repository.
+- Cần xác minh thêm log/monitoring trong môi trường demo để phát hiện IPN lỗi, amount mismatch và callback lặp.
 - Cần xác minh quy tắc hết hạn payment attempt so với TTL checkout khi user đang ở gateway.
 - Scheduler cleanup hiện chạy theo fixed delay; chưa thấy batch size cấu hình.
 - Event order created hiện chỉ log, chưa gửi email/thông báo thật.
 - Chưa xác minh hiệu năng query dưới tải thật ngoài các integration/concurrency test hiện có.
 
-## 4.19. Mức sẵn sàng trước khi tích hợp VNPay
+## 4.19. Mức sẵn sàng VNPay sandbox
 
-Place Order hiện đã sẵn sàng về nền transaction và domain cho COD, reservation và online payment initialization. Phần còn thiếu để tích hợp VNPay sandbox nằm chủ yếu ở adapter và callback/IPN:
+Place Order hiện đã sẵn sàng cho luồng VNPay sandbox backend:
 
-- Cần thêm cấu hình VNPay sandbox: terminal code, secret/hash key, pay URL, return URL, IPN/callback URL.
-- Cần implement `VnPayAdapter.createPayment` để sinh URL có chữ ký.
-- Cần endpoint return/callback/IPN, verify signature và mapping transaction status.
-- Cần service hoàn tất payment online: mark attempt completed, consume reservation, tạo/cập nhật order/payment tùy flow được chọn.
-- Cần xử lý duplicate callback, callback đến sau khi checkout expired, amount mismatch và signature mismatch.
+- Cấu hình VNPay lấy từ property/env, không hard-code secret.
+- `VnPayAdapter.createPayment` sinh URL sandbox có chữ ký.
+- Endpoint return/IPN verify signature, terminal code, reference và amount.
+- IPN thành công tạo order/payment, consume reservation, xóa cart item và publish event.
+- Duplicate callback, callback sau expired/failed, amount mismatch và signature mismatch đều có nhánh xử lý/test.
 
-Không nên sửa luồng COD khi tích hợp VNPay, trừ khi cần tái sử dụng chung mapping order/payment cho online success.
+Luồng COD không bị thay đổi trong Phase VNPay.
 
-## 4.20. Kết quả kiểm tra trong lượt tạo báo cáo
+## 4.20. Kết quả kiểm tra trong lượt cập nhật Phase 3
 
 Các lệnh đã chạy:
 
 - `git branch --show-current`: `feat/place-order`.
-- `git status --short --branch`: sạch trước khi tạo báo cáo.
-- `git log --oneline --decorate -30`: đã đọc lịch sử phase.
-- `git diff --check`: pass trước khi tạo báo cáo.
-- `mvn clean test`: chưa xác minh được do môi trường không tải được parent POM từ Maven Central.
-- `mvn clean verify -Pintegration`: chưa xác minh được do cùng lỗi môi trường.
+- `git status --short --branch`: sạch trước khi chỉnh Phase 3.
+- `git log -5 --oneline`: commit mới nhất là `216468c feat(vnpay): handle ipn and finalize online payment`.
+- `mvn clean test`: pass, `Tests run: 377, Failures: 0, Errors: 0, Skipped: 0`.
+- `mvn clean verify -Pintegration`: chưa pass trong môi trường Codex vì Testcontainers không truy cập được Docker.
 
-Lỗi Maven trong môi trường Codex:
+Lỗi integration hiện tại:
 
 ```text
-Non-resolvable parent POM ... org.springframework.boot:spring-boot-starter-parent:pom:4.0.6
-Could not transfer artifact ... from/to central (https://repo.maven.apache.org/maven2): Permission denied
+Could not find a valid Docker environment.
+DOCKER_HOST npipe:////./pipe/docker_engine is not listening
+java.nio.file.AccessDeniedException: \\.\pipe\docker_engine
 ```
 
-Kết luận kiểm tra: chưa thể xác minh pass/fail test trong môi trường Codex vì lỗi môi trường dependency, không phải bằng chứng source code lỗi. Cần chạy lại trên máy có quyền truy cập Maven Central/cache Maven đầy đủ:
+Kết luận kiểm tra: unit test đã xác minh được. Integration test chưa chạy tới assertion nghiệp vụ VNPay vì PostgreSQL Testcontainer không khởi động được trong môi trường hiện tại. Cần chạy lại trên máy có Docker Desktop đang chạy và quyền truy cập Docker pipe:
 
 ```powershell
-mvn clean test
 mvn clean verify -Pintegration
 ```
 
-## 4.21. Kế hoạch tiếp theo cho VNPay sandbox
+## 4.21. VNPay Phase 3 hardening và sandbox acceptance
 
-Đề xuất phase tiếp theo:
+Các bổ sung Phase 3:
 
-1. Thêm cấu hình VNPay sandbox tối thiểu bằng property/env, không hard-code secret.
-2. Implement `VnPayAdapter.createPayment` với URL encode, sort params, HMAC/signature đúng tài liệu VNPay.
-3. Tạo DTO/parser cho VNPay return và IPN.
-4. Tạo endpoint callback/IPN và verify signature.
-5. Thêm transaction service xử lý payment success/failure idempotent.
-6. Quyết định flow online order: tạo order khi callback success, hoặc tạo order pending trước rồi cập nhật payment.
-7. Thêm unit test cho signing, callback verification, idempotency và amount mismatch.
-8. Thêm PostgreSQL integration test cho online success/failure callback.
-9. Chạy lại `mvn clean test` và `mvn clean verify -Pintegration`.
+1. Thêm log vận hành an toàn khi khởi tạo online payment, reuse payment URL, IPN amount mismatch, duplicate callback, payment failed, payment completed và requires-refund.
+2. Tạo `docs/VNPAY_SANDBOX_GUIDE.md` với cấu hình env, ngrok, return/IPN, checklist sandbox, negative cases, logging checklist và troubleshooting.
+3. Cập nhật báo cáo này để phản ánh trạng thái VNPay đã có signed URL, return/IPN và online finalization qua IPN.
 
-Commit message đề xuất cho báo cáo này:
+Sandbox manual acceptance cần được thực hiện ngoài Codex bằng tài khoản VNPay sandbox thật và public ngrok URL. Không commit terminal code/hash secret thật vào repository.
+
+Commit message đề xuất cho cập nhật Phase 3:
 
 ```text
-docs(checkout): summarize place order implementation
+test(vnpay): complete sandbox acceptance and hardening
 ```

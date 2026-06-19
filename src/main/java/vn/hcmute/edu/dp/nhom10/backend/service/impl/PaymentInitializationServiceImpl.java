@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import vn.hcmute.edu.dp.nhom10.backend.dto.payment.OnlinePaymentInitializationResult;
@@ -16,6 +17,7 @@ import vn.hcmute.edu.dp.nhom10.backend.service.internal.PaymentAttemptTransactio
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "PAYMENT-INITIALIZATION")
 public class PaymentInitializationServiceImpl implements PaymentInitializationService {
 
     private final PaymentAttemptTransactionService paymentAttemptTransactionService;
@@ -31,6 +33,9 @@ public class PaymentInitializationServiceImpl implements PaymentInitializationSe
     public OnlinePaymentInitializationResult initializeOnlinePayment(String checkoutCode, Long userId, String clientIp) {
         PendingPaymentContext pendingContext = paymentAttemptTransactionService.createPendingAttempt(checkoutCode, userId);
         if (pendingContext.hasPaymentUrl()) {
+            log.info("Reusing initialized online payment: checkoutCode={}, paymentReference={}, method={}, expiresAt={}",
+                    pendingContext.checkoutCode(), pendingContext.paymentReference(),
+                    pendingContext.paymentMethod(), pendingContext.expiresAt());
             return toOnlinePaymentInitializationResult(pendingContext);
         }
 
@@ -38,15 +43,21 @@ public class PaymentInitializationServiceImpl implements PaymentInitializationSe
             PaymentGatewayAdapter adapter = paymentGatewayAdapterFactory.getAdapter(pendingContext.paymentMethod());
             GatewayPaymentCreationResult gatewayResult = adapter.createPayment(toGatewayCommand(pendingContext, clientIp));
             validateGatewayResult(gatewayResult);
-            return paymentAttemptTransactionService.completeInitialization(
+            OnlinePaymentInitializationResult result = paymentAttemptTransactionService.completeInitialization(
                     pendingContext.paymentReference(),
                     gatewayResult
             );
+            log.info("Initialized online payment: checkoutCode={}, paymentReference={}, method={}, expiresAt={}",
+                    result.checkoutCode(), result.paymentReference(), result.paymentMethod(), result.expiresAt());
+            return result;
         } catch (RuntimeException e) {
             paymentAttemptTransactionService.failInitialization(
                     pendingContext.paymentReference(),
                     safeFailureReason(e)
             );
+            log.warn("Online payment initialization failed: checkoutCode={}, paymentReference={}, method={}, reason={}",
+                    pendingContext.checkoutCode(), pendingContext.paymentReference(),
+                    pendingContext.paymentMethod(), safeFailureReason(e));
             throw new PaymentInitializationException("Payment initialization failed", e);
         }
     }

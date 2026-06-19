@@ -47,18 +47,25 @@ public class VnPayIpnService {
                 .findByPaymentReference(callbackData.paymentReference())
                 .orElse(null);
         if (paymentAttempt == null) {
+            log.info("VNPay IPN rejected: paymentReference={}, gatewayTransactionId={}, reason=attempt_not_found",
+                    callbackData.paymentReference(), callbackData.transactionNumber());
             return VnPayIpnResponse.notFound();
         }
         if (!amountMatcher.matches(callbackData.amount(), paymentAttempt.getAmount())) {
+            log.warn("VNPay IPN rejected: paymentReference={}, gatewayTransactionId={}, reason=amount_mismatch, vnpAmount={}, expectedAmount={}",
+                    callbackData.paymentReference(), callbackData.transactionNumber(),
+                    callbackData.amount(), paymentAttempt.getAmount());
             return VnPayIpnResponse.invalidAmount();
         }
         if (isAlreadyProcessedBeforeTransaction(paymentAttempt, callbackData)) {
+            log.info("VNPay IPN acknowledged duplicate: paymentReference={}, gatewayTransactionId={}, status={}",
+                    callbackData.paymentReference(), callbackData.transactionNumber(), paymentAttempt.getStatus());
             return VnPayIpnResponse.alreadyProcessed(alreadyProcessedMessage(paymentAttempt.getStatus()));
         }
 
         try {
             VnPayIpnTransactionResult result = ipnTransactionService.process(callbackData);
-            return toResponse(result);
+            return toResponse(result, callbackData);
         } catch (RuntimeException e) {
             log.error("VNPay IPN failed: paymentReference={}, gatewayTransactionId={}",
                     callbackData.paymentReference(), callbackData.transactionNumber(), e);
@@ -88,13 +95,17 @@ public class VnPayIpnService {
         return "Transaction already processed";
     }
 
-    private VnPayIpnResponse toResponse(VnPayIpnTransactionResult result) {
-        return switch (result.code()) {
+    private VnPayIpnResponse toResponse(VnPayIpnTransactionResult result, VnPayCallbackData callbackData) {
+        VnPayIpnResponse response = switch (result.code()) {
             case CONFIRMED -> VnPayIpnResponse.confirmSuccess();
             case NOT_FOUND -> VnPayIpnResponse.notFound();
             case ALREADY_PROCESSED -> VnPayIpnResponse.alreadyProcessed(result.message());
             case INVALID_AMOUNT -> VnPayIpnResponse.invalidAmount();
             case UNKNOWN_ERROR -> VnPayIpnResponse.unknownError();
         };
+        log.info("VNPay IPN processed: paymentReference={}, gatewayTransactionId={}, resultCode={}, rspCode={}, message={}",
+                callbackData.paymentReference(), callbackData.transactionNumber(),
+                result.code(), response.rspCode(), response.message());
+        return response;
     }
 }
