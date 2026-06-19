@@ -43,7 +43,7 @@ openapi:
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 900000 # 15 minutes in ms
+  expiration: 3600000 # 1 hour in ms
 
 brevo:
   api-key: ${BREVO_API_KEY}
