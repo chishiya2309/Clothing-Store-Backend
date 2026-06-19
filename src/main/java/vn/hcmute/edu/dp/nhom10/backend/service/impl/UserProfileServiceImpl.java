@@ -4,16 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateProfileRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ChangePasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.UserProfileResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.MembershipTier;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
+import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.chain.profile.DobValidationHandler;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.chain.profile.NameValidationHandler;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.chain.profile.PhoneValidationHandler;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.chain.profile.ProfileValidationHandler;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.UserProfileService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Inject the handlers
     private final NameValidationHandler nameValidationHandler;
@@ -63,6 +67,29 @@ public class UserProfileServiceImpl implements UserProfileService {
         User savedUser = userRepository.save(user);
         log.info("Updated profile for user: {}", email);
         return mapToResponse(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng với email: " + email));
+
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPasswordHash())) {
+            throw new InvalidDataException("Mật khẩu hiện tại không chính xác");
+        }
+
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw new InvalidDataException("Mật khẩu xác nhận không khớp");
+        }
+
+        if (passwordEncoder.matches(request.newPassword(), user.getPasswordHash())) {
+            throw new InvalidDataException("Mật khẩu mới không được trùng mật khẩu hiện tại");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        log.info("Changed password for user: {}", email);
     }
 
     private UserProfileResponse mapToResponse(User user) {
