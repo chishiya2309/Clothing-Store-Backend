@@ -30,7 +30,8 @@ public class PlaceOrderServiceImpl implements PlaceOrderService {
     @Override
     public PlaceOrderResponseDTO confirmCheckout(
             ConfirmCheckoutRequestDTO requestDTO,
-            Long userId
+            Long userId,
+            String clientIp
     ) {
         validateRequest(requestDTO, userId);
         preflightGatewayIfNeeded(requestDTO.paymentMethod());
@@ -40,7 +41,7 @@ public class PlaceOrderServiceImpl implements PlaceOrderService {
 
         return switch (reservedCheckout.paymentMethod()) {
             case cod -> createCodOrder(reservedCheckout, userId);
-            case vnpay, momo -> initializeOnlinePayment(reservedCheckout, userId);
+            case vnpay, momo -> initializeOnlinePayment(reservedCheckout, userId, clientIp);
         };
     }
 
@@ -103,11 +104,13 @@ public class PlaceOrderServiceImpl implements PlaceOrderService {
 
     private PlaceOrderResponseDTO initializeOnlinePayment(
             ReservedCheckoutResult reservedCheckout,
-            Long userId
+            Long userId,
+            String clientIp
     ) {
         OnlinePaymentInitializationResult paymentResult = paymentInitializationService.initializeOnlinePayment(
                 reservedCheckout.checkoutCode(),
-                userId
+                userId,
+                clientIp
         );
         OnlinePaymentResponseDTO onlinePayment = new OnlinePaymentResponseDTO(
                 paymentResult.paymentReference(),

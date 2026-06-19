@@ -6,6 +6,7 @@ public interface PaymentInitializationService {
 
     OnlinePaymentInitializationResult initializeOnlinePayment(
             String checkoutCode,
-            Long userId
+            Long userId,
+            String clientIp
     );
 }

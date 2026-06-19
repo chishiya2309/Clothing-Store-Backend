@@ -8,6 +8,11 @@ public interface PaymentGatewayAdapter {
 
     boolean isAvailable();
 
+    default String unavailableReason() {
+        PaymentMethod method = supportMethod();
+        return method == null ? "payment gateway" : method.name();
+    }
+
     GatewayPaymentCreationResult createPayment(
             GatewayPaymentCreationCommand command
     );

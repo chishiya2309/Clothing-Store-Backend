@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
@@ -256,6 +257,7 @@ public abstract class AbstractPostgresIntegrationTest {
 
         @Bean
         @Primary
+        @ConditionalOnProperty(name = "test.fake-payment-gateway.enabled", havingValue = "true", matchIfMissing = true)
         PaymentGatewayAdapterFactory paymentGatewayAdapterFactory(PaymentAttemptRepository paymentAttemptRepository) {
             PaymentGatewayAdapter fakeVnPayAdapter = new PaymentGatewayAdapter() {
                 @Override

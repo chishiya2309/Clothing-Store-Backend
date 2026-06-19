@@ -54,7 +54,8 @@ class OnlinePaymentInitializationIT extends AbstractPostgresIntegrationTest {
 
         PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(
                 fixture.request(PaymentMethod.vnpay),
-                fixture.userId()
+                fixture.userId(),
+                "203.0.113.10"
         );
 
         assertThat(response.paymentMethod()).isEqualTo(PaymentMethod.vnpay);
@@ -88,7 +89,8 @@ class OnlinePaymentInitializationIT extends AbstractPostgresIntegrationTest {
 
         assertThatThrownBy(() -> placeOrderService.confirmCheckout(
                 fixture.request(PaymentMethod.vnpay),
-                fixture.userId()
+                fixture.userId(),
+                "203.0.113.10"
         )).isInstanceOf(PaymentInitializationException.class);
 
         List<CheckoutSession> sessions = checkoutSessionRepository.findAll();

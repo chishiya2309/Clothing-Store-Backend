@@ -7,6 +7,7 @@ public interface PlaceOrderService {
 
     PlaceOrderResponseDTO confirmCheckout(
             ConfirmCheckoutRequestDTO requestDTO,
-            Long userId
+            Long userId,
+            String clientIp
     );
 }

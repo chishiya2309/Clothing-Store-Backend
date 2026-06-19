@@ -31,7 +31,8 @@ class OrderCreatedEventIT extends AbstractPostgresIntegrationTest {
 
         PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(
                 fixture.request(PaymentMethod.cod),
-                fixture.userId()
+                fixture.userId(),
+                "203.0.113.10"
         );
 
         List<OrderCreatedEvent> events = orderCreatedEventProbe.events();

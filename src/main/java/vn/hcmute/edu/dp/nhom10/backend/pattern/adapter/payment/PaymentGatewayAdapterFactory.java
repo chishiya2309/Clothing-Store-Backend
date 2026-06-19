@@ -64,7 +64,7 @@ public class PaymentGatewayAdapterFactory {
             throw new PaymentGatewayUnavailableException("Payment gateway is not supported: " + method);
         }
         if (!adapter.isAvailable()) {
-            throw new PaymentGatewayUnavailableException("Payment gateway is unavailable: " + method);
+            throw new PaymentGatewayUnavailableException("Payment gateway is unavailable: " + adapter.unavailableReason());
         }
     }
 }

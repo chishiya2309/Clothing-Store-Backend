@@ -24,6 +24,7 @@ import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentGatewayUnavailableException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.security.AuthenticatedUserProvider;
+import vn.hcmute.edu.dp.nhom10.backend.security.ClientIpResolver;
 import vn.hcmute.edu.dp.nhom10.backend.service.PlaceOrderService;
 
 import java.math.BigDecimal;
@@ -41,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class CheckoutControllerTest {
 
+    private static final String CLIENT_IP = "203.0.113.10";
+
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -50,6 +53,9 @@ class CheckoutControllerTest {
 
     @Mock
     private AuthenticatedUserProvider authenticatedUserProvider;
+
+    @Mock
+    private ClientIpResolver clientIpResolver;
 
     @InjectMocks
     private CheckoutController checkoutController;
@@ -70,7 +76,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.cod);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L))).thenReturn(codResponse());
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP))).thenReturn(codResponse());
 
         mockMvc.perform(post("/api/checkouts/confirm")
                         .principal(authentication)
@@ -89,7 +96,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.vnpay);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L))).thenReturn(onlineResponse());
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP))).thenReturn(onlineResponse());
 
         mockMvc.perform(post("/api/checkouts/confirm")
                         .principal(authentication)
@@ -107,7 +115,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.cod);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L))).thenReturn(codResponse());
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP))).thenReturn(codResponse());
 
         mockMvc.perform(post("/api/checkouts/confirm")
                         .principal(authentication)
@@ -116,8 +125,26 @@ class CheckoutControllerTest {
                 .andExpect(status().isOk());
 
         verify(authenticatedUserProvider).getCurrentUserId(authentication);
-        verify(placeOrderService).confirmCheckout(request, 10L);
+        verify(placeOrderService).confirmCheckout(request, 10L, CLIENT_IP);
         verifyNoMoreInteractions(placeOrderService);
+    }
+
+    @Test
+    void confirmCheckout_passesResolvedClientIpToService() throws Exception {
+        Authentication authentication = authentication();
+        ConfirmCheckoutRequestDTO request = request(PaymentMethod.vnpay);
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP))).thenReturn(onlineResponse());
+
+        mockMvc.perform(post("/api/checkouts/confirm")
+                        .principal(authentication)
+                        .header("X-Forwarded-For", "203.0.113.10, 10.0.0.1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        verify(placeOrderService).confirmCheckout(request, 10L, CLIENT_IP);
     }
 
     @Test
@@ -147,7 +174,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.vnpay);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L)))
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP)))
                 .thenThrow(new PaymentGatewayUnavailableException("Gateway unavailable"));
 
         mockMvc.perform(post("/api/checkouts/confirm")
@@ -163,7 +191,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.cod);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L)))
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP)))
                 .thenThrow(new InvalidDataException("Checkout conflict"));
 
         mockMvc.perform(post("/api/checkouts/confirm")
@@ -179,7 +208,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.cod);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L)))
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP)))
                 .thenThrow(new ResourceNotFoundException("Checkout not found"));
 
         mockMvc.perform(post("/api/checkouts/confirm")
@@ -195,7 +225,8 @@ class CheckoutControllerTest {
         Authentication authentication = authentication();
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.cod);
         when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
-        when(placeOrderService.confirmCheckout(eq(request), eq(10L))).thenReturn(codResponse());
+        when(clientIpResolver.resolve(org.mockito.ArgumentMatchers.any())).thenReturn(CLIENT_IP);
+        when(placeOrderService.confirmCheckout(eq(request), eq(10L), eq(CLIENT_IP))).thenReturn(codResponse());
 
         mockMvc.perform(post("/api/checkouts/confirm")
                         .principal(authentication)
@@ -203,7 +234,7 @@ class CheckoutControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        verify(placeOrderService).confirmCheckout(request, 10L);
+        verify(placeOrderService).confirmCheckout(request, 10L, CLIENT_IP);
     }
 
     private Authentication authentication() {

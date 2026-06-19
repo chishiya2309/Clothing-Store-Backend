@@ -38,6 +38,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PlaceOrderServiceImplTest {
 
+    private static final String CLIENT_IP = "203.0.113.10";
+
     @Mock
     private CheckoutService checkoutService;
 
@@ -61,7 +63,7 @@ class PlaceOrderServiceImplTest {
         when(checkoutService.prepareCheckout(request(PaymentMethod.cod), 10L)).thenReturn(reserved(PaymentMethod.cod));
         when(orderService.createCodOrder("CHK-1", 10L)).thenReturn(order());
 
-        PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L);
+        PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP);
 
         assertEquals("CHK-1", response.checkoutCode());
         assertEquals(PaymentMethod.cod, response.paymentMethod());
@@ -74,7 +76,7 @@ class PlaceOrderServiceImplTest {
         when(checkoutService.prepareCheckout(request(PaymentMethod.cod), 10L)).thenReturn(reserved(PaymentMethod.cod));
         when(orderService.createCodOrder("CHK-1", 10L)).thenReturn(order());
 
-        placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L);
+        placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP);
 
         verifyNoInteractions(paymentGatewayAdapterFactory);
     }
@@ -85,7 +87,7 @@ class PlaceOrderServiceImplTest {
         when(checkoutService.prepareCheckout(request, 10L)).thenReturn(reserved(PaymentMethod.cod));
         when(orderService.createCodOrder("CHK-1", 10L)).thenReturn(order());
 
-        placeOrderService.confirmCheckout(request, 10L);
+        placeOrderService.confirmCheckout(request, 10L, CLIENT_IP);
 
         InOrder inOrder = inOrder(checkoutService, orderService);
         inOrder.verify(checkoutService).prepareCheckout(request, 10L);
@@ -97,7 +99,7 @@ class PlaceOrderServiceImplTest {
         when(checkoutService.prepareCheckout(request(PaymentMethod.cod), 10L)).thenReturn(reserved(PaymentMethod.cod));
         when(orderService.createCodOrder("CHK-1", 10L)).thenReturn(order());
 
-        placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L);
+        placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP);
 
         verifyNoInteractions(paymentInitializationService);
     }
@@ -108,7 +110,7 @@ class PlaceOrderServiceImplTest {
                 .thenThrow(new InvalidDataException("Invalid checkout"));
 
         assertThrows(InvalidDataException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP));
 
         verifyNoInteractions(orderService, paymentInitializationService, checkoutFailureTransactionService);
     }
@@ -120,7 +122,7 @@ class PlaceOrderServiceImplTest {
         when(orderService.createCodOrder("CHK-1", 10L)).thenThrow(originalException);
 
         RuntimeException thrown = assertThrows(RuntimeException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP));
 
         assertSame(originalException, thrown);
         verify(checkoutFailureTransactionService).failAndReleaseReservedCheckout("CHK-1");
@@ -135,7 +137,7 @@ class PlaceOrderServiceImplTest {
         doThrow(compensationException).when(checkoutFailureTransactionService).failAndReleaseReservedCheckout("CHK-1");
 
         RuntimeException thrown = assertThrows(RuntimeException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP));
 
         assertSame(originalException, thrown);
         assertSame(compensationException, thrown.getSuppressed()[0]);
@@ -146,7 +148,7 @@ class PlaceOrderServiceImplTest {
         when(checkoutService.prepareCheckout(request(PaymentMethod.cod), 10L)).thenReturn(reserved(PaymentMethod.cod));
         when(orderService.createCodOrder("CHK-1", 10L)).thenReturn(order());
 
-        placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L);
+        placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP);
 
         verifyNoInteractions(checkoutFailureTransactionService);
     }
@@ -155,14 +157,14 @@ class PlaceOrderServiceImplTest {
     void confirmCheckout_vnpayChecksAvailabilityBeforePrepare() {
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.vnpay);
         when(checkoutService.prepareCheckout(request, 10L)).thenReturn(reserved(PaymentMethod.vnpay));
-        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L)).thenReturn(payment(PaymentMethod.vnpay));
+        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L, CLIENT_IP)).thenReturn(payment(PaymentMethod.vnpay));
 
-        placeOrderService.confirmCheckout(request, 10L);
+        placeOrderService.confirmCheckout(request, 10L, CLIENT_IP);
 
         InOrder inOrder = inOrder(paymentGatewayAdapterFactory, checkoutService, paymentInitializationService);
         inOrder.verify(paymentGatewayAdapterFactory).requireAvailable(PaymentMethod.vnpay);
         inOrder.verify(checkoutService).prepareCheckout(request, 10L);
-        inOrder.verify(paymentInitializationService).initializeOnlinePayment("CHK-1", 10L);
+        inOrder.verify(paymentInitializationService).initializeOnlinePayment("CHK-1", 10L, CLIENT_IP);
     }
 
     @Test
@@ -171,7 +173,7 @@ class PlaceOrderServiceImplTest {
                 .when(paymentGatewayAdapterFactory).requireAvailable(PaymentMethod.vnpay);
 
         assertThrows(PaymentGatewayUnavailableException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.vnpay), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.vnpay), 10L, CLIENT_IP));
 
         verifyNoInteractions(checkoutService, orderService, paymentInitializationService);
     }
@@ -179,9 +181,9 @@ class PlaceOrderServiceImplTest {
     @Test
     void confirmCheckout_vnpaySuccess_mapsOnlinePayment() {
         when(checkoutService.prepareCheckout(request(PaymentMethod.vnpay), 10L)).thenReturn(reserved(PaymentMethod.vnpay));
-        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L)).thenReturn(payment(PaymentMethod.vnpay));
+        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L, CLIENT_IP)).thenReturn(payment(PaymentMethod.vnpay));
 
-        PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(request(PaymentMethod.vnpay), 10L);
+        PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(request(PaymentMethod.vnpay), 10L, CLIENT_IP);
 
         assertEquals(PaymentMethod.vnpay, response.paymentMethod());
         assertNull(response.order());
@@ -193,11 +195,11 @@ class PlaceOrderServiceImplTest {
     @Test
     void confirmCheckout_onlineInitializationFails_doesNotCallCodCompensation() {
         when(checkoutService.prepareCheckout(request(PaymentMethod.vnpay), 10L)).thenReturn(reserved(PaymentMethod.vnpay));
-        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L))
+        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L, CLIENT_IP))
                 .thenThrow(new InvalidDataException("Payment failed"));
 
         assertThrows(InvalidDataException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.vnpay), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.vnpay), 10L, CLIENT_IP));
 
         verifyNoInteractions(checkoutFailureTransactionService, orderService);
     }
@@ -206,14 +208,14 @@ class PlaceOrderServiceImplTest {
     void confirmCheckout_momoChecksAvailabilityBeforePrepare() {
         ConfirmCheckoutRequestDTO request = request(PaymentMethod.momo);
         when(checkoutService.prepareCheckout(request, 10L)).thenReturn(reserved(PaymentMethod.momo));
-        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L)).thenReturn(payment(PaymentMethod.momo));
+        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L, CLIENT_IP)).thenReturn(payment(PaymentMethod.momo));
 
-        placeOrderService.confirmCheckout(request, 10L);
+        placeOrderService.confirmCheckout(request, 10L, CLIENT_IP);
 
         InOrder inOrder = inOrder(paymentGatewayAdapterFactory, checkoutService, paymentInitializationService);
         inOrder.verify(paymentGatewayAdapterFactory).requireAvailable(PaymentMethod.momo);
         inOrder.verify(checkoutService).prepareCheckout(request, 10L);
-        inOrder.verify(paymentInitializationService).initializeOnlinePayment("CHK-1", 10L);
+        inOrder.verify(paymentInitializationService).initializeOnlinePayment("CHK-1", 10L, CLIENT_IP);
     }
 
     @Test
@@ -222,7 +224,7 @@ class PlaceOrderServiceImplTest {
                 .when(paymentGatewayAdapterFactory).requireAvailable(PaymentMethod.momo);
 
         assertThrows(PaymentGatewayUnavailableException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.momo), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.momo), 10L, CLIENT_IP));
 
         verifyNoInteractions(checkoutService, orderService, paymentInitializationService);
     }
@@ -230,9 +232,9 @@ class PlaceOrderServiceImplTest {
     @Test
     void confirmCheckout_momoSuccess_doesNotCallOrderService() {
         when(checkoutService.prepareCheckout(request(PaymentMethod.momo), 10L)).thenReturn(reserved(PaymentMethod.momo));
-        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L)).thenReturn(payment(PaymentMethod.momo));
+        when(paymentInitializationService.initializeOnlinePayment("CHK-1", 10L, CLIENT_IP)).thenReturn(payment(PaymentMethod.momo));
 
-        placeOrderService.confirmCheckout(request(PaymentMethod.momo), 10L);
+        placeOrderService.confirmCheckout(request(PaymentMethod.momo), 10L, CLIENT_IP);
 
         verifyNoInteractions(orderService);
     }
@@ -240,7 +242,7 @@ class PlaceOrderServiceImplTest {
     @Test
     void confirmCheckout_nullRequest_throwsException() {
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.confirmCheckout(null, 10L));
+                () -> placeOrderService.confirmCheckout(null, 10L, CLIENT_IP));
 
         verifyNoInteractions(checkoutService, orderService, paymentInitializationService);
     }
@@ -248,7 +250,7 @@ class PlaceOrderServiceImplTest {
     @Test
     void confirmCheckout_nullUserId_throwsException() {
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), null));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), null, CLIENT_IP));
 
         verifyNoInteractions(checkoutService, orderService, paymentInitializationService);
     }
@@ -258,7 +260,7 @@ class PlaceOrderServiceImplTest {
         ConfirmCheckoutRequestDTO request = new ConfirmCheckoutRequestDTO(1L, null, null);
 
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.confirmCheckout(request, 10L));
+                () -> placeOrderService.confirmCheckout(request, 10L, CLIENT_IP));
 
         verifyNoInteractions(checkoutService, orderService, paymentInitializationService);
     }
@@ -268,7 +270,7 @@ class PlaceOrderServiceImplTest {
         when(checkoutService.prepareCheckout(request(PaymentMethod.cod), 10L)).thenReturn(reserved(PaymentMethod.vnpay));
 
         assertThrows(InvalidDataException.class,
-                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L));
+                () -> placeOrderService.confirmCheckout(request(PaymentMethod.cod), 10L, CLIENT_IP));
 
         verify(orderService, never()).createCodOrder(any(), anyLong());
         verifyNoInteractions(paymentInitializationService);

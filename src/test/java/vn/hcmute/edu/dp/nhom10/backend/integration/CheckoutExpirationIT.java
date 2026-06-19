@@ -62,7 +62,8 @@ class CheckoutExpirationIT extends AbstractPostgresIntegrationTest {
                 testDataFactory.createCheckoutFixture(5, 1, true);
         PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(
                 fixture.request(PaymentMethod.vnpay),
-                fixture.userId()
+                fixture.userId(),
+                "203.0.113.10"
         );
 
         CheckoutSession checkoutSession = checkoutSessionRepository.findByCheckoutCode(response.checkoutCode()).orElseThrow();

@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PlaceOrderResponseDTO;
 import vn.hcmute.edu.dp.nhom10.backend.security.AuthenticatedUserProvider;
+import vn.hcmute.edu.dp.nhom10.backend.security.ClientIpResolver;
 import vn.hcmute.edu.dp.nhom10.backend.service.PlaceOrderService;
 
 import java.time.OffsetDateTime;
@@ -27,15 +29,18 @@ public class CheckoutController {
 
     private final PlaceOrderService placeOrderService;
     private final AuthenticatedUserProvider authenticatedUserProvider;
+    private final ClientIpResolver clientIpResolver;
 
     @PostMapping("/confirm")
     public ApiResponse confirmCheckout(
             @Valid @RequestBody ConfirmCheckoutRequestDTO requestDTO,
-            Authentication authentication
+            Authentication authentication,
+            HttpServletRequest httpRequest
     ) {
         Long userId = authenticatedUserProvider.getCurrentUserId(authentication);
+        String clientIp = clientIpResolver.resolve(httpRequest);
         log.info("Confirming checkout for authenticated user: {}", authentication.getName());
-        PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(requestDTO, userId);
+        PlaceOrderResponseDTO response = placeOrderService.confirmCheckout(requestDTO, userId, clientIp);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Confirm checkout successfully")

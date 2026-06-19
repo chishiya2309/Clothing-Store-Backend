@@ -28,7 +28,7 @@ public class PaymentInitializationServiceImpl implements PaymentInitializationSe
     private String callbackUrl;
 
     @Override
-    public OnlinePaymentInitializationResult initializeOnlinePayment(String checkoutCode, Long userId) {
+    public OnlinePaymentInitializationResult initializeOnlinePayment(String checkoutCode, Long userId, String clientIp) {
         PendingPaymentContext pendingContext = paymentAttemptTransactionService.createPendingAttempt(checkoutCode, userId);
         if (pendingContext.hasPaymentUrl()) {
             return toOnlinePaymentInitializationResult(pendingContext);
@@ -36,7 +36,7 @@ public class PaymentInitializationServiceImpl implements PaymentInitializationSe
 
         try {
             PaymentGatewayAdapter adapter = paymentGatewayAdapterFactory.getAdapter(pendingContext.paymentMethod());
-            GatewayPaymentCreationResult gatewayResult = adapter.createPayment(toGatewayCommand(pendingContext));
+            GatewayPaymentCreationResult gatewayResult = adapter.createPayment(toGatewayCommand(pendingContext, clientIp));
             validateGatewayResult(gatewayResult);
             return paymentAttemptTransactionService.completeInitialization(
                     pendingContext.paymentReference(),
@@ -51,20 +51,15 @@ public class PaymentInitializationServiceImpl implements PaymentInitializationSe
         }
     }
 
-    private GatewayPaymentCreationCommand toGatewayCommand(PendingPaymentContext pendingContext) {
-        if (returnUrl == null || returnUrl.isBlank()) {
-            throw new InvalidDataException("Payment return URL is not configured");
-        }
-        if (callbackUrl == null || callbackUrl.isBlank()) {
-            throw new InvalidDataException("Payment callback URL is not configured");
-        }
+    private GatewayPaymentCreationCommand toGatewayCommand(PendingPaymentContext pendingContext, String clientIp) {
         return new GatewayPaymentCreationCommand(
                 pendingContext.paymentReference(),
                 pendingContext.checkoutCode(),
                 pendingContext.amount(),
                 pendingContext.expiresAt(),
                 returnUrl,
-                callbackUrl
+                callbackUrl,
+                clientIp
         );
     }
 

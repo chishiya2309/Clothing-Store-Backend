@@ -9,6 +9,7 @@ public record GatewayPaymentCreationCommand(
         BigDecimal amount,
         OffsetDateTime expiresAt,
         String returnUrl,
-        String callbackUrl
+        String callbackUrl,
+        String clientIp
 ) {
 }

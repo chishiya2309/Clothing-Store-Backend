@@ -59,3 +59,17 @@ app:
 
 google:
   client-id: ${GOOGLE_CLIENT_ID}
+
+payment:
+  vnpay:
+    enabled: ${VNPAY_ENABLED:false}
+    tmn-code: ${VNPAY_TMN_CODE:}
+    hash-secret: ${VNPAY_HASH_SECRET:}
+    pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+    return-url: ${VNPAY_RETURN_URL:}
+    version: ${VNPAY_VERSION:2.1.0}
+    command: ${VNPAY_COMMAND:pay}
+    order-type: ${VNPAY_ORDER_TYPE:other}
+    locale: ${VNPAY_LOCALE:vn}
+    currency: ${VNPAY_CURRENCY:VND}
+    expire-minutes: ${VNPAY_EXPIRE_MINUTES:15}
