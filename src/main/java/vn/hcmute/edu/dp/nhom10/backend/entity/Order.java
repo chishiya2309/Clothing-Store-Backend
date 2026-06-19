@@ -3,7 +3,9 @@ package vn.hcmute.edu.dp.nhom10.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 
 import java.math.BigDecimal;
@@ -66,6 +68,7 @@ public class Order {
     private Voucher voucher;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "order_status")
     private OrderStatus status = OrderStatus.pending;
 
