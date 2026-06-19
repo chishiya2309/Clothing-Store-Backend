@@ -73,3 +73,16 @@ payment:
     locale: ${VNPAY_LOCALE:vn}
     currency: ${VNPAY_CURRENCY:VND}
     expire-minutes: ${VNPAY_EXPIRE_MINUTES:15}
+  momo:
+    enabled: ${MOMO_ENABLED:false}
+    partner-code: ${MOMO_PARTNER_CODE:}
+    access-key: ${MOMO_ACCESS_KEY:}
+    secret-key: ${MOMO_SECRET_KEY:}
+    create-url: ${MOMO_CREATE_URL:https://test-payment.momo.vn/v2/gateway/api/create}
+    redirect-url: ${MOMO_REDIRECT_URL:}
+    ipn-url: ${MOMO_IPN_URL:}
+    request-type: ${MOMO_REQUEST_TYPE:captureWallet}
+    lang: ${MOMO_LANG:vi}
+    auto-capture: ${MOMO_AUTO_CAPTURE:true}
+    connect-timeout-seconds: ${MOMO_CONNECT_TIMEOUT_SECONDS:10}
+    read-timeout-seconds: ${MOMO_READ_TIMEOUT_SECONDS:30}

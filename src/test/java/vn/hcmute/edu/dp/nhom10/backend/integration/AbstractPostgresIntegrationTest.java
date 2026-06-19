@@ -291,7 +291,44 @@ public abstract class AbstractPostgresIntegrationTest {
                     );
                 }
             };
-            return new PaymentGatewayAdapterFactory(List.of(fakeVnPayAdapter));
+            PaymentGatewayAdapter fakeMomoAdapter = new PaymentGatewayAdapter() {
+                @Override
+                public PaymentMethod supportMethod() {
+                    return PaymentMethod.momo;
+                }
+
+                @Override
+                public boolean isAvailable() {
+                    return true;
+                }
+
+                @Override
+                public GatewayPaymentCreationResult createPayment(GatewayPaymentCreationCommand command) {
+                    if (GATEWAY_FAILS.get()) {
+                        throw new PaymentInitializationException("Fake gateway failure");
+                    }
+
+                    PaymentAttempt pendingAttempt = paymentAttemptRepository
+                            .findByPaymentReference(command.paymentReference())
+                            .orElseThrow(() -> new PaymentInitializationException("Pending payment attempt was not committed"));
+                    if (pendingAttempt.getStatus() == PaymentAttemptStatus.pending
+                            && pendingAttempt.getPaymentUrl() == null) {
+                        GATEWAY_OBSERVED_PENDING_ATTEMPT.set(true);
+                    }
+
+                    return new GatewayPaymentCreationResult(
+                            "https://test-payment.momo.vn/pay/" + command.paymentReference(),
+                            null,
+                            Map.of(
+                                    "gateway", "momo",
+                                    "checkoutCode", command.checkoutCode(),
+                                    "orderId", command.paymentReference(),
+                                    "requestId", command.paymentReference()
+                            )
+                    );
+                }
+            };
+            return new PaymentGatewayAdapterFactory(List.of(fakeVnPayAdapter, fakeMomoAdapter));
         }
 
         @Bean

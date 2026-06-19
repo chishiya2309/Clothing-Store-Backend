@@ -46,7 +46,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/api/guest/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/payments/vnpay/return",
-                                "/api/payments/vnpay/ipn").permitAll()
+                                "/api/payments/vnpay/ipn",
+                                "/api/payments/momo/return").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/payments/momo/ipn").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )

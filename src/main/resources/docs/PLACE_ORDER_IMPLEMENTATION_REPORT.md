@@ -479,3 +479,101 @@ Commit message đề xuất cho cập nhật Phase 3:
 ```text
 test(vnpay): complete sandbox acceptance and hardening
 ```
+## 4.22. MoMo sandbox payment workflow
+
+Trang thai: implementation completed va automated end-to-end verified bang unit test, controller test, va PostgreSQL integration test. Manual MoMo Sandbox voi tai khoan/ngrok that chua verified trong luot nay.
+
+Kien truc MoMo:
+
+- Tai su dung checkout snapshot, inventory reservation, voucher reservation, PaymentAttempt, cart cleanup, OrderCreatedEvent va lock order cua online payment flow hien co.
+- `PaymentGatewayAdapterFactory` tiep tuc chon gateway qua adapter; `MomoAdapter` ho tro `PaymentMethod.momo`.
+- `MomoAdapter` khong ghep URL cuc bo. Adapter ky request va POST JSON den MoMo Create Payment API.
+- Return endpoint chi doc trang thai PaymentAttempt, khong finalize order.
+- IPN endpoint verify HMAC/partner/orderId/requestId/amount truoc khi finalize.
+
+Create Payment flow:
+
+1. Confirm checkout voi `paymentMethod=momo`.
+2. Tao checkout session/reservation/PaymentAttempt pending trong transaction ngan.
+3. Ngoai transaction, `MomoAdapter` tao `MomoCreatePaymentRequest`, ky HMAC-SHA256 va POST den `payment.momo.create-url`.
+4. Verify create response: partnerCode, orderId, requestId, amount, resultCode=0, payUrl va response signature.
+5. Luu paymentUrl va gateway payload da sanitize vao PaymentAttempt.
+
+Signature rules:
+
+- Create request raw signature dung thu tu MoMo: `accessKey`, `amount`, `extraData`, `ipnUrl`, `orderId`, `orderInfo`, `partnerCode`, `redirectUrl`, `requestId`, `requestType`.
+- Create response raw signature dung thu tu MoMo: `accessKey`, `amount`, `message`, `orderId`, `partnerCode`, `payUrl`, `requestId`, `responseTime`, `resultCode`.
+- IPN/return raw signature dung thu tu MoMo: `accessKey`, `amount`, `extraData`, `message`, `orderId`, `orderInfo`, `orderType`, `partnerCode`, `payType`, `requestId`, `responseTime`, `resultCode`, `transId`.
+- Output signature la lowercase hex; verify dung constant-time comparison.
+
+Result code classifier:
+
+- `0`: completed.
+- `1000`, `7000`, `7002`: pending/processing, khong tao order va khong release reservation.
+- `9000`: authorized, giu pending voi scope `captureWallet` + `autoCapture=true`.
+- Cac code con lai: final failure, mark failed va release reservation.
+
+Success flow:
+
+- IPN hop le va completed se tao Order/OrderItem/Payment tu checkout snapshot.
+- Payment co `method=momo`, `status=completed`, `transactionId=transId`.
+- Inventory/voucher duoc consume dung mot lan, cart item da mua bi xoa, CheckoutSession completed, PaymentAttempt completed.
+
+Requires-refund:
+
+- Neu callback thanh cong den sau khi checkout expired/failed hoac reservation khong con fulfill duoc, PaymentAttempt chuyen `requires_refund`.
+- Khong tao Order, khong consume inventory/voucher, khong xoa cart.
+- Refund API that khong nam trong scope nay.
+
+Idempotency va concurrency:
+
+- PaymentAttempt la idempotency boundary.
+- Duplicate IPN terminal tra accepted, khong tao them Order/Payment.
+- Concurrent duplicate success duoc test voi PostgreSQL lock: Order count = 1, Payment count = 1, stock giam mot lan.
+
+Configuration:
+
+- Them `MomoProperties` voi prefix `payment.momo`.
+- Env placeholder da bo sung vao `.env.example`.
+- `MOMO_ENABLED=false` mac dinh.
+- Khong log/tra ve `accessKey`, `secretKey`, hoac signature trong API payload da sanitize.
+
+Security:
+
+- Public dung `GET /api/payments/momo/return`.
+- Public dung `POST /api/payments/momo/ipn`.
+- Khong public wildcard `/api/payments/**`.
+
+Automated test result trong luot MoMo:
+
+- `mvn clean test`: pass, `Tests run: 396, Failures: 0, Errors: 0, Skipped: 0`.
+- `mvn clean verify -Pintegration "-Dit.test=MomoPaymentInitializationIT,MomoIpnIT"`: pass, `Tests run: 10, Failures: 0, Errors: 0, Skipped: 0`.
+
+Manual Sandbox status:
+
+- Chua verified bang giao dich MoMo Sandbox that trong luot nay.
+- Da tao `docs/MOMO_SANDBOX_GUIDE.md` de chay ngrok, set env, confirm checkout va kiem tra IPN 204.
+
+Production gaps:
+
+- Chua co refund API/reconciliation/query transaction.
+- Chua co recurring/tokenization, Pay Later, ATM, credit card.
+- Chua co production monitoring/alerting rieng cho MoMo.
+- Chua verify allowlist/anti-abuse o moi truong production; security hien dua vao HMAC, partnerCode, orderId, requestId, amount va idempotency.
+
+Ket luan:
+
+- MoMo Payment URL tao duoc qua adapter.
+- MoMo Create API da duoc goi that trong adapter; automated test mock HTTP endpoint, khong goi sandbox that.
+- Redirect handler read-only.
+- IPN verify chu ky va finalize Order.
+- Pending result giu pending.
+- Duplicate callback khong tao trung Order.
+- MoMo demo-ready cho backend sandbox sau khi set env/ngrok.
+- Chua production-ready vi con thieu refund/reconciliation va manual sandbox acceptance that.
+
+Commit message de xuat:
+
+```text
+feat(momo): integrate sandbox payment workflow
+```

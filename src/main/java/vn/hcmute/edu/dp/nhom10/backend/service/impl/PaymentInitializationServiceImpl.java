@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import vn.hcmute.edu.dp.nhom10.backend.dto.payment.OnlinePaymentInitializationResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.payment.PendingPaymentContext;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
+import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentGatewayUncertainException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentInitializationException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCreationCommand;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCreationResult;
@@ -50,6 +51,11 @@ public class PaymentInitializationServiceImpl implements PaymentInitializationSe
             log.info("Initialized online payment: checkoutCode={}, paymentReference={}, method={}, expiresAt={}",
                     result.checkoutCode(), result.paymentReference(), result.paymentMethod(), result.expiresAt());
             return result;
+        } catch (PaymentGatewayUncertainException e) {
+            log.warn("Online payment initialization uncertain: checkoutCode={}, paymentReference={}, method={}, reason={}",
+                    pendingContext.checkoutCode(), pendingContext.paymentReference(),
+                    pendingContext.paymentMethod(), safeFailureReason(e));
+            throw new PaymentInitializationException("Payment initialization is uncertain", e);
         } catch (RuntimeException e) {
             paymentAttemptTransactionService.failInitialization(
                     pendingContext.paymentReference(),
