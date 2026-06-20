@@ -162,7 +162,9 @@ public class GlobalExceptionHandling {
                                 "message": "{data} exists. Please try again"
                             }
                             """)) })
-    }) public ErrorResponse handleDuplicateKeyException(InvalidDataException e, WebRequest request) {
+    })
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicateKeyException(InvalidDataException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
