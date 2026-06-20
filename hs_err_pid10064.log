@@ -1,0 +1,230 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (malloc) failed to allocate 1048576 bytes for AllocateHeap
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+#   JVM is running with Unscaled Compressed Oops mode in which the Java heap is
+#     placed in the first 4GB address space. The Java Heap base address is the
+#     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+#     to set the Java Heap base and to place the Java Heap above 4GB virtual address.
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (allocation.cpp:44), pid=10064, tid=2804
+#
+# JRE version:  (21.0.7+8) (build )
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (21.0.7+8-LTS-245, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, windows-amd64)
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dfile.encoding=IBM437 -Dnet.bytebuddy.agent.attacher.dump= net.bytebuddy.agent.Attacher com.sun.tools.attach.VirtualMachine 3164 C:\Users\lequa\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar false 
+
+Host: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz, 8 cores, 7G,  Windows 11 , 64 bit Build 22621 (10.0.22621.5415)
+Time: Fri Jun 19 14:39:24 2026 SE Asia Standard Time elapsed time: 0.022239 seconds (0d 0h 0m 0s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000002a9f4b791f0):  JavaThread "Unknown thread" [_thread_in_vm, id=2804, stack(0x000000c6cde00000,0x000000c6cdf00000) (1024K)]
+
+Stack: [0x000000c6cde00000,0x000000c6cdf00000]
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x6cae19]
+V  [jvm.dll+0x855741]
+V  [jvm.dll+0x857c6e]
+V  [jvm.dll+0x858343]
+V  [jvm.dll+0x27e0b6]
+V  [jvm.dll+0xbfa77]
+V  [jvm.dll+0x326025]
+V  [jvm.dll+0x81eabd]
+V  [jvm.dll+0x3bb211]
+V  [jvm.dll+0x807d78]
+V  [jvm.dll+0x4503ee]
+V  [jvm.dll+0x451fe1]
+C  [jli.dll+0x52a3]
+C  [ucrtbase.dll+0x29333]
+C  [KERNEL32.DLL+0x1259d]
+C  [ntdll.dll+0x5af78]
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x00007ff92272cc48, length=0, elements={
+}
+
+Java Threads: ( => current thread )
+Total: 0
+
+Other Threads:
+
+=>0x000002a9f4b791f0 (exited) JavaThread "Unknown thread"    [_thread_in_vm, id=2804, stack(0x000000c6cde00000,0x000000c6cdf00000) (1024K)]
+Total: 1
+
+Threads with active compile tasks:
+Total: 0
+
+VM state: not at safepoint (not fully initialized)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap address: 0x0000000000000000, size: 0 MB, Compressed Oops mode: 32-bit
+
+CDS archive(s) mapped at: [0x0000000000000000-0x0000000000000000-0x0000000000000000), size 0, SharedBaseAddress: 0x0000000800000000, ArchiveRelocationMode: 1.
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 0, Narrow klass range: 0x0
+
+GC Precious Log:
+ CardTable entry size: 512
+ Card Set container configuration: InlinePtr #cards 5 size 8 Array Of Cards #cards 12 size 40 Howl #buckets 4 coarsen threshold 1843 Howl Bitmap #cards 512 size 80 coarsen threshold 460 Card regions per heap region 1 cards per card region 2048
+
+GC Heap History (0 events):
+No events
+
+Dll operation events (1 events):
+Event: 0.016 Loaded shared library D:\Java\jdk-21\bin\java.dll
+
+Deoptimization events (0 events):
+No events
+
+Classes loaded (0 events):
+No events
+
+Classes unloaded (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (0 events):
+No events
+
+ZGC Phase Switch (0 events):
+No events
+
+VM Operations (0 events):
+No events
+
+Events (0 events):
+No events
+
+
+Dynamic libraries:
+0x00007ff609910000 - 0x00007ff609920000 	D:\Java\jdk-21\bin\java.exe
+0x00007ff9b5ad0000 - 0x00007ff9b5ce8000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007ff9b4250000 - 0x00007ff9b4314000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007ff9b2da0000 - 0x00007ff9b3173000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007ff9b3530000 - 0x00007ff9b3641000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007ff9a9510000 - 0x00007ff9a952b000 	D:\Java\jdk-21\bin\VCRUNTIME140.dll
+0x00007ff9a8520000 - 0x00007ff9a8539000 	D:\Java\jdk-21\bin\jli.dll
+0x00007ff9b4190000 - 0x00007ff9b4241000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007ff9b3770000 - 0x00007ff9b3817000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007ff9b5390000 - 0x00007ff9b5438000 	C:\WINDOWS\System32\sechost.dll
+0x00007ff9b31b0000 - 0x00007ff9b31d8000 	C:\WINDOWS\System32\bcrypt.dll
+0x00007ff9b5050000 - 0x00007ff9b5168000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007ff9b4410000 - 0x00007ff9b45c2000 	C:\WINDOWS\System32\USER32.dll
+0x00007ff9b3180000 - 0x00007ff9b31a6000 	C:\WINDOWS\System32\win32u.dll
+0x00007ff9b38a0000 - 0x00007ff9b38c9000 	C:\WINDOWS\System32\GDI32.dll
+0x00007ff9b3650000 - 0x00007ff9b376b000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007ff9b31e0000 - 0x00007ff9b327a000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007ff99a5e0000 - 0x00007ff99a87c000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.22621.6060_none_2712eda17382d24b\COMCTL32.dll
+0x00007ff9b2590000 - 0x00007ff9b259a000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007ff9b46f0000 - 0x00007ff9b4721000 	C:\WINDOWS\System32\IMM32.DLL
+0x0000000069630000 - 0x000000006963d000 	D:\360\Total Security\safemon\SafeWrapper.dll
+0x00007ff9a8100000 - 0x00007ff9a8205000 	D:\360\Total Security\safemon\libzdtp64.dll
+0x00007ff9b38d0000 - 0x00007ff9b416c000 	C:\WINDOWS\System32\SHELL32.dll
+0x00007ff9b33f0000 - 0x00007ff9b352f000 	C:\WINDOWS\System32\wintypes.dll
+0x00007ff9b4730000 - 0x00007ff9b4ac1000 	C:\WINDOWS\System32\combase.dll
+0x00007ff9b54c0000 - 0x00007ff9b5529000 	C:\WINDOWS\System32\SHLWAPI.dll
+0x00007ff9a89b0000 - 0x00007ff9a89bc000 	D:\Java\jdk-21\bin\vcruntime140_1.dll
+0x00007ff97a6a0000 - 0x00007ff97a72e000 	D:\Java\jdk-21\bin\msvcp140.dll
+0x00007ff921b60000 - 0x00007ff92287a000 	D:\Java\jdk-21\bin\server\jvm.dll
+0x00007ff9b3820000 - 0x00007ff9b3891000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007ff9b2aa0000 - 0x00007ff9b2aed000 	C:\WINDOWS\SYSTEM32\POWRPROF.dll
+0x00007ff9a8900000 - 0x00007ff9a8934000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007ff9b2a80000 - 0x00007ff9b2a93000 	C:\WINDOWS\SYSTEM32\UMPDC.dll
+0x00007ff9b1b10000 - 0x00007ff9b1b28000 	C:\WINDOWS\SYSTEM32\kernel.appcore.dll
+0x00007ff9a4e40000 - 0x00007ff9a4e4a000 	D:\Java\jdk-21\bin\jimage.dll
+0x00007ff9b0550000 - 0x00007ff9b0783000 	C:\WINDOWS\SYSTEM32\DBGHELP.DLL
+0x00007ff9b59b0000 - 0x00007ff9b5a88000 	C:\WINDOWS\System32\OLEAUT32.dll
+0x00007ff98e1c0000 - 0x00007ff98e1f2000 	C:\WINDOWS\SYSTEM32\dbgcore.DLL
+0x00007ff9b2c60000 - 0x00007ff9b2cdb000 	C:\WINDOWS\System32\bcryptPrimitives.dll
+0x00007ff9a1520000 - 0x00007ff9a153f000 	D:\Java\jdk-21\bin\java.dll
+
+dbghelp: loaded successfully - version: 4.0.5 - missing functions: none
+symbol engine: initialized successfully - sym options: 0x614 - pdb path: .;D:\Java\jdk-21\bin;C:\WINDOWS\SYSTEM32;C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.22621.6060_none_2712eda17382d24b;D:\360\Total Security\safemon;D:\Java\jdk-21\bin\server
+
+VM Arguments:
+jvm_args: -Dfile.encoding=IBM437 -Dnet.bytebuddy.agent.attacher.dump= 
+java_command: net.bytebuddy.agent.Attacher com.sun.tools.attach.VirtualMachine 3164 C:\Users\lequa\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar false 
+java_class_path (initial): C:\Users\lequa\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 4                                         {product} {ergonomic}
+     uint ConcGCThreads                            = 2                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 8                                         {product} {ergonomic}
+   size_t G1HeapRegionSize                         = 1048576                                   {product} {ergonomic}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 130023424                                 {product} {ergonomic}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 2055208960                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 1048576                                   {product} {ergonomic}
+   size_t MinHeapSize                              = 8388608                                   {product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 5839372                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122909434                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122909434                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+   size_t SoftMaxHeapSize                          = 2055208960                             {manageable} {ergonomic}
+     bool UseCompressedOops                        = true                           {product lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+     bool UseLargePagesIndividualAllocation        = false                                  {pd product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags foldmultilines=false
+ #1: stderr all=off uptime,level,tags foldmultilines=false
+
+Environment Variables:
+JAVA_HOME=D:\Java\jdk-21
+JAVA_TOOL_OPTIONS=-Dfile.encoding=IBM437
+PATH=C:\Program Files\Volta\;D:\Eclipse Adoptium\jdk-21.0.9.10-hotspot\bin;C:\Program Files\BraveSoftware\Brave-Browser\Application;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files\Python39\Scripts\;C:\Program Files\Python39\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;D:\Git\cmd;D:\MinGW\bin;C:\Program Files\HP\HP One Agent;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\dotnet\;C:\msys64\mingw64\bin;D:\JetBrains\IntelliJ IDEA Community Edition 2023.3.3\bin;D:\PyCharm 2024.2\bin;C:\Users\lequ;D:\Java\jdk-21\bin;C:\Users\lequa\Downloads\apache-maven-3.9.9\bin;D:\MinGW\bin;C:\Program Files\Microsoft SQL Server\170\DTS\Binn\;D:\cursor\resources\app\bin;D:\apache-maven-3.9.12-bin\apache-maven-3.9.12\bin;C:\Program Files\Cloudflare\Cloudflare WARP\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\nodejs\;C:\Users\lequa\AppData\Local\Programs\Python\Python314\Scripts\;C:\Users\lequa\AppData\Local\Programs\Python\Python314\;d:\AppData\Local\Programs\cursor\resources\app\codeBin;C:\Users\lequa\AppData\Local\Volta\bin;D:\Python313\Scripts\;D:\Python313\;C:\msys64\mingw64\bin;D:\JetBrains\IntelliJ IDEA Community Edition 2023.3.3\bin;D:\JetBrains\PyCharm 2025.1.3.1\bin;C:\Users\lequa\AppData\Local\Muse Hub\lib;D:\JetBrains\IntelliJ IDEA 2025.3.1\bin;D:\JetBrains\WebStorm 2024.2.3\bin;D:\JetBrains\JetBrains Rider 2024.2.7\bin;C:\Users\lequa\.dotnet\tools;C:\Users\lequa\AppData\Local\Python\bin;D:\Antigravity\bin;C:\Users\lequa\AppData\Local\Programs\Microsoft VS Code\bin;D:\Programs\cursor\resources\app\bin;D:\AppData\Local\Programs\Kiro\bin;C:\Users\lequa\AppData\Roaming\npm;C:\Users\lequa\AppData\Local\JetBrains\Toolbox\scripts;
+USERNAME=lequa
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 140 Stepping 1, GenuineIntel
+TMP=C:\Users\lequa\AppData\Local\Temp
+TEMP=C:\Users\lequa\AppData\Local\Temp
+
+
+
+
+Periodic native trim disabled
+
+---------------  S Y S T E M  ---------------
+
+OS:
+ Windows 11 , 64 bit Build 22621 (10.0.22621.5415)
+OS uptime: 0 days 2:01 hours
+Hyper-V role detected
+
+CPU: total 8 (initial active 8) (4 cores per cpu, 2 threads per core) family 6 model 140 stepping 1 microcode 0xb4, cx8, cmov, fxsr, ht, mmx, 3dnowpref, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, lzcnt, tsc, tscinvbit, avx, avx2, aes, erms, clmul, bmi1, bmi2, adx, avx512f, avx512dq, avx512cd, avx512bw, avx512vl, sha, fma, vzeroupper, avx512_vpopcntdq, avx512_vpclmulqdq, avx512_vaes, avx512_vnni, clflush, clflushopt, clwb, avx512_vbmi2, avx512_vbmi, hv, rdtscp, rdpid, fsrm, gfni, avx512_bitalg, f16c, cet_ibt, cet_ss, avx512_ifma
+Processor Information for all 8 processors :
+  Max Mhz: 2401, Current Mhz: 2400, Mhz Limit: 2376
+
+Memory: 4k page, system-wide physical 7834M (122M free)
+TotalPageFile size 16320M (AvailPageFile size 5M)
+current process WorkingSet (physical memory assigned to process): 11M, peak: 11M
+current process commit charge ("private bytes"): 17M, peak: 18M
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (21.0.7+8-LTS-245) for windows-amd64 JRE (21.0.7+8-LTS-245), built on 2025-02-21T05:11:27Z by "mach5one" with MS VC++ 17.6 (VS2022)
+
+END.

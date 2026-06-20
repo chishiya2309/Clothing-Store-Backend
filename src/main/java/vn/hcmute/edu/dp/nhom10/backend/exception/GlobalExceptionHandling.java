@@ -43,15 +43,17 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ResponseEntity<ErrorResponse> handleInsufficientStockException(
-            InsufficientStockException e,
-            WebRequest request
-    ) {
-        HttpStatus status = BAD_REQUEST;
-        ErrorResponse errorResponse = baseErrorResponse(status, request);
+
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInsufficientStockException(InsufficientStockException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(BAD_REQUEST.value());
+        errorResponse.setError(BAD_REQUEST.getReasonPhrase());
         errorResponse.setMessage(e.getMessage());
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     @ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class,
@@ -68,9 +70,12 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ResponseEntity<ErrorResponse> handleValidationException(Exception e, WebRequest request) {
-        HttpStatus status = BAD_REQUEST;
-        ErrorResponse errorResponse = baseErrorResponse(status, request);
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidationException(Exception e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setStatus(BAD_REQUEST.value());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
 
         String message = e.getMessage();
         if (e instanceof MethodArgumentNotValidException) {
@@ -90,7 +95,7 @@ public class GlobalExceptionHandling {
             errorResponse.setMessage(message);
         }
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -106,15 +111,17 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
-            ResourceNotFoundException e,
-            WebRequest request
-    ) {
-        HttpStatus status = NOT_FOUND;
-        ErrorResponse errorResponse = baseErrorResponse(status, request);
+
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NOT_FOUND)
+    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(NOT_FOUND.value());
+        errorResponse.setError(NOT_FOUND.getReasonPhrase());
         errorResponse.setMessage(e.getMessage());
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
@@ -130,15 +137,17 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ResponseEntity<ErrorResponse> handleInternalServerErrorException(
-            HttpServerErrorException.InternalServerError e,
-            WebRequest request
-    ) {
-        HttpStatus status = INTERNAL_SERVER_ERROR;
-        ErrorResponse errorResponse = baseErrorResponse(status, request);
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleInternalServerErrorException(HttpServerErrorException.InternalServerError e,
+            WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(INTERNAL_SERVER_ERROR.value());
+        errorResponse.setError(INTERNAL_SERVER_ERROR.getReasonPhrase());
         errorResponse.setMessage(e.getMessage());
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     @ExceptionHandler(InvalidDataException.class)
@@ -153,16 +162,15 @@ public class GlobalExceptionHandling {
                                 "message": "{data} exists. Please try again"
                             }
                             """)) })
-    })
-    public ResponseEntity<ErrorResponse> handleDuplicateKeyException(
-            InvalidDataException e,
-            WebRequest request
-    ) {
-        HttpStatus status = CONFLICT;
-        ErrorResponse errorResponse = baseErrorResponse(status, request);
+    }) public ErrorResponse handleDuplicateKeyException(InvalidDataException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(CONFLICT.value());
+        errorResponse.setError(CONFLICT.getReasonPhrase());
         errorResponse.setMessage(e.getMessage());
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     @ExceptionHandler(PaymentGatewayUnavailableException.class)
@@ -190,15 +198,16 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
-            AccessDeniedException e,
-            WebRequest req
-    ) {
-        HttpStatus status = FORBIDDEN;
-        ErrorResponse errorResponse = baseErrorResponse(status, req);
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException e, WebRequest req) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(FORBIDDEN.value());
+        errorResponse.setError(FORBIDDEN.getReasonPhrase());
         errorResponse.setMessage(e.getMessage());
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     @ExceptionHandler({ InternalAuthenticationServiceException.class,
@@ -215,12 +224,16 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(Exception e, WebRequest req) {
-        HttpStatus status = UNAUTHORIZED;
-        ErrorResponse errorResponse = baseErrorResponse(status, req);
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleAuthenticationException(Exception e, WebRequest req) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(req.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(UNAUTHORIZED.value());
+        errorResponse.setError(UNAUTHORIZED.getReasonPhrase());
         errorResponse.setMessage("Username or password is incorrect");
 
-        return ResponseEntity.status(status).body(errorResponse);
+        return errorResponse;
     }
 
     private ErrorResponse baseErrorResponse(HttpStatus status, WebRequest request) {
