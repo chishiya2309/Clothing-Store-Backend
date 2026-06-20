@@ -20,6 +20,8 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    boolean existsByOrderCode(String orderCode);
+
     @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse(" +
            "  CAST(o.createdAt AS date), " +
            "  COUNT(o.id), " +

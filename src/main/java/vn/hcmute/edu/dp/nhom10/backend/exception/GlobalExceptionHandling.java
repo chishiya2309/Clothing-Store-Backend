@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,7 +18,13 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Date;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestControllerAdvice
@@ -31,10 +39,11 @@ public class GlobalExceptionHandling {
                                 "status": 400,
                                 "path": "/api/customer/cart/items",
                                 "error": "Bad Request",
-                                "message": "Sản phẩm không đủ số lượng tồn kho"
+                                "message": "Product has insufficient stock"
                             }
                             """)) })
     })
+
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
     public ErrorResponse handleInsufficientStockException(InsufficientStockException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -102,6 +111,7 @@ public class GlobalExceptionHandling {
                             }
                             """)) })
     })
+
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NOT_FOUND)
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -165,6 +175,18 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
+    @ExceptionHandler(PaymentGatewayUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentGatewayUnavailableException(
+            PaymentGatewayUnavailableException e,
+            WebRequest request
+    ) {
+        HttpStatus status = SERVICE_UNAVAILABLE;
+        ErrorResponse errorResponse = baseErrorResponse(status, request);
+        errorResponse.setMessage(e.getMessage());
+
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
     @ExceptionHandler({ AccessDeniedException.class })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "403", description = "Forbidden", content = {
@@ -213,6 +235,15 @@ public class GlobalExceptionHandling {
         errorResponse.setError(UNAUTHORIZED.getReasonPhrase());
         errorResponse.setMessage("Username or password is incorrect");
 
+        return errorResponse;
+    }
+
+    private ErrorResponse baseErrorResponse(HttpStatus status, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(status.value());
+        errorResponse.setError(status.getReasonPhrase());
         return errorResponse;
     }
 }

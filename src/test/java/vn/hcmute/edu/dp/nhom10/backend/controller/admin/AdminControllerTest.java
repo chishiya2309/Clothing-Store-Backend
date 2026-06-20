@@ -120,7 +120,6 @@ class AdminControllerTest {
         @Test
         void updateUserRole_invalidRequest_returns400() throws Exception {
                 UpdateUserRoleRequest request = new UpdateUserRoleRequest(null);
-
                 mockMvc.perform(patch("/api/admin/users/{id}/role", 1L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
