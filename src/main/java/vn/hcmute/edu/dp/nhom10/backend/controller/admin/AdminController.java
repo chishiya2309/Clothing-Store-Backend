@@ -25,59 +25,58 @@ import java.time.OffsetDateTime;
 @Slf4j(topic = "ADMIN-CONTROLLER")
 public class AdminController {
 
-    private final AdminUserService adminUserService;
+        private final AdminUserService adminUserService;
 
-    @GetMapping("/users")
-    public ApiResponse getUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) UserRole role,
-            @RequestParam(required = false) Boolean isActive) {
+        @GetMapping("/users")
+        public ApiResponse getUsers(
+                        @RequestParam(defaultValue = "0") int page,
+                        @RequestParam(defaultValue = "10") int size,
+                        @RequestParam(required = false) String keyword,
+                        @RequestParam(required = false) UserRole role,
+                        @RequestParam(required = false) Boolean isActive) {
 
-        log.info("Admin fetching user list with pagination. Page: {}, Size: {}, Keyword: {}, Role: {}, IsActive: {}",
-                page, size, keyword, role, isActive);
+                log.info("Admin fetching user list with pagination. Page: {}, Size: {}, Keyword: {}, Role: {}, IsActive: {}",
+                                page, size, keyword, role, isActive);
 
-        Page<AdminUserResponse> userPage = adminUserService.getUsers(page, size, keyword, role, isActive);
+                Page<AdminUserResponse> userPage = adminUserService.getUsers(page, size, keyword, role, isActive);
 
-        return ApiResponse.builder()
-                .status(HttpStatus.OK.value())
-                .message("Fetch user list successful")
-                .data((Serializable) userPage)
-                .timestamp(OffsetDateTime.now())
-                .build();
-    }
+                return ApiResponse.builder()
+                                .status(HttpStatus.OK.value())
+                                .message("Fetch user list successful")
+                                .data((Serializable) userPage)
+                                .timestamp(OffsetDateTime.now())
+                                .build();
+        }
 
-    @PatchMapping("/users/{id}/status")
-    public ApiResponse updateUserStatus(
-            @PathVariable Long id,
-            @RequestParam Boolean isActive) {
+        @PatchMapping("/users/{id}/status")
+        public ApiResponse updateUserStatus(
+                        @PathVariable Long id,
+                        @RequestParam Boolean isActive) {
 
-        log.info("Admin changing status of user id: {} to isActive: {}", id, isActive);
-        AdminUserResponse response = adminUserService.updateUserStatus(id, isActive);
+                log.info("Admin changing status of user id: {} to isActive: {}", id, isActive);
+                AdminUserResponse response = adminUserService.updateUserStatus(id, isActive);
 
-        return ApiResponse.builder()
-                .status(HttpStatus.OK.value())
-                .message("Update user status successful")
-                .data(response)
-                .timestamp(OffsetDateTime.now())
-                .build();
-    }
+                return ApiResponse.builder()
+                                .status(HttpStatus.OK.value())
+                                .message("Update user status successful")
+                                .data(response)
+                                .timestamp(OffsetDateTime.now())
+                                .build();
+        }
 
-    @PatchMapping("/users/{id}/role")
-    public ApiResponse updateUserRole(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateUserRoleRequest request) {
+        @PatchMapping("/users/{id}/role")
+        public ApiResponse updateUserRole(
+                        @PathVariable Long id,
+                        @Valid @RequestBody UpdateUserRoleRequest request) {
 
-        log.info("Admin changing role of user id: {} to role: {}", id, request.role());
-        AdminUserResponse response = adminUserService.updateUserRole(id, request.role());
+                log.info("Admin changing role of user id: {} to role: {}", id, request.role());
+                AdminUserResponse response = adminUserService.updateUserRole(id, request.role());
 
-        return ApiResponse.builder()
-                .status(HttpStatus.OK.value())
-                .message("Update user role successful")
-                .data(response)
-                .timestamp(OffsetDateTime.now())
-                .build();
-    }
+                return ApiResponse.builder()
+                                .status(HttpStatus.OK.value())
+                                .message("Update user role successful")
+                                .data(response)
+                                .timestamp(OffsetDateTime.now())
+                                .build();
+        }
 }
-
