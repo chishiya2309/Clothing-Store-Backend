@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateProfileRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ChangePasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.MembershipInfoResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.UserProfileResponse;
 import vn.hcmute.edu.dp.nhom10.backend.service.UserProfileService;
 
@@ -63,6 +64,19 @@ public class UserProfileController {
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Đổi mật khẩu thành công")
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @GetMapping("/membership")
+    public ApiResponse getMembershipInfo(Principal principal) {
+        log.info("Fetching membership info for user: {}", principal.getName());
+        MembershipInfoResponse membershipInfo = userProfileService.getMembershipInfo(principal.getName());
+
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Get membership info successfully!")
+                .data(membershipInfo)
                 .timestamp(OffsetDateTime.now())
                 .build();
     }
