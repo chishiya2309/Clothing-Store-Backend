@@ -3,6 +3,7 @@ package vn.hcmute.edu.dp.nhom10.backend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -40,9 +41,16 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(new vn.hcmute.edu.dp.nhom10.backend.security.JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/guest/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/payments/vnpay/return",
+                                "/api/payments/vnpay/ipn",
+                                "/api/payments/momo/return").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/payments/momo/ipn").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )

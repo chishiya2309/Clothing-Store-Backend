@@ -154,11 +154,11 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new BadCredentialsException("Email or password is incorrect"));
 
         if (Boolean.FALSE.equals(user.getIsActive())) {
-            throw new AccessDeniedException("Account is locked");
+            throw new AccessDeniedException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên");
         }
 
         if (Boolean.FALSE.equals(user.getEmailVerified())) {
-            throw new AccessDeniedException("Email not verified. Please verify your email first.");
+            throw new AccessDeniedException("Email chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.");
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
@@ -182,6 +182,9 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtTokenProvider.getJwtExpirationInMs() / 1000)
+                .role(user.getRole().name())
+                .name(user.getFullName())
+                .id(user.getId())
                 .build();
     }
 
@@ -295,7 +298,7 @@ public class AuthServiceImpl implements AuthService {
             userRepository.save(user);
         } else {
             if (Boolean.FALSE.equals(user.getIsActive())) {
-                throw new AccessDeniedException("Account is locked");
+                throw new AccessDeniedException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên");
             }
             if (Boolean.FALSE.equals(user.getEmailVerified())) {
                 user.setEmailVerified(true);
@@ -317,6 +320,9 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtTokenProvider.getJwtExpirationInMs() / 1000)
+                .role(user.getRole().name())
+                .name(user.getFullName())
+                .id(user.getId())
                 .build();
     }
 

@@ -148,6 +148,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .build();
     }
 
+
     private Voucher getVoucher(Long id) {
         return voucherRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Voucher not found with id: " + id));

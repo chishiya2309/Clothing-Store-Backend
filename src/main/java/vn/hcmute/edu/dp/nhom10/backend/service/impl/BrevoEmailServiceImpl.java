@@ -87,9 +87,48 @@ public class BrevoEmailServiceImpl implements EmailService {
         }
     }
 
+    @Async
+    @Override
+    public void sendAccountStatusEmail(String toEmail, String fullName, Boolean isActive) {
+        String statusText = Boolean.TRUE.equals(isActive) ? "được kích hoạt lại" : "bị khóa";
+        String htmlContent = String.format("""
+                <html>
+                <body>
+                    <h2>Thông báo thay đổi trạng thái tài khoản</h2>
+                    <p>Chào %s,</p>
+                    <p>Tài khoản của bạn đã %s bởi Quản trị viên.</p>
+                    <p>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ bộ phận hỗ trợ.</p>
+                </body>
+                </html>
+                """, fullName, statusText);
+
+        Map<String, Object> requestBody = Map.of(
+                "sender", Map.of("name", senderName, "email", senderEmail),
+                "to", List.of(Map.of("email", toEmail, "name", fullName)),
+                "subject", "Clothing Store - Trạng thái tài khoản",
+                "htmlContent", htmlContent);
+
+        try {
+            restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Account status email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send account status email to {}", toEmail, e);
+        }
+    }
+
+
     private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
-        String verificationLink = backendUrl + "/api/auth/verify-email?token=" + token;
+        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
+        String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
+        String verificationLink = baseUrl + "/verify-email?token=" + encodedToken;
 
         return """
                 <html>

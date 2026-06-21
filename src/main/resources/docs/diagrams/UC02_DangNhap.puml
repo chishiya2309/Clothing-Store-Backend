@@ -1,0 +1,316 @@
+@startuml UC02_DangNhap
+!theme plain
+title **UC-02: Đăng nhập**\nHệ thống Website Bán Quần Áo - Nhóm 10
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 280
+skinparam sequenceGroupBorderThickness 1
+skinparam noteBorderColor #888888
+
+actor "Khách vãng lai\n(KVL)" as Client #LightYellow
+
+box "Frontend" #F0F8FF
+    participant "Browser\n(React App)" as Browser #LightSkyBlue
+end box
+
+box "Backend (Spring Boot)" #FFFFF0
+    participant "AuthController\n(/api/auth)" as Controller #LightGreen
+    participant "AuthServiceImpl" as Service #LightGreen
+    participant "UserRepository\n(PostgreSQL)" as UserRepo #Wheat
+    participant "PasswordEncoder\n(BCrypt)" as Encoder #Wheat
+    participant "JwtTokenProvider" as JWT #Gold
+    participant "RedisTemplate\n(Token Store)" as Redis #Salmon
+    participant "ActivityLog\nRepository" as ActivityLog #Thistle
+end box
+
+box "External Service" #F0FFF0
+    participant "Google OAuth\n(Google API)" as Google #Coral
+end box
+
+== LUỒNG CHÍNH: Đăng nhập bằng Email/Password ==
+
+Client -> Browser : Truy cập trang đăng nhập,\nnhập email và mật khẩu
+activate Browser
+
+note right of Client
+  **Tiền điều kiện:**
+  Người dùng đã có tài khoản
+  đã xác thực email
+end note
+
+Browser -> Controller : **POST /api/auth/login**\n{ email, password, rememberMe? }
+activate Controller
+
+note right of Controller
+  Lấy metadata từ HttpServletRequest:
+  - ipAddress = getRemoteAddr()
+  - userAgent = getHeader("User-Agent")
+end note
+
+Controller -> Service : login(request, ipAddress, userAgent)
+activate Service
+
+' --- Bước 1: Tìm user theo email ---
+Service -> UserRepo : findByEmail(email)
+activate UserRepo
+UserRepo --> Service : user
+deactivate UserRepo
+
+' --- Bước 2: Kiểm tra tài khoản bị khóa ---
+Service -> Service : Kiểm tra isActive == true
+
+' --- Bước 3: Kiểm tra email đã xác thực ---
+Service -> Service : Kiểm tra emailVerified == true
+
+' --- Bước 4: So khớp mật khẩu ---
+Service -> Encoder : matches(password,\nuser.passwordHash)
+activate Encoder
+Encoder --> Service : **true** (mật khẩu đúng)
+deactivate Encoder
+
+' --- Bước 5: Tạo Access Token (JWT) ---
+Service -> JWT : generateToken(email)
+activate JWT
+note right of JWT
+  JWT Token chứa:
+  - subject = email
+  - issuedAt = now
+  - expiration = now + jwtExpirationInMs
+  - signWith = HMAC-SHA key
+end note
+JWT --> Service : accessToken (JWT)
+deactivate JWT
+
+' --- Bước 6: Tạo Refresh Token ---
+Service -> Service : refreshToken =\nUUID.randomUUID()
+
+' --- Bước 7: Lưu Refresh Token vào Redis ---
+Service -> Redis : SET refresh_token:{refreshToken}\n→ userId
+activate Redis
+note right of Redis #LightYellow
+  **TTL phụ thuộc vào rememberMe:**
+  - rememberMe = true → **30 ngày**
+  - rememberMe = false → **7 ngày**
+end note
+Redis --> Service : OK
+deactivate Redis
+
+' --- Bước 8: Cập nhật lastLoginAt ---
+Service -> UserRepo : save(user)\n[lastLoginAt = now()]
+activate UserRepo
+UserRepo --> Service : OK
+deactivate UserRepo
+
+' --- Bước 9: Ghi Activity Log ---
+Service -> ActivityLog : save(ActivityLog)
+activate ActivityLog
+note right of ActivityLog
+  Ghi log đăng nhập:
+  - action = "login"
+  - entityType = "user"
+  - ipAddress, userAgent
+  - newData = { ip, userAgent }
+end note
+ActivityLog --> Service : OK
+deactivate ActivityLog
+
+Service --> Controller : TokenResponse
+deactivate Service
+
+Controller --> Browser : **200 OK**\n{ accessToken, refreshToken, expiresIn }
+deactivate Controller
+
+note right of Browser
+  **Hậu điều kiện:**
+  Chuyển hướng theo vai trò:
+  - **admin** → /admin/dashboard
+  - **staff** → /admin/orders
+  - **customer** → / (trang chủ)
+end note
+
+Browser --> Client : Đăng nhập thành công,\nchuyển hướng theo vai trò
+deactivate Browser
+
+== LUỒNG THAY THẾ 2a: Đăng nhập bằng Google OAuth ==
+
+Client -> Browser : Chọn "Đăng nhập\nbằng Google"
+activate Browser
+
+Browser -> Google : Mở Google Sign-In popup
+activate Google
+Google --> Browser : idToken (Google ID Token)
+deactivate Google
+
+Browser -> Controller : **POST /api/auth/google**\n{ idToken }
+activate Controller
+
+note right of Controller
+  Lấy ipAddress, userAgent
+  từ HttpServletRequest
+end note
+
+Controller -> Service : loginWithGoogle(\nrequest, ipAddress, userAgent)
+activate Service
+
+' --- Xác thực Google Token ---
+Service -> Google : verify(idToken)\nvia GoogleIdTokenVerifier
+activate Google
+note right of Google
+  Verifier kiểm tra:
+  - Token signature hợp lệ
+  - Audience = googleClientId
+  - Token chưa hết hạn
+end note
+Google --> Service : Payload\n{ email, name, picture }
+deactivate Google
+
+' --- Tìm user ---
+Service -> UserRepo : findByEmail(email)
+activate UserRepo
+
+alt #LightBlue Tài khoản đã tồn tại
+    UserRepo --> Service : user (đã có)
+    deactivate UserRepo
+
+    Service -> Service : Kiểm tra isActive == true
+    Service -> Service : Nếu emailVerified == false\n→ tự động set = true
+
+else #LightBlue Tài khoản chưa tồn tại (Auto-register)
+    UserRepo --> Service : null
+    note right of Service #LightBlue
+      **Tự động tạo tài khoản mới:**
+      - email = từ Google payload
+      - fullName = name từ Google
+      - avatarUrl = picture từ Google
+      - authProvider = "**google**"
+      - emailVerified = **true**
+      - role = customer
+      - membershipTier = Đồng
+    end note
+
+    Service -> UserRepo : save(newUser)
+    activate UserRepo
+    UserRepo --> Service : savedUser
+    deactivate UserRepo
+end
+
+' --- Tạo Token ---
+Service -> JWT : generateToken(email)
+activate JWT
+JWT --> Service : accessToken (JWT)
+deactivate JWT
+
+Service -> Service : refreshToken =\nUUID.randomUUID()
+
+Service -> Redis : SET refresh_token:{refreshToken}\n→ userId, TTL = refreshTokenTtl
+activate Redis
+Redis --> Service : OK
+deactivate Redis
+
+' --- Cập nhật và log ---
+Service -> UserRepo : save(user)\n[lastLoginAt = now()]
+activate UserRepo
+UserRepo --> Service : OK
+deactivate UserRepo
+
+Service -> ActivityLog : save(ActivityLog)\n[action = "login_google"]
+activate ActivityLog
+ActivityLog --> Service : OK
+deactivate ActivityLog
+
+Service --> Controller : TokenResponse\n{ accessToken, refreshToken, expiresIn }
+deactivate Service
+
+Controller --> Browser : **200 OK**\n+ TokenResponse
+deactivate Controller
+
+Browser --> Client : Đăng nhập thành công
+deactivate Browser
+
+== LUỒNG NGOẠI LỆ ==
+
+alt #Pink 4a: Email hoặc mật khẩu không đúng
+    Client -> Browser : Nhập sai email\nhoặc mật khẩu
+    activate Browser
+    Browser -> Controller : POST /api/auth/login
+    activate Controller
+    Controller -> Service : login(request, ip, ua)
+    activate Service
+
+    Service -> UserRepo : findByEmail(email)
+    activate UserRepo
+
+    alt Email không tồn tại
+        UserRepo --> Service : !! Empty Optional
+        deactivate UserRepo
+        Service --> Controller : !! BadCredentialsException\n"Email or password is incorrect"
+    else Email đúng nhưng sai password
+        UserRepo --> Service : user
+        Service -> Encoder : matches(password,\nuser.passwordHash)
+        activate Encoder
+        Encoder --> Service : **false**
+        deactivate Encoder
+
+        Service -> ActivityLog : save(log)\n[action = "**login_failed**"]
+        activate ActivityLog
+        ActivityLog --> Service : OK
+        deactivate ActivityLog
+
+        Service --> Controller : !! BadCredentialsException\n"Email or password is incorrect"
+    end
+
+    deactivate Service
+    Controller --> Browser : **401 Unauthorized**\n"Email hoặc mật khẩu\nkhông chính xác"
+    deactivate Controller
+    Browser --> Client : Hiển thị lỗi
+    deactivate Browser
+
+else #Pink 4b: Tài khoản bị khóa
+    Client -> Browser : Đăng nhập với\ntài khoản bị khóa
+    activate Browser
+    Browser -> Controller : POST /api/auth/login
+    activate Controller
+    Controller -> Service : login(request, ip, ua)
+    activate Service
+
+    Service -> UserRepo : findByEmail(email)
+    activate UserRepo
+    UserRepo --> Service : user (isActive = **false**)
+    deactivate UserRepo
+
+    Service --> Controller : !! AccessDeniedException\n"Tài khoản đã bị khóa.\nVui lòng liên hệ quản trị viên"
+    deactivate Service
+    Controller --> Browser : **403 Forbidden**
+    deactivate Controller
+    Browser --> Client : Hiển thị lỗi\ntài khoản bị khóa
+    deactivate Browser
+
+else #Pink 4c: Tài khoản chưa xác thực email
+    Client -> Browser : Đăng nhập với\nemail chưa xác thực
+    activate Browser
+    Browser -> Controller : POST /api/auth/login
+    activate Controller
+    Controller -> Service : login(request, ip, ua)
+    activate Service
+
+    Service -> UserRepo : findByEmail(email)
+    activate UserRepo
+    UserRepo --> Service : user (emailVerified = **false**)
+    deactivate UserRepo
+
+    Service --> Controller : !! AccessDeniedException\n"Email not verified.\nPlease verify your email first."
+    deactivate Service
+    Controller --> Browser : **403 Forbidden**\n+ link gửi lại OTP
+    deactivate Controller
+
+    note right of Browser
+      Hiển thị nút **"Gửi lại email xác thực"**
+      → POST /api/auth/resend-verification
+    end note
+
+    Browser --> Client : Hiển thị lỗi\nvà nút gửi lại xác thực
+    deactivate Browser
+end
+
+@enduml

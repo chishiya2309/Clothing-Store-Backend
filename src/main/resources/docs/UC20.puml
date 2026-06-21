@@ -1,0 +1,67 @@
+@startuml UC20_DatHang_ThanhToan
+left to right direction
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam usecase {
+  BackgroundColor #D9EDFF
+  BorderColor #536779
+  ArrowColor #536779
+}
+skinparam actor {
+  BackgroundColor #FFF2CC
+  BorderColor #536779
+}
+
+actor "Khách hàng" as Customer
+
+rectangle "Đặt hàng và thanh toán" {
+  usecase "Áp dụng Voucher" as ApplyVoucher
+  usecase "Xác nhận sản phẩm\nmua" as ConfirmProducts
+  usecase "Chọn phương thức\nthanh toán" as SelectPaymentMethod
+
+  usecase "Đặt hàng" as PlaceOrder
+  usecase "Xác nhận đặt hàng" as ConfirmOrder
+
+  usecase "Xác định địa chỉ giao\nhàng" as SelectAddress
+  usecase "Tính phí vận chuyển" as CalculateShippingFee
+  usecase "Thanh toán trực tuyến" as OnlinePayment
+
+  usecase "Thêm địa chỉ mới" as AddAddress
+  usecase "Thay đổi địa chỉ" as ChangeAddress
+  usecase "Ghi nhận kết quả\nthanh toán" as RecordPaymentResult
+
+  ' Liên kết ẩn chỉ dùng để giữ bố cục gần giống hình tham chiếu.
+  ApplyVoucher -[hidden]right- ConfirmProducts
+  ConfirmProducts -[hidden]right- SelectPaymentMethod
+  ApplyVoucher -[hidden]down- PlaceOrder
+  PlaceOrder -[hidden]right- ConfirmOrder
+  PlaceOrder -[hidden]down- SelectAddress
+  SelectAddress -[hidden]right- CalculateShippingFee
+  CalculateShippingFee -[hidden]right- OnlinePayment
+  SelectAddress -[hidden]down- AddAddress
+  AddAddress -[hidden]right- ChangeAddress
+  ChangeAddress -[hidden]right- RecordPaymentResult
+
+  ApplyVoucher ..> PlaceOrder : <<extend>>
+  PlaceOrder ..> ConfirmProducts : <<include>>
+  PlaceOrder ..> SelectPaymentMethod : <<include>>
+  PlaceOrder ..> ConfirmOrder : <<include>>
+  PlaceOrder ..> SelectAddress : <<include>>
+
+  SelectAddress ..> CalculateShippingFee : <<include>>
+  AddAddress ..> SelectAddress : <<extend>>
+  ChangeAddress ..> SelectAddress : <<extend>>
+
+  OnlinePayment ..> ConfirmOrder : <<extend>>
+  OnlinePayment ..> RecordPaymentResult : <<include>>
+}
+
+actor "Cổng thanh toán" as PaymentGateway
+
+Customer -- PlaceOrder
+OnlinePayment -- PaymentGateway
+RecordPaymentResult -- PaymentGateway
+
+@enduml

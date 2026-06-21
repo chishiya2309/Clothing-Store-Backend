@@ -6,7 +6,9 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.AppliedVoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.VoucherResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.time.OffsetDateTime;
 
 public interface VoucherService {
     VoucherResponse create(CreateVoucherRequest request);
