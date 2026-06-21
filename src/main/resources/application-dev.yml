@@ -21,6 +21,11 @@ spring:
       hibernate:
         format_sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
   data:
     redis:
       host: ${REDIS_HOST}
@@ -86,3 +91,10 @@ payment:
     auto-capture: ${MOMO_AUTO_CAPTURE:true}
     connect-timeout-seconds: ${MOMO_CONNECT_TIMEOUT_SECONDS:10}
     read-timeout-seconds: ${MOMO_READ_TIMEOUT_SECONDS:30}
+
+aws:
+  s3:
+    access-key: ${AWS_ACCESS_KEY:}
+    secret-key: ${AWS_SECRET_KEY:}
+    region: ${AWS_REGION:ap-southeast-1}
+    bucket-name: ${AWS_S3_BUCKET:clothing-store-banners}
