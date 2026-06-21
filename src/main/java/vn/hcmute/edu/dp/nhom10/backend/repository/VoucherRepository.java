@@ -13,7 +13,9 @@ import java.util.Optional;
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     Optional<Voucher> findByCode(String code);
+    boolean existsByCode(String code);
 
+    boolean existsByCodeAndIdNot(String code, Long id);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select v

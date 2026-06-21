@@ -7,7 +7,7 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
-import vn.hcmute.edu.dp.nhom10.backend.service.VoucherService;
+import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +15,7 @@ public class CheckoutFailureTransactionService {
 
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final InventoryReservationService inventoryReservationService;
-    private final VoucherService voucherService;
+    private final VoucherReservationService voucherService;
 
     @Transactional
     public void failAndReleaseReservedCheckout(String checkoutCode) {

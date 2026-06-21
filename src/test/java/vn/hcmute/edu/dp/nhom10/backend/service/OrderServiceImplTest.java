@@ -76,7 +76,7 @@ class OrderServiceImplTest {
     private InventoryReservationService inventoryReservationService;
 
     @Mock
-    private VoucherService voucherService;
+    private VoucherReservationService voucherService;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;

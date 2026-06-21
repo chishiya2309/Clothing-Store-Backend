@@ -3,6 +3,11 @@ package vn.hcmute.edu.dp.nhom10.backend.pattern.reservation.voucher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.ApplyVoucherRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.CreateVoucherRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.AppliedVoucherResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.VoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
@@ -13,15 +18,16 @@ import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
-import vn.hcmute.edu.dp.nhom10.backend.service.VoucherService;
+import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class VoucherReservationServiceImpl implements VoucherService {
+public class VoucherReservationServiceImpl implements VoucherReservationService {
 
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final int MONEY_SCALE = 2;
@@ -29,6 +35,7 @@ public class VoucherReservationServiceImpl implements VoucherService {
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final VoucherRepository voucherRepository;
     private final VoucherReservationRepository voucherReservationRepository;
+
 
     @Override
     @Transactional
