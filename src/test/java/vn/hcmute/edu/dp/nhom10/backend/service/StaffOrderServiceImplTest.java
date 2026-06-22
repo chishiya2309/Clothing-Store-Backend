@@ -2,6 +2,8 @@ package vn.hcmute.edu.dp.nhom10.backend.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderListItemResponse;
@@ -22,6 +25,7 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderCompletionSource;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
@@ -35,12 +39,18 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointAwardResult;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointService;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.StaffOrderServiceImpl;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -79,7 +90,13 @@ class StaffOrderServiceImplTest {
     private OrderStatusTransitionPolicy orderStatusTransitionPolicy;
 
     @Mock
+    private LoyaltyPointService loyaltyPointService;
+
+    @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private Clock clock;
 
     @InjectMocks
     private StaffOrderServiceImpl staffOrderService;
@@ -384,6 +401,259 @@ class StaffOrderServiceImplTest {
     }
 
     @Test
+    void completeOrder_shippingCodPending_updatesPaymentAwardsLoyaltyRecordsHistoryPublishesEventAndReturnsDetail() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, PaymentStatus.pending,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        LoyaltyPointAwardResult loyaltyResult = new LoyaltyPointAwardResult(
+                250,
+                100,
+                350,
+                "Äá»“ng",
+                "Äá»“ng",
+                false
+        );
+        Map<String, Object> metadata = Map.of("confirmationSource", "shipping_partner");
+        OrderStatusHistory completeHistory = OrderStatusHistory.builder()
+                .id(4L)
+                .order(order)
+                .fromStatus(OrderStatus.shipping)
+                .toStatus(OrderStatus.completed)
+                .changedBy(staff)
+                .changedByRole(UserRole.staff)
+                .reason("GHN confirmed")
+                .metadata(metadata)
+                .createdAt(OffsetDateTime.parse("2026-01-10T09:20:00+07:00"))
+                .build();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(codPayment));
+        when(loyaltyPointService.awardForCompletedOrder(order)).thenReturn(loyaltyResult);
+        when(orderItemRepository.findAllByOrderIdWithVariantOrderById(1L)).thenReturn(List.of());
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(codPayment));
+        when(orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(1L))
+                .thenReturn(List.of(completeHistory));
+
+        StaffOrderDetailResponse response = staffOrderService.completeOrder(" ORD-1 ", 5L, completeRequest());
+
+        assertEquals(OrderStatus.completed, order.getStatus());
+        assertEquals(PaymentStatus.completed, codPayment.getStatus());
+        assertEquals(fixedNow(), codPayment.getPaidAt());
+        assertEquals(OrderStatus.completed, response.getStatus());
+        assertEquals(PaymentStatus.completed, response.getPayment().getStatus());
+        assertEquals("GHN confirmed", response.getTimeline().get(0).getReason());
+        assertEquals("shipping_partner", response.getTimeline().get(0).getMetadata().get("confirmationSource"));
+        InOrder inOrder = inOrder(
+                userRepository,
+                orderRepository,
+                orderStatusTransitionPolicy,
+                paymentRepository,
+                loyaltyPointService,
+                orderStatusHistoryService,
+                eventPublisher
+        );
+        inOrder.verify(userRepository).findById(5L);
+        inOrder.verify(orderRepository).findByOrderCodeForUpdate("ORD-1");
+        inOrder.verify(orderStatusTransitionPolicy).validate(OrderStatus.shipping, OrderStatus.completed);
+        inOrder.verify(paymentRepository).findAllByOrderIdForUpdate(1L);
+        inOrder.verify(loyaltyPointService).awardForCompletedOrder(order);
+        ArgumentCaptor<Map<String, Object>> metadataCaptor = ArgumentCaptor.forClass(Map.class);
+        inOrder.verify(orderStatusHistoryService).recordTransition(
+                eq(order),
+                eq(OrderStatus.shipping),
+                eq(OrderStatus.completed),
+                eq(staff),
+                eq("GHN confirmed"),
+                metadataCaptor.capture()
+        );
+        assertEquals("shipping_partner", metadataCaptor.getValue().get("confirmationSource"));
+        assertEquals(true, metadataCaptor.getValue().get("codPaymentCompleted"));
+        assertEquals(250, metadataCaptor.getValue().get("loyaltyPointsAwarded"));
+        ArgumentCaptor<OrderStatusChangedEvent> eventCaptor = ArgumentCaptor.forClass(OrderStatusChangedEvent.class);
+        inOrder.verify(eventPublisher).publishEvent(eventCaptor.capture());
+        assertEquals(OrderStatus.shipping, eventCaptor.getValue().fromStatus());
+        assertEquals(OrderStatus.completed, eventCaptor.getValue().toStatus());
+        assertEquals("GHN confirmed", eventCaptor.getValue().reason());
+        assertEquals(fixedNow(), eventCaptor.getValue().changedAt());
+    }
+
+    @Test
+    void completeOrder_onlineCompletedPayment_isNotModified() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        OffsetDateTime paidAt = OffsetDateTime.parse("2026-01-10T08:00:00+07:00");
+        Payment vnpayPayment = payment(10L, order, PaymentMethod.vnpay, PaymentStatus.completed, paidAt);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(vnpayPayment));
+        when(loyaltyPointService.awardForCompletedOrder(order)).thenReturn(loyaltyResult());
+        when(orderItemRepository.findAllByOrderIdWithVariantOrderById(1L)).thenReturn(List.of());
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(vnpayPayment));
+        when(orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(1L)).thenReturn(List.of());
+
+        staffOrderService.completeOrder("ORD-1", 5L, completeRequest());
+
+        assertEquals(PaymentStatus.completed, vnpayPayment.getStatus());
+        assertEquals(paidAt, vnpayPayment.getPaidAt());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"pending", "processing", "completed", "cancelled"})
+    void completeOrder_invalidTransition_doesNotUpdatePaymentAwardLoyaltyRecordHistoryOrPublishEvent(OrderStatus status) {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(status);
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, PaymentStatus.pending,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        doThrow(new OrderStateConflictException("KhÃ´ng thá»ƒ chuyá»ƒn tá»« tráº¡ng thÃ¡i " + status + " sang completed"))
+                .when(orderStatusTransitionPolicy).validate(status, OrderStatus.completed);
+
+        assertThrows(OrderStateConflictException.class,
+                () -> staffOrderService.completeOrder("ORD-1", 5L, completeRequest()));
+
+        assertEquals(status, order.getStatus());
+        assertEquals(PaymentStatus.pending, codPayment.getStatus());
+        verify(paymentRepository, never()).findAllByOrderIdForUpdate(any());
+        verify(loyaltyPointService, never()).awardForCompletedOrder(any());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PaymentStatus.class, names = {"failed", "refunded"})
+    void completeOrder_codFailedOrRefunded_conflictsBeforeLoyaltyHistoryAndEvent(PaymentStatus paymentStatus) {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, paymentStatus,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(codPayment));
+
+        assertThrows(OrderStateConflictException.class,
+                () -> staffOrderService.completeOrder("ORD-1", 5L, completeRequest()));
+
+        assertEquals(OrderStatus.shipping, order.getStatus());
+        assertEquals(paymentStatus, codPayment.getStatus());
+        verify(loyaltyPointService, never()).awardForCompletedOrder(any());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void completeOrder_withoutAnyPayment_conflictsBeforeLoyaltyHistoryAndEvent() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of());
+
+        assertThrows(OrderStateConflictException.class,
+                () -> staffOrderService.completeOrder("ORD-1", 5L, completeRequest()));
+
+        assertEquals(OrderStatus.shipping, order.getStatus());
+        verify(loyaltyPointService, never()).awardForCompletedOrder(any());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void completeOrder_codAlreadyCompleted_doesNotOverwritePaidAt() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        OffsetDateTime originalPaidAt = OffsetDateTime.parse("2026-01-10T08:00:00+07:00");
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, PaymentStatus.completed, originalPaidAt);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(codPayment));
+        when(loyaltyPointService.awardForCompletedOrder(order)).thenReturn(loyaltyResult());
+        when(orderItemRepository.findAllByOrderIdWithVariantOrderById(1L)).thenReturn(List.of());
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(codPayment));
+        when(orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(1L)).thenReturn(List.of());
+
+        staffOrderService.completeOrder("ORD-1", 5L, completeRequest());
+
+        assertEquals(PaymentStatus.completed, codPayment.getStatus());
+        assertEquals(originalPaidAt, codPayment.getPaidAt());
+    }
+
+    @Test
+    void completeOrder_loyaltyFailure_doesNotSetCompletedOrRecordHistoryOrPublishEvent() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, PaymentStatus.pending,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(codPayment));
+        doThrow(new RuntimeException("Cannot award points"))
+                .when(loyaltyPointService).awardForCompletedOrder(order);
+
+        assertThrows(RuntimeException.class,
+                () -> staffOrderService.completeOrder("ORD-1", 5L, completeRequest()));
+
+        assertEquals(OrderStatus.shipping, order.getStatus());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void completeOrder_historyFailure_doesNotPublishEvent() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, PaymentStatus.pending,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(codPayment));
+        when(loyaltyPointService.awardForCompletedOrder(order)).thenReturn(loyaltyResult());
+        doThrow(new RuntimeException("Cannot write history"))
+                .when(orderStatusHistoryService)
+                .recordTransition(eq(order), eq(OrderStatus.shipping), eq(OrderStatus.completed), eq(staff), eq("GHN confirmed"), any());
+
+        assertThrows(RuntimeException.class,
+                () -> staffOrderService.completeOrder("ORD-1", 5L, completeRequest()));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void completeOrder_eventPublisherFailure_isPropagated() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.shipping);
+        User staff = staff();
+        Payment codPayment = payment(10L, order, PaymentMethod.cod, PaymentStatus.pending,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderIdForUpdate(1L)).thenReturn(List.of(codPayment));
+        when(loyaltyPointService.awardForCompletedOrder(order)).thenReturn(loyaltyResult());
+        doThrow(new RuntimeException("Cannot publish event")).when(eventPublisher).publishEvent(any());
+
+        assertThrows(RuntimeException.class,
+                () -> staffOrderService.completeOrder("ORD-1", 5L, completeRequest()));
+    }
+
+    @Test
     void confirmOrder_unknownOrder_doesNotRecordHistoryOrPublishEvent() {
         when(userRepository.findById(5L)).thenReturn(Optional.of(staff()));
         when(orderRepository.findByOrderCodeForUpdate("ORD-404")).thenReturn(Optional.empty());
@@ -484,5 +754,23 @@ class StaffOrderServiceImplTest {
                 .changedByRole(changedBy == null ? null : changedBy.getRole())
                 .createdAt(OffsetDateTime.parse("2026-01-10T09:00:00+07:00").plusMinutes(id))
                 .build();
+    }
+
+    private StaffCompleteOrderRequest completeRequest() {
+        return new StaffCompleteOrderRequest(OrderCompletionSource.shipping_partner, "GHN confirmed");
+    }
+
+    private LoyaltyPointAwardResult loyaltyResult() {
+        return new LoyaltyPointAwardResult(250, 0, 250, null, "Äá»“ng", true);
+    }
+
+    private OffsetDateTime fixedNow() {
+        return OffsetDateTime.parse("2026-01-10T09:30:00Z");
+    }
+
+    private void stubClock() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-01-10T09:30:00Z"), ZoneOffset.UTC);
+        when(clock.instant()).thenReturn(fixedClock.instant());
+        when(clock.getZone()).thenReturn(fixedClock.getZone());
     }
 }

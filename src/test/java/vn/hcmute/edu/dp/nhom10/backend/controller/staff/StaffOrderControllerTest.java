@@ -3,16 +3,20 @@ package vn.hcmute.edu.dp.nhom10.backend.controller.staff;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderListItemResponse;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderCompletionSource;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
@@ -27,6 +31,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -224,8 +229,192 @@ class StaffOrderControllerTest {
     }
 
     @Test
+    void completeOrder_withValidRequest_returnsDetailResponseAndPassesRequest() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.completeOrder(eq("ORD-1"), eq(5L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(StaffOrderDetailResponse.builder()
+                        .orderCode("ORD-1")
+                        .status(OrderStatus.completed)
+                        .items(List.of())
+                        .timeline(List.of())
+                        .build());
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("HoÃ n thÃ nh Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng"))
+                .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
+                .andExpect(jsonPath("$.data.status").value("completed"));
+
+        ArgumentCaptor<StaffCompleteOrderRequest> requestCaptor =
+                ArgumentCaptor.forClass(StaffCompleteOrderRequest.class);
+        verify(authenticatedUserProvider).getCurrentUserId(authentication);
+        verify(staffOrderService).completeOrder(eq("ORD-1"), eq(5L), requestCaptor.capture());
+        assertEquals(OrderCompletionSource.shipping_partner, requestCaptor.getValue().confirmationSource());
+        assertEquals("GHN confirmed", requestCaptor.getValue().note());
+    }
+
+    @Test
+    void completeOrder_conflict_returnsConflict() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.completeOrder(eq("ORD-1"), eq(5L), org.mockito.ArgumentMatchers.any()))
+                .thenThrow(new OrderStateConflictException("KhÃ´ng thá»ƒ chuyá»ƒn tá»« tráº¡ng thÃ¡i pending sang completed"));
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    void completeOrder_unknownOrder_returnsNotFound() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.completeOrder(eq("ORD-404"), eq(5L), org.mockito.ArgumentMatchers.any()))
+                .thenThrow(new ResourceNotFoundException("Order not found"));
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-404/complete")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void completeOrder_nullConfirmationSource_returnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": null,
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void completeOrder_invalidConfirmationSource_returnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "unknown",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void completeOrder_nullNote_returnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": null
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void completeOrder_blankNote_returnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "   "
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void completeOrder_noteTooLong_returnsBadRequest() throws Exception {
+        String longNote = "a".repeat(501);
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "%s"
+                                }
+                                """.formatted(longNote)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void allCompletionSources_parseSuccessfully() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.completeOrder(eq("ORD-1"), eq(5L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(StaffOrderDetailResponse.builder()
+                        .orderCode("ORD-1")
+                        .status(OrderStatus.completed)
+                        .items(List.of())
+                        .timeline(List.of())
+                        .build());
+
+        for (OrderCompletionSource source : OrderCompletionSource.values()) {
+            mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                            .principal(authentication)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                                    {
+                                      "confirmationSource": "%s",
+                                      "note": "Confirmed"
+                                    }
+                                    """.formatted(source.name())))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Test
     void patchStatusEndpoint_doesNotExist() throws Exception {
         mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
+                        .principal(authentication()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void cancelEndpoint_doesNotExist() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
                         .principal(authentication()))
                 .andExpect(status().isNotFound());
     }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderItemResponse;
@@ -21,9 +22,12 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderCompletionSource;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
 import vn.hcmute.edu.dp.nhom10.backend.event.OrderStatusChangedEvent;
+import vn.hcmute.edu.dp.nhom10.backend.exception.OrderStateConflictException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.specification.OrderSpecification;
 import vn.hcmute.edu.dp.nhom10.backend.policy.OrderStatusTransitionPolicy;
@@ -32,9 +36,12 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointAwardResult;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -68,7 +75,9 @@ public class StaffOrderServiceImpl implements StaffOrderService {
     private final UserRepository userRepository;
     private final OrderStatusHistoryService orderStatusHistoryService;
     private final OrderStatusTransitionPolicy orderStatusTransitionPolicy;
+    private final LoyaltyPointService loyaltyPointService;
     private final ApplicationEventPublisher eventPublisher;
+    private final Clock clock;
 
     @Override
     @Transactional(readOnly = true)
@@ -143,6 +152,38 @@ public class StaffOrderServiceImpl implements StaffOrderService {
         return transitionOrder(orderCode, staffUserId, OrderStatus.shipping);
     }
 
+    @Override
+    @Transactional
+    public StaffOrderDetailResponse completeOrder(String orderCode, Long staffUserId, StaffCompleteOrderRequest request) {
+        validateCompleteRequest(request);
+
+        String normalizedOrderCode = normalizeOrderCode(orderCode);
+        User staffUser = findStaffActor(staffUserId);
+        Order order = orderRepository.findByOrderCodeForUpdate(normalizedOrderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + normalizedOrderCode));
+        OrderStatus fromStatus = order.getStatus();
+        OffsetDateTime completedAt = OffsetDateTime.now(clock);
+
+        orderStatusTransitionPolicy.validate(fromStatus, OrderStatus.completed);
+        CodPaymentCompletionResult paymentResult = completeCodPaymentIfPresent(order, completedAt);
+        LoyaltyPointAwardResult loyaltyResult = loyaltyPointService.awardForCompletedOrder(order);
+
+        order.setStatus(OrderStatus.completed);
+
+        Map<String, Object> metadata = completionMetadata(request.confirmationSource(), paymentResult, loyaltyResult);
+        orderStatusHistoryService.recordTransition(
+                order,
+                fromStatus,
+                OrderStatus.completed,
+                staffUser,
+                request.note(),
+                metadata
+        );
+        publishStatusChangedEvent(order, staffUser, fromStatus, OrderStatus.completed, request.note(), completedAt);
+
+        return toDetailResponse(order);
+    }
+
     private StaffOrderDetailResponse transitionOrder(String orderCode, Long staffUserId, OrderStatus targetStatus) {
         String normalizedOrderCode = normalizeOrderCode(orderCode);
         User staffUser = findStaffActor(staffUserId);
@@ -161,9 +202,77 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 null,
                 null
         );
-        publishStatusChangedEvent(order, staffUser, fromStatus, targetStatus, null);
+        publishStatusChangedEvent(order, staffUser, fromStatus, targetStatus, null, OffsetDateTime.now());
 
         return toDetailResponse(order);
+    }
+
+    private void validateCompleteRequest(StaffCompleteOrderRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Complete order request is required");
+        }
+        if (request.confirmationSource() == null) {
+            throw new IllegalArgumentException("Confirmation source is required");
+        }
+        if (request.note() == null || request.note().trim().isEmpty()) {
+            throw new IllegalArgumentException("Completion note is required");
+        }
+        if (request.note().length() > 500) {
+            throw new IllegalArgumentException("Completion note must not exceed 500 characters");
+        }
+    }
+
+    private CodPaymentCompletionResult completeCodPaymentIfPresent(Order order, OffsetDateTime completedAt) {
+        List<Payment> payments = paymentRepository.findAllByOrderIdForUpdate(order.getId());
+        if (payments.isEmpty()) {
+            throw new OrderStateConflictException("Order has no payment record");
+        }
+        List<Payment> codPayments = payments.stream()
+                .filter(payment -> payment.getMethod() == PaymentMethod.cod)
+                .sorted(paymentCreatedAtDesc())
+                .toList();
+        if (codPayments.isEmpty()) {
+            return CodPaymentCompletionResult.notCod();
+        }
+
+        Payment pendingCodPayment = codPayments.stream()
+                .filter(payment -> payment.getStatus() == PaymentStatus.pending)
+                .findFirst()
+                .orElse(null);
+        if (pendingCodPayment != null) {
+            pendingCodPayment.setStatus(PaymentStatus.completed);
+            pendingCodPayment.setPaidAt(completedAt);
+            return CodPaymentCompletionResult.completed(pendingCodPayment);
+        }
+
+        Payment completedCodPayment = codPayments.stream()
+                .filter(payment -> payment.getStatus() == PaymentStatus.completed)
+                .findFirst()
+                .orElse(null);
+        if (completedCodPayment != null) {
+            return CodPaymentCompletionResult.alreadyCompleted(completedCodPayment);
+        }
+
+        Payment invalidCodPayment = codPayments.get(0);
+        throw new OrderStateConflictException(
+                "COD payment is " + invalidCodPayment.getStatus() + " and cannot be completed"
+        );
+    }
+
+    private Map<String, Object> completionMetadata(
+            OrderCompletionSource confirmationSource,
+            CodPaymentCompletionResult paymentResult,
+            LoyaltyPointAwardResult loyaltyResult
+    ) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("confirmationSource", confirmationSource.name());
+        metadata.put("codPaymentCompleted", paymentResult.completedNow());
+        metadata.put("codPaymentAlreadyCompleted", paymentResult.alreadyCompleted());
+        metadata.put("loyaltyPointsAwarded", loyaltyResult.awardedPoints());
+        metadata.put("previousMembershipTier", loyaltyResult.previousMembershipTier());
+        metadata.put("resultingMembershipTier", loyaltyResult.resultingMembershipTier());
+        metadata.put("membershipTierChanged", loyaltyResult.membershipTierChanged());
+        return metadata;
     }
 
     private User findStaffActor(Long staffUserId) {
@@ -179,7 +288,8 @@ public class StaffOrderServiceImpl implements StaffOrderService {
             User staffUser,
             OrderStatus fromStatus,
             OrderStatus toStatus,
-            String reason
+            String reason,
+            OffsetDateTime changedAt
     ) {
         User customer = order.getUser();
         eventPublisher.publishEvent(new OrderStatusChangedEvent(
@@ -192,7 +302,7 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 fromStatus,
                 toStatus,
                 reason,
-                OffsetDateTime.now()
+                changedAt
         ));
     }
 
@@ -439,5 +549,24 @@ public class StaffOrderServiceImpl implements StaffOrderService {
             return null;
         }
         return date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+    }
+
+    private record CodPaymentCompletionResult(
+            boolean codOrder,
+            boolean completedNow,
+            boolean alreadyCompleted,
+            Long paymentId
+    ) {
+        static CodPaymentCompletionResult notCod() {
+            return new CodPaymentCompletionResult(false, false, false, null);
+        }
+
+        static CodPaymentCompletionResult completed(Payment payment) {
+            return new CodPaymentCompletionResult(true, true, false, payment.getId());
+        }
+
+        static CodPaymentCompletionResult alreadyCompleted(Payment payment) {
+            return new CodPaymentCompletionResult(true, false, true, payment.getId());
+        }
     }
 }

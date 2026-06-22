@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -86,6 +87,69 @@ class StaffOrderControllerSecurityTest {
     void anonymousCannotConfirmOrder() throws Exception {
         mockMvc.perform(patch("/api/staff/orders/ORD-1/confirm"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "staff@test.com", roles = "STAFF")
+    void staffCanCompleteOrder() throws Exception {
+        when(authenticatedUserProvider.getCurrentUserId(any(Authentication.class))).thenReturn(5L);
+        when(staffOrderService.completeOrder(Mockito.eq("ORD-1"), Mockito.eq(5L), any())).thenReturn(StaffOrderDetailResponse.builder()
+                .orderCode("ORD-1")
+                .status(OrderStatus.completed)
+                .items(List.of())
+                .timeline(List.of())
+                .build());
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "customer@test.com", roles = "CUSTOMER")
+    void customerCannotCompleteOrder() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void anonymousCannotCompleteOrder() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/complete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "confirmationSource": "shipping_partner",
+                                  "note": "GHN confirmed"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "staff@test.com", roles = "STAFF")
+    void statusAndCancelEndpointsAreNotAvailable() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isNotFound());
     }
 
     @Configuration

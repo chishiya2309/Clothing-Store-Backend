@@ -17,6 +17,10 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.testcontainers.containers.PostgreSQLContainer;
 import vn.hcmute.edu.dp.nhom10.backend.entity.PaymentAttempt;
+import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
+import vn.hcmute.edu.dp.nhom10.backend.entity.OrderStatusHistory;
+import vn.hcmute.edu.dp.nhom10.backend.entity.User;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentAttemptStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.event.OrderCreatedEvent;
@@ -27,6 +31,11 @@ import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCre
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.PaymentGatewayAdapter;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.PaymentGatewayAdapterFactory;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentAttemptRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointAwardResult;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
+import vn.hcmute.edu.dp.nhom10.backend.service.impl.LoyaltyPointServiceImpl;
+import vn.hcmute.edu.dp.nhom10.backend.service.impl.OrderStatusHistoryServiceImpl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +61,8 @@ public abstract class AbstractPostgresIntegrationTest {
 
     private static final AtomicBoolean GATEWAY_FAILS = new AtomicBoolean(false);
     private static final AtomicBoolean GATEWAY_OBSERVED_PENDING_ATTEMPT = new AtomicBoolean(false);
+    private static final AtomicBoolean LOYALTY_AWARD_FAILS = new AtomicBoolean(false);
+    private static final AtomicBoolean HISTORY_TRANSITION_FAILS = new AtomicBoolean(false);
     private static final AtomicBoolean SCHEMA_INITIALIZED = new AtomicBoolean(false);
 
     @Autowired
@@ -98,6 +109,8 @@ public abstract class AbstractPostgresIntegrationTest {
     void resetIntegrationState() {
         GATEWAY_FAILS.set(false);
         GATEWAY_OBSERVED_PENDING_ATTEMPT.set(false);
+        LOYALTY_AWARD_FAILS.set(false);
+        HISTORY_TRANSITION_FAILS.set(false);
         orderCreatedEventProbe.clear();
         orderStatusChangedEventProbe.clear();
     }
@@ -108,6 +121,14 @@ public abstract class AbstractPostgresIntegrationTest {
 
     protected boolean gatewayObservedPendingAttempt() {
         return GATEWAY_OBSERVED_PENDING_ATTEMPT.get();
+    }
+
+    protected void makeLoyaltyAwardFail() {
+        LOYALTY_AWARD_FAILS.set(true);
+    }
+
+    protected void makeHistoryTransitionFail() {
+        HISTORY_TRANSITION_FAILS.set(true);
     }
 
     private static void initializeDatabaseSchema() {
@@ -348,6 +369,46 @@ public abstract class AbstractPostgresIntegrationTest {
         @Bean
         OrderStatusChangedEventProbe orderStatusChangedEventProbe() {
             return new OrderStatusChangedEventProbe();
+        }
+
+        @Bean
+        @Primary
+        LoyaltyPointService loyaltyPointService(LoyaltyPointServiceImpl delegate) {
+            return new LoyaltyPointService() {
+                @Override
+                public LoyaltyPointAwardResult awardForCompletedOrder(Order order) {
+                    if (LOYALTY_AWARD_FAILS.get()) {
+                        throw new RuntimeException("Cannot award points");
+                    }
+                    return delegate.awardForCompletedOrder(order);
+                }
+            };
+        }
+
+        @Bean
+        @Primary
+        OrderStatusHistoryService orderStatusHistoryService(OrderStatusHistoryServiceImpl delegate) {
+            return new OrderStatusHistoryService() {
+                @Override
+                public void recordInitialStatus(Order order) {
+                    delegate.recordInitialStatus(order);
+                }
+
+                @Override
+                public OrderStatusHistory recordTransition(
+                        Order order,
+                        OrderStatus fromStatus,
+                        OrderStatus toStatus,
+                        User changedBy,
+                        String reason,
+                        Map<String, Object> metadata
+                ) {
+                    if (HISTORY_TRANSITION_FAILS.get() && toStatus == OrderStatus.completed) {
+                        throw new RuntimeException("Cannot write history");
+                    }
+                    return delegate.recordTransition(order, fromStatus, toStatus, changedBy, reason, metadata);
+                }
+            };
         }
     }
 

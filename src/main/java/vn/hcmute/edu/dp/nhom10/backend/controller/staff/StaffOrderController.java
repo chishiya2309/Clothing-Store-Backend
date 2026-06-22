@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.controller.staff;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,9 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
@@ -78,6 +81,22 @@ public class StaffOrderController {
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Chuyển đơn hàng sang trạng thái giao hàng thành công")
+                .data(response)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PatchMapping("/{orderCode}/complete")
+    public ApiResponse completeOrder(
+            @PathVariable String orderCode,
+            @Valid @RequestBody StaffCompleteOrderRequest request,
+            Authentication authentication
+    ) {
+        Long staffUserId = authenticatedUserProvider.getCurrentUserId(authentication);
+        StaffOrderDetailResponse response = staffOrderService.completeOrder(orderCode, staffUserId, request);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("HoÃ n thÃ nh Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
