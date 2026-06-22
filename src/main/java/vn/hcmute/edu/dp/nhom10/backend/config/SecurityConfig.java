@@ -41,6 +41,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(new vn.hcmute.edu.dp.nhom10.backend.security.JwtAuthenticationEntryPoint()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/guest/**", "/error").permitAll()

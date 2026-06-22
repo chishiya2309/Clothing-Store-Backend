@@ -27,7 +27,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutDataService;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutService;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
-import vn.hcmute.edu.dp.nhom10.backend.service.VoucherService;
+import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -42,7 +42,7 @@ public class CheckoutServiceFacade implements CheckoutService {
 
     private final CheckoutDataService checkoutDataService;
     private final InventoryReservationService inventoryReservationService;
-    private final VoucherService voucherService;
+    private final VoucherReservationService voucherService;
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final CheckoutSessionItemRepository checkoutSessionItemRepository;
     private final UserRepository userRepository;

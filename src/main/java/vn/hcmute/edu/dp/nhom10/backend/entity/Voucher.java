@@ -37,6 +37,7 @@ public class Voucher {
     private BigDecimal maxDiscountAmount;
 
     @Column(name = "min_order_amount", nullable = false, precision = 12, scale = 2)
+    @Builder.Default
     private BigDecimal minOrderAmount = BigDecimal.ZERO;
 
     @Column(name = "start_date", nullable = false)
@@ -46,12 +47,15 @@ public class Voucher {
     private OffsetDateTime endDate;
 
     @Column(name = "usage_limit", nullable = false)
+    @Builder.Default
     private Integer usageLimit = 1;
 
     @Column(name = "times_used", nullable = false)
+    @Builder.Default
     private Integer timesUsed = 0;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @CreationTimestamp

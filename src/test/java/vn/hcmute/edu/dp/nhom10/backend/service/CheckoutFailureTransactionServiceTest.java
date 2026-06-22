@@ -33,7 +33,7 @@ class CheckoutFailureTransactionServiceTest {
     private InventoryReservationService inventoryReservationService;
 
     @Mock
-    private VoucherService voucherService;
+    private VoucherReservationService voucherService;
 
     @InjectMocks
     private CheckoutFailureTransactionService checkoutFailureTransactionService;

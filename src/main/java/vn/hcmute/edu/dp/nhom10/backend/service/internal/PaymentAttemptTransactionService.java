@@ -16,7 +16,7 @@ import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCre
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentAttemptRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
-import vn.hcmute.edu.dp.nhom10.backend.service.VoucherService;
+import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -33,7 +33,7 @@ public class PaymentAttemptTransactionService {
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final PaymentAttemptRepository paymentAttemptRepository;
     private final InventoryReservationService inventoryReservationService;
-    private final VoucherService voucherService;
+    private final VoucherReservationService voucherService;
 
     @Transactional
     public PendingPaymentContext createPendingAttempt(String checkoutCode, Long userId) {
