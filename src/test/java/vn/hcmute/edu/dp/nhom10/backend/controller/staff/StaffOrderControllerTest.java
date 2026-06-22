@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
@@ -15,7 +17,9 @@ import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
 import vn.hcmute.edu.dp.nhom10.backend.exception.GlobalExceptionHandling;
+import vn.hcmute.edu.dp.nhom10.backend.exception.OrderStateConflictException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
+import vn.hcmute.edu.dp.nhom10.backend.security.AuthenticatedUserProvider;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
 
 import java.math.BigDecimal;
@@ -27,6 +31,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,6 +42,9 @@ class StaffOrderControllerTest {
 
     @Mock
     private StaffOrderService staffOrderService;
+
+    @Mock
+    private AuthenticatedUserProvider authenticatedUserProvider;
 
     @InjectMocks
     private StaffOrderController staffOrderController;
@@ -140,5 +148,91 @@ class StaffOrderControllerTest {
         mockMvc.perform(get("/api/staff/orders/ORD-404"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void confirmOrder_withoutRequestBody_returnsDetailResponse() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.confirmOrder("ORD-1", 5L)).thenReturn(StaffOrderDetailResponse.builder()
+                .orderCode("ORD-1")
+                .status(OrderStatus.processing)
+                .items(List.of())
+                .timeline(List.of())
+                .build());
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/confirm")
+                        .principal(authentication))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Xác nhận đơn hàng thành công"))
+                .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
+                .andExpect(jsonPath("$.data.status").value("processing"));
+
+        verify(authenticatedUserProvider).getCurrentUserId(authentication);
+        verify(staffOrderService).confirmOrder("ORD-1", 5L);
+    }
+
+    @Test
+    void shipOrder_withoutRequestBody_returnsDetailResponse() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.shipOrder("ORD-1", 5L)).thenReturn(StaffOrderDetailResponse.builder()
+                .orderCode("ORD-1")
+                .status(OrderStatus.shipping)
+                .items(List.of())
+                .timeline(List.of())
+                .build());
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/ship")
+                        .principal(authentication))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Chuyển đơn hàng sang trạng thái giao hàng thành công"))
+                .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
+                .andExpect(jsonPath("$.data.status").value("shipping"));
+
+        verify(authenticatedUserProvider).getCurrentUserId(authentication);
+        verify(staffOrderService).shipOrder("ORD-1", 5L);
+    }
+
+    @Test
+    void confirmOrder_unknownOrder_returnsNotFound() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.confirmOrder("ORD-404", 5L))
+                .thenThrow(new ResourceNotFoundException("Order not found"));
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-404/confirm")
+                        .principal(authentication))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void shipOrder_conflict_returnsConflict() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.shipOrder("ORD-1", 5L))
+                .thenThrow(new OrderStateConflictException("Không thể chuyển từ trạng thái pending sang shipping"));
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/ship")
+                        .principal(authentication))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("Không thể chuyển từ trạng thái pending sang shipping"));
+    }
+
+    @Test
+    void patchStatusEndpoint_doesNotExist() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
+                        .principal(authentication()))
+                .andExpect(status().isNotFound());
+    }
+
+    private Authentication authentication() {
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("staff@test.com", null);
+        authentication.setAuthenticated(true);
+        return authentication;
     }
 }

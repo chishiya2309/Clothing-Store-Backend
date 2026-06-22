@@ -8,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
 import vn.hcmute.edu.dp.nhom10.backend.entity.OrderStatusHistory;
+import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.UserRole;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.OrderStatusHistoryServiceImpl;
 
@@ -74,6 +76,57 @@ class OrderStatusHistoryServiceImplTest {
                 .build();
 
         assertThrows(IllegalStateException.class, () -> orderStatusHistoryService.recordInitialStatus(order));
+
+        verifyNoInteractions(orderStatusHistoryRepository);
+    }
+
+    @Test
+    void recordTransition_savesStaffActorAndStatusChange() {
+        Order order = Order.builder()
+                .id(1L)
+                .status(OrderStatus.processing)
+                .build();
+        User staff = User.builder()
+                .id(5L)
+                .role(UserRole.staff)
+                .build();
+
+        orderStatusHistoryService.recordTransition(
+                order,
+                OrderStatus.pending,
+                OrderStatus.processing,
+                staff,
+                null,
+                null
+        );
+
+        ArgumentCaptor<OrderStatusHistory> captor = ArgumentCaptor.forClass(OrderStatusHistory.class);
+        verify(orderStatusHistoryRepository).save(captor.capture());
+        OrderStatusHistory history = captor.getValue();
+        assertSame(order, history.getOrder());
+        assertEquals(OrderStatus.pending, history.getFromStatus());
+        assertEquals(OrderStatus.processing, history.getToStatus());
+        assertSame(staff, history.getChangedBy());
+        assertEquals(UserRole.staff, history.getChangedByRole());
+        assertNull(history.getReason());
+        assertNull(history.getMetadata());
+    }
+
+    @Test
+    void recordTransition_missingActor_throwsException() {
+        Order order = Order.builder()
+                .id(1L)
+                .status(OrderStatus.processing)
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> orderStatusHistoryService.recordTransition(
+                order,
+                OrderStatus.pending,
+                OrderStatus.processing,
+                null,
+                null,
+                null
+        ));
 
         verifyNoInteractions(orderStatusHistoryRepository);
     }

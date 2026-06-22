@@ -20,6 +20,7 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.PaymentAttempt;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentAttemptStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.event.OrderCreatedEvent;
+import vn.hcmute.edu.dp.nhom10.backend.event.OrderStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentInitializationException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCreationCommand;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCreationResult;
@@ -55,6 +56,9 @@ public abstract class AbstractPostgresIntegrationTest {
 
     @Autowired
     protected OrderCreatedEventProbe orderCreatedEventProbe;
+
+    @Autowired
+    protected OrderStatusChangedEventProbe orderStatusChangedEventProbe;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -95,6 +99,7 @@ public abstract class AbstractPostgresIntegrationTest {
         GATEWAY_FAILS.set(false);
         GATEWAY_OBSERVED_PENDING_ATTEMPT.set(false);
         orderCreatedEventProbe.clear();
+        orderStatusChangedEventProbe.clear();
     }
 
     protected void makeGatewayFail() {
@@ -339,6 +344,11 @@ public abstract class AbstractPostgresIntegrationTest {
         OrderCreatedEventProbe orderCreatedEventProbe() {
             return new OrderCreatedEventProbe();
         }
+
+        @Bean
+        OrderStatusChangedEventProbe orderStatusChangedEventProbe() {
+            return new OrderStatusChangedEventProbe();
+        }
     }
 
     public static class OrderCreatedEventProbe {
@@ -354,6 +364,23 @@ public abstract class AbstractPostgresIntegrationTest {
         }
 
         public synchronized List<OrderCreatedEvent> events() {
+            return List.copyOf(events);
+        }
+    }
+
+    public static class OrderStatusChangedEventProbe {
+        private final List<OrderStatusChangedEvent> events = new ArrayList<>();
+
+        @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+        public synchronized void onOrderStatusChanged(OrderStatusChangedEvent event) {
+            events.add(event);
+        }
+
+        public synchronized void clear() {
+            events.clear();
+        }
+
+        public synchronized List<OrderStatusChangedEvent> events() {
             return List.copyOf(events);
         }
     }

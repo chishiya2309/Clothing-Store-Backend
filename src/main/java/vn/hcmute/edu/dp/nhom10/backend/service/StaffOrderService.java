@@ -20,4 +20,8 @@ public interface StaffOrderService {
     );
 
     StaffOrderDetailResponse getOrderDetail(String orderCode);
+
+    StaffOrderDetailResponse confirmOrder(String orderCode, Long staffUserId);
+
+    StaffOrderDetailResponse shipOrder(String orderCode, Long staffUserId);
 }

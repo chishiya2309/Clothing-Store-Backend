@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,12 +23,16 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
+import vn.hcmute.edu.dp.nhom10.backend.event.OrderStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.specification.OrderSpecification;
+import vn.hcmute.edu.dp.nhom10.backend.policy.OrderStatusTransitionPolicy;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
 
 import java.time.LocalDate;
@@ -60,6 +65,10 @@ public class StaffOrderServiceImpl implements StaffOrderService {
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final UserRepository userRepository;
+    private final OrderStatusHistoryService orderStatusHistoryService;
+    private final OrderStatusTransitionPolicy orderStatusTransitionPolicy;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -120,6 +129,71 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 chooseRepresentativePayment(payments),
                 histories
         );
+    }
+
+    @Override
+    @Transactional
+    public StaffOrderDetailResponse confirmOrder(String orderCode, Long staffUserId) {
+        return transitionOrder(orderCode, staffUserId, OrderStatus.processing);
+    }
+
+    @Override
+    @Transactional
+    public StaffOrderDetailResponse shipOrder(String orderCode, Long staffUserId) {
+        return transitionOrder(orderCode, staffUserId, OrderStatus.shipping);
+    }
+
+    private StaffOrderDetailResponse transitionOrder(String orderCode, Long staffUserId, OrderStatus targetStatus) {
+        String normalizedOrderCode = normalizeOrderCode(orderCode);
+        User staffUser = findStaffActor(staffUserId);
+        Order order = orderRepository.findByOrderCodeForUpdate(normalizedOrderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + normalizedOrderCode));
+        OrderStatus fromStatus = order.getStatus();
+
+        orderStatusTransitionPolicy.validate(fromStatus, targetStatus);
+        order.setStatus(targetStatus);
+
+        orderStatusHistoryService.recordTransition(
+                order,
+                fromStatus,
+                targetStatus,
+                staffUser,
+                null,
+                null
+        );
+        publishStatusChangedEvent(order, staffUser, fromStatus, targetStatus, null);
+
+        return toDetailResponse(order);
+    }
+
+    private User findStaffActor(Long staffUserId) {
+        if (staffUserId == null) {
+            throw new IllegalArgumentException("Staff user ID is required");
+        }
+        return userRepository.findById(staffUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff user not found with ID: " + staffUserId));
+    }
+
+    private void publishStatusChangedEvent(
+            Order order,
+            User staffUser,
+            OrderStatus fromStatus,
+            OrderStatus toStatus,
+            String reason
+    ) {
+        User customer = order.getUser();
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                order.getId(),
+                order.getOrderCode(),
+                customer == null ? null : customer.getId(),
+                customer == null ? null : customer.getEmail(),
+                staffUser.getId(),
+                staffUser.getEmail(),
+                fromStatus,
+                toStatus,
+                reason,
+                OffsetDateTime.now()
+        ));
     }
 
     private Map<Long, Payment> representativePayments(List<Order> orders) {
@@ -219,6 +293,22 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 .payment(toPaymentSummaryResponse(representativePayment))
                 .timeline(histories.stream().map(this::toTimelineResponse).toList())
                 .build();
+    }
+
+    private StaffOrderDetailResponse toDetailResponse(Order order) {
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithVariantOrderById(order.getId());
+        List<Payment> payments = paymentRepository.findAllByOrderId(order.getId()).stream()
+                .sorted(paymentCreatedAtDesc())
+                .toList();
+        List<OrderStatusHistory> histories = orderStatusHistoryRepository
+                .findAllByOrder_IdOrderByCreatedAtAscIdAsc(order.getId());
+
+        return toDetailResponse(
+                order,
+                orderItems,
+                chooseRepresentativePayment(payments),
+                histories
+        );
     }
 
     private StaffOrderItemResponse toOrderItemResponse(OrderItem item) {

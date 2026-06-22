@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
+import vn.hcmute.edu.dp.nhom10.backend.security.AuthenticatedUserProvider;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
 
 import java.time.LocalDate;
@@ -24,6 +27,7 @@ import java.time.OffsetDateTime;
 public class StaffOrderController {
 
     private final StaffOrderService staffOrderService;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
 
     @GetMapping
     public ApiResponse getOrders(
@@ -50,6 +54,30 @@ public class StaffOrderController {
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Fetch staff order detail successful")
+                .data(response)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PatchMapping("/{orderCode}/confirm")
+    public ApiResponse confirmOrder(@PathVariable String orderCode, Authentication authentication) {
+        Long staffUserId = authenticatedUserProvider.getCurrentUserId(authentication);
+        StaffOrderDetailResponse response = staffOrderService.confirmOrder(orderCode, staffUserId);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Xác nhận đơn hàng thành công")
+                .data(response)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PatchMapping("/{orderCode}/ship")
+    public ApiResponse shipOrder(@PathVariable String orderCode, Authentication authentication) {
+        Long staffUserId = authenticatedUserProvider.getCurrentUserId(authentication);
+        StaffOrderDetailResponse response = staffOrderService.shipOrder(orderCode, staffUserId);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Chuyển đơn hàng sang trạng thái giao hàng thành công")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();

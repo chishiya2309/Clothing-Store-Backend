@@ -3,9 +3,11 @@ package vn.hcmute.edu.dp.nhom10.backend.service;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,11 +26,15 @@ import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.UserRole;
+import vn.hcmute.edu.dp.nhom10.backend.event.OrderStatusChangedEvent;
+import vn.hcmute.edu.dp.nhom10.backend.exception.OrderStateConflictException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
+import vn.hcmute.edu.dp.nhom10.backend.policy.OrderStatusTransitionPolicy;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.StaffOrderServiceImpl;
 
 import java.math.BigDecimal;
@@ -42,6 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,6 +68,18 @@ class StaffOrderServiceImplTest {
 
     @Mock
     private OrderStatusHistoryRepository orderStatusHistoryRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private OrderStatusHistoryService orderStatusHistoryService;
+
+    @Mock
+    private OrderStatusTransitionPolicy orderStatusTransitionPolicy;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private StaffOrderServiceImpl staffOrderService;
@@ -250,6 +270,158 @@ class StaffOrderServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> staffOrderService.getOrderDetail(" "));
     }
 
+    @Test
+    void confirmOrder_success_locksValidatesRecordsHistoryPublishesEventAndReturnsDetail() {
+        Order order = order("ORD-1", 1L);
+        User staff = staff();
+        OrderStatusHistory initialHistory = history(1L, order, null, OrderStatus.pending, null);
+        OrderStatusHistory confirmHistory = history(2L, order, OrderStatus.pending, OrderStatus.processing, staff);
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(1L))
+                .thenReturn(List.of(initialHistory, confirmHistory));
+        when(orderItemRepository.findAllByOrderIdWithVariantOrderById(1L)).thenReturn(List.of());
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of());
+
+        StaffOrderDetailResponse response = staffOrderService.confirmOrder(" ORD-1 ", 5L);
+
+        assertEquals(OrderStatus.processing, order.getStatus());
+        assertEquals(OrderStatus.processing, response.getStatus());
+        assertEquals(2, response.getTimeline().size());
+        InOrder inOrder = inOrder(
+                userRepository,
+                orderRepository,
+                orderStatusTransitionPolicy,
+                orderStatusHistoryService,
+                eventPublisher
+        );
+        inOrder.verify(userRepository).findById(5L);
+        inOrder.verify(orderRepository).findByOrderCodeForUpdate("ORD-1");
+        inOrder.verify(orderStatusTransitionPolicy).validate(OrderStatus.pending, OrderStatus.processing);
+        inOrder.verify(orderStatusHistoryService).recordTransition(
+                order,
+                OrderStatus.pending,
+                OrderStatus.processing,
+                staff,
+                null,
+                null
+        );
+        ArgumentCaptor<OrderStatusChangedEvent> eventCaptor = ArgumentCaptor.forClass(OrderStatusChangedEvent.class);
+        inOrder.verify(eventPublisher).publishEvent(eventCaptor.capture());
+        OrderStatusChangedEvent event = eventCaptor.getValue();
+        assertEquals(1L, event.orderId());
+        assertEquals("ORD-1", event.orderCode());
+        assertEquals(10L, event.customerId());
+        assertEquals("alice@test.com", event.customerEmail());
+        assertEquals(5L, event.changedByStaffId());
+        assertEquals("staff@test.com", event.changedByStaffEmail());
+        assertEquals(OrderStatus.pending, event.fromStatus());
+        assertEquals(OrderStatus.processing, event.toStatus());
+    }
+
+    @Test
+    void shipOrder_success_movesProcessingToShipping() {
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.processing);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(1L)).thenReturn(List.of(
+                history(1L, order, null, OrderStatus.pending, null),
+                history(2L, order, OrderStatus.pending, OrderStatus.processing, staff),
+                history(3L, order, OrderStatus.processing, OrderStatus.shipping, staff)
+        ));
+        when(orderItemRepository.findAllByOrderIdWithVariantOrderById(1L)).thenReturn(List.of());
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of());
+
+        StaffOrderDetailResponse response = staffOrderService.shipOrder("ORD-1", 5L);
+
+        assertEquals(OrderStatus.shipping, order.getStatus());
+        assertEquals(OrderStatus.shipping, response.getStatus());
+        verify(orderStatusTransitionPolicy).validate(OrderStatus.processing, OrderStatus.shipping);
+        verify(orderStatusHistoryService).recordTransition(
+                order,
+                OrderStatus.processing,
+                OrderStatus.shipping,
+                staff,
+                null,
+                null
+        );
+        verify(eventPublisher).publishEvent(any(OrderStatusChangedEvent.class));
+    }
+
+    @Test
+    void confirmOrder_invalidCurrentStatus_doesNotRecordHistoryOrPublishEvent() {
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.processing);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        doThrow(new OrderStateConflictException("Không thể chuyển từ trạng thái processing sang processing"))
+                .when(orderStatusTransitionPolicy).validate(OrderStatus.processing, OrderStatus.processing);
+
+        assertThrows(OrderStateConflictException.class, () -> staffOrderService.confirmOrder("ORD-1", 5L));
+
+        assertEquals(OrderStatus.processing, order.getStatus());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void shipOrder_invalidCurrentStatus_doesNotRecordHistoryOrPublishEvent() {
+        Order order = order("ORD-1", 1L);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        doThrow(new OrderStateConflictException("Không thể chuyển từ trạng thái pending sang shipping"))
+                .when(orderStatusTransitionPolicy).validate(OrderStatus.pending, OrderStatus.shipping);
+
+        assertThrows(OrderStateConflictException.class, () -> staffOrderService.shipOrder("ORD-1", 5L));
+
+        assertEquals(OrderStatus.pending, order.getStatus());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void confirmOrder_unknownOrder_doesNotRecordHistoryOrPublishEvent() {
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff()));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-404")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> staffOrderService.confirmOrder("ORD-404", 5L));
+
+        verify(orderStatusTransitionPolicy, never()).validate(any(), any());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void confirmOrder_unknownStaff_doesNotLockOrRecordHistoryOrPublishEvent() {
+        when(userRepository.findById(5L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> staffOrderService.confirmOrder("ORD-1", 5L));
+
+        verify(orderRepository, never()).findByOrderCodeForUpdate(any());
+        verify(orderStatusTransitionPolicy, never()).validate(any(), any());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void confirmOrder_historyFailure_isPropagatedAndDoesNotPublishEvent() {
+        Order order = order("ORD-1", 1L);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        doThrow(new RuntimeException("Cannot write history"))
+                .when(orderStatusHistoryService)
+                .recordTransition(order, OrderStatus.pending, OrderStatus.processing, staff, null, null);
+
+        assertThrows(RuntimeException.class, () -> staffOrderService.confirmOrder("ORD-1", 5L));
+
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
     private Order order(String orderCode, Long id) {
         return Order.builder()
                 .id(id)
@@ -291,5 +463,26 @@ class StaffOrderServiceImplTest {
 
     private BigDecimal money(String value) {
         return new BigDecimal(value);
+    }
+
+    private User staff() {
+        return User.builder()
+                .id(5L)
+                .fullName("Staff One")
+                .email("staff@test.com")
+                .role(UserRole.staff)
+                .build();
+    }
+
+    private OrderStatusHistory history(Long id, Order order, OrderStatus fromStatus, OrderStatus toStatus, User changedBy) {
+        return OrderStatusHistory.builder()
+                .id(id)
+                .order(order)
+                .fromStatus(fromStatus)
+                .toStatus(toStatus)
+                .changedBy(changedBy)
+                .changedByRole(changedBy == null ? null : changedBy.getRole())
+                .createdAt(OffsetDateTime.parse("2026-01-10T09:00:00+07:00").plusMinutes(id))
+                .build();
     }
 }
