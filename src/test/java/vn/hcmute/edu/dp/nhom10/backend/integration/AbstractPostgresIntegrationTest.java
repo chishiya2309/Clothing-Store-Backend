@@ -78,6 +78,10 @@ public abstract class AbstractPostgresIntegrationTest {
         registry.add("brevo.api-key", () -> "test-api-key");
         registry.add("brevo.sender-email", () -> "noreply@example.test");
         registry.add("brevo.sender-name", () -> "Clothing Store Test");
+        registry.add("aws.s3.access-key", () -> "test-access-key");
+        registry.add("aws.s3.secret-key", () -> "test-secret-key");
+        registry.add("aws.s3.region", () -> "ap-southeast-1");
+        registry.add("aws.s3.bucket-name", () -> "test-bucket");
         registry.add("app.verification-token-ttl", () -> "900");
         registry.add("app.refresh-token-ttl", () -> "604800");
         registry.add("app.remember-me-token-ttl", () -> "2592000");

@@ -1,0 +1,57 @@
+package vn.hcmute.edu.dp.nhom10.backend.controller.staff;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
+import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
+@RestController
+@RequestMapping("/api/staff/orders")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('STAFF')")
+public class StaffOrderController {
+
+    private final StaffOrderService staffOrderService;
+
+    @GetMapping
+    public ApiResponse getOrders(
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ) {
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Fetch staff order list successful")
+                .data(staffOrderService.getOrders(status, fromDate, toDate, keyword, page, size, sortBy, sortDir))
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @GetMapping("/{orderCode}")
+    public ApiResponse getOrderDetail(@PathVariable String orderCode) {
+        StaffOrderDetailResponse response = staffOrderService.getOrderDetail(orderCode);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Fetch staff order detail successful")
+                .data(response)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+}

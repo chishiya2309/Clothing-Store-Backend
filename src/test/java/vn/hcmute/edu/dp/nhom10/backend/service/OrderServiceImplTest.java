@@ -79,6 +79,9 @@ class OrderServiceImplTest {
     private VoucherReservationService voucherService;
 
     @Mock
+    private OrderStatusHistoryService orderStatusHistoryService;
+
+    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
@@ -446,14 +449,26 @@ class OrderServiceImplTest {
     }
 
     @Test
+    void createCodOrder_success_recordsInitialHistory() {
+        mockSuccessfulFlow(null);
+
+        orderService.createCodOrder("CHK-1", 10L);
+
+        verify(orderStatusHistoryService).recordInitialStatus(org.mockito.ArgumentMatchers.argThat(order ->
+                order != null && order.getId().equals(500L) && order.getStatus() == OrderStatus.pending
+        ));
+    }
+
+    @Test
     void createCodOrder_callsDependenciesInRequiredOrder() {
         mockSuccessfulFlow(Voucher.builder().id(100L).build());
 
         orderService.createCodOrder("CHK-1", 10L);
 
-        InOrder inOrder = inOrder(orderRepository, orderItemRepository, paymentRepository,
+        InOrder inOrder = inOrder(orderRepository, orderStatusHistoryService, orderItemRepository, paymentRepository,
                 inventoryReservationService, voucherService, cartItemRepository, checkoutSessionRepository);
         inOrder.verify(orderRepository).save(any(Order.class));
+        inOrder.verify(orderStatusHistoryService).recordInitialStatus(any(Order.class));
         inOrder.verify(orderItemRepository).saveAll(any());
         inOrder.verify(paymentRepository).save(any(Payment.class));
         inOrder.verify(inventoryReservationService).consumeStockReservation("CHK-1");
@@ -484,9 +499,10 @@ class OrderServiceImplTest {
 
         orderService.createCodOrder("CHK-1", 10L);
 
-        InOrder inOrder = inOrder(orderRepository, orderItemRepository, paymentRepository,
+        InOrder inOrder = inOrder(orderRepository, orderStatusHistoryService, orderItemRepository, paymentRepository,
                 inventoryReservationService, voucherService, cartItemRepository, checkoutSessionRepository, eventPublisher);
         inOrder.verify(orderRepository).save(any(Order.class));
+        inOrder.verify(orderStatusHistoryService).recordInitialStatus(any(Order.class));
         inOrder.verify(orderItemRepository).saveAll(any());
         inOrder.verify(paymentRepository).save(any(Payment.class));
         inOrder.verify(inventoryReservationService).consumeStockReservation("CHK-1");
