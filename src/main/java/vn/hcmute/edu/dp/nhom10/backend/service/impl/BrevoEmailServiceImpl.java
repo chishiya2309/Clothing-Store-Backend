@@ -124,6 +124,60 @@ public class BrevoEmailServiceImpl implements EmailService {
     }
 
 
+    @Async
+    @Override
+    public void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product) {
+        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
+        String productUrl = baseUrl + "/product/" + product.getSlug();
+        String priceDisplay = product.getSalePrice() != null ? product.getSalePrice().toString() : "";
+        
+        String imageUrl = "";
+        if (product.getImages() != null && !product.getImages().isEmpty()) {
+            imageUrl = product.getImages().get(0).getImageUrl();
+        }
+        
+        String imageHtml = !imageUrl.isEmpty() 
+            ? String.format("<div style='text-align: center; margin: 20px 0;'><a href='%s'><img src='%s' alt='%s' style='max-width: 100%%; max-height: 300px; border-radius: 8px;'/></a></div>", productUrl, imageUrl, product.getName())
+            : "";
+
+        String htmlContent = String.format("""
+                <html>
+                <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                        <h2 style="color: #ba1a1a; text-align: center;">Sản phẩm bạn yêu thích đang giảm giá!</h2>
+                        <p>Chào <strong>%s</strong>,</p>
+                        <p>Sản phẩm <strong>%s</strong> mà bạn đã lưu vào danh sách yêu thích hiện đang có giá ưu đãi là <strong style="color: #ba1a1a; font-size: 1.2em;">%s đ</strong>.</p>
+                        %s
+                        <div style="text-align: center; margin-top: 30px;">
+                            <a href="%s" style="background-color: #111827; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Xem chi tiết và Mua ngay</a>
+                        </div>
+                        <p style="margin-top: 30px; font-size: 0.9em; color: #666; text-align: center;">Cảm ơn bạn đã luôn đồng hành cùng CLOTHY!</p>
+                    </div>
+                </body>
+                </html>
+                """, fullName, product.getName(), priceDisplay, imageHtml, productUrl);
+
+        Map<String, Object> requestBody = Map.of(
+                "sender", Map.of("name", senderName, "email", senderEmail),
+                "to", List.of(Map.of("email", toEmail, "name", fullName)),
+                "subject", "Clothing Store - " + product.getName() + " đang giảm giá!",
+                "htmlContent", htmlContent);
+
+        try {
+            restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Product sale email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send product sale email to {}", toEmail, e);
+        }
+    }
+
     private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
         String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
