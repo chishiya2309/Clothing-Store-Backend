@@ -1,5 +1,6 @@
 package vn.hcmute.edu.dp.nhom10.backend.repository;
 
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,3 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             """)
     List<Product> findTopByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
-
