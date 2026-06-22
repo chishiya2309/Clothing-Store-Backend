@@ -6,5 +6,7 @@ public interface EmailService {
     void sendPasswordResetEmail(String toEmail, String fullName, String token);
 
     void sendAccountStatusEmail(String toEmail, String fullName, Boolean isActive);
+
+    void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product);
 }
 
