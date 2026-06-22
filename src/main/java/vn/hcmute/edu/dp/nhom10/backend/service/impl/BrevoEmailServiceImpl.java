@@ -10,6 +10,7 @@ import org.springframework.web.util.HtmlUtils;
 import org.springframework.web.client.RestClient;
 import vn.hcmute.edu.dp.nhom10.backend.service.EmailService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -120,6 +121,104 @@ public class BrevoEmailServiceImpl implements EmailService {
             log.info("Account status email sent successfully to {}", toEmail);
         } catch (Exception e) {
             log.error("Failed to send account status email to {}", toEmail, e);
+        }
+    }
+
+    @Async
+    @Override
+    public void sendOrderCancellationEmailToCustomer(
+            String toEmail,
+            String orderCode,
+            String reason,
+            boolean requiresManualRefundReview
+    ) {
+        String htmlContent = """
+                <html>
+                <body>
+                    <h2>Order cancelled</h2>
+                    <p>Your order <strong>%s</strong> has been cancelled.</p>
+                    <p>Reason: %s</p>
+                    <p>If you need support, please contact the store.</p>
+                    %s
+                </body>
+                </html>
+                """.formatted(
+                HtmlUtils.htmlEscape(orderCode),
+                HtmlUtils.htmlEscape(reason),
+                requiresManualRefundReview
+                        ? "<p>The store will review the completed online payment transaction separately.</p>"
+                        : ""
+        );
+
+        sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Order cancelled", htmlContent);
+    }
+
+    @Async
+    @Override
+    public void sendOrderCancellationEmailToAdmin(
+            String toEmail,
+            String orderCode,
+            String customerEmail,
+            String staffEmail,
+            String fromStatus,
+            String reason,
+            String paymentMethod,
+            String paymentStatus,
+            BigDecimal paidAmount,
+            boolean requiresManualRefundReview
+    ) {
+        String htmlContent = """
+                <html>
+                <body>
+                    <h2>Staff order cancellation</h2>
+                    <p>Order: <strong>%s</strong></p>
+                    <p>Customer: %s</p>
+                    <p>Staff: %s</p>
+                    <p>From status: %s</p>
+                    <p>Reason: %s</p>
+                    <p>Payment method: %s</p>
+                    <p>Payment status: %s</p>
+                    <p>Paid amount: %s</p>
+                    <p>Staff cancel does not perform a refund.</p>
+                    %s
+                </body>
+                </html>
+                """.formatted(
+                HtmlUtils.htmlEscape(orderCode),
+                HtmlUtils.htmlEscape(customerEmail == null ? "" : customerEmail),
+                HtmlUtils.htmlEscape(staffEmail == null ? "" : staffEmail),
+                HtmlUtils.htmlEscape(fromStatus == null ? "" : fromStatus),
+                HtmlUtils.htmlEscape(reason),
+                HtmlUtils.htmlEscape(paymentMethod == null ? "" : paymentMethod),
+                HtmlUtils.htmlEscape(paymentStatus == null ? "" : paymentStatus),
+                paidAmount == null ? "" : paidAmount.toPlainString(),
+                requiresManualRefundReview
+                        ? "<p>Manual refund review is required for this completed online payment.</p>"
+                        : "<p>Manual refund review is not required by this cancellation snapshot.</p>"
+        );
+
+        sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Staff cancelled order", htmlContent);
+    }
+
+    private void sendTransactionalEmail(String toEmail, String toName, String subject, String htmlContent) {
+        Map<String, Object> requestBody = Map.of(
+                "sender", Map.of("name", senderName, "email", senderEmail),
+                "to", List.of(Map.of("email", toEmail, "name", toName == null ? toEmail : toName)),
+                "subject", subject,
+                "htmlContent", htmlContent);
+
+        try {
+            restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Transactional email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send transactional email to {}", toEmail, e);
         }
     }
 

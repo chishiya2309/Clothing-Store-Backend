@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
+import vn.hcmute.edu.dp.nhom10.backend.enums.UserRole;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    List<User> findAllByRoleAndIsActiveTrue(UserRole role);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""

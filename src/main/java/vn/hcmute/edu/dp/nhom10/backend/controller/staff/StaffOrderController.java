@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCancelOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
@@ -97,6 +98,22 @@ public class StaffOrderController {
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("HoÃ n thÃ nh Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng")
+                .data(response)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @PatchMapping("/{orderCode}/cancel")
+    public ApiResponse cancelOrder(
+            @PathVariable String orderCode,
+            @Valid @RequestBody StaffCancelOrderRequest request,
+            Authentication authentication
+    ) {
+        Long staffUserId = authenticatedUserProvider.getCurrentUserId(authentication);
+        StaffOrderDetailResponse response = staffOrderService.cancelOrder(orderCode, staffUserId, request);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("H\u1ee7y \u0111\u01a1n h\u00e0ng th\u00e0nh c\u00f4ng")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();

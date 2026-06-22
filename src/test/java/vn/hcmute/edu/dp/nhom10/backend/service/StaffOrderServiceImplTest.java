@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCancelOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
@@ -88,6 +89,12 @@ class StaffOrderServiceImplTest {
 
     @Mock
     private OrderStatusTransitionPolicy orderStatusTransitionPolicy;
+
+    @Mock
+    private OrderInventoryAdjustmentService orderInventoryAdjustmentService;
+
+    @Mock
+    private OrderVoucherAdjustmentService orderVoucherAdjustmentService;
 
     @Mock
     private LoyaltyPointService loyaltyPointService;
@@ -396,6 +403,144 @@ class StaffOrderServiceImplTest {
         assertThrows(OrderStateConflictException.class, () -> staffOrderService.shipOrder("ORD-1", 5L));
 
         assertEquals(OrderStatus.pending, order.getStatus());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void cancelOrder_processingOnlinePaid_restoresInventoryVoucherRecordsHistoryPublishesEventAndReturnsDetail() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(OrderStatus.processing);
+        order.setVoucher(Voucher.builder().id(22L).code("SAVE10").timesUsed(1).build());
+        User staff = staff();
+        Payment vnpayPayment = payment(10L, order, PaymentMethod.vnpay, PaymentStatus.completed,
+                OffsetDateTime.parse("2026-01-10T09:00:00+07:00"));
+        OrderStatusHistory cancelHistory = OrderStatusHistory.builder()
+                .id(5L)
+                .order(order)
+                .fromStatus(OrderStatus.processing)
+                .toStatus(OrderStatus.cancelled)
+                .changedBy(staff)
+                .changedByRole(UserRole.staff)
+                .reason("Customer requested cancellation")
+                .metadata(Map.of(
+                        "inventoryRestored", true,
+                        "voucherUsageRestored", true,
+                        "refundPerformed", false,
+                        "requiresManualRefundReview", true
+                ))
+                .createdAt(OffsetDateTime.parse("2026-01-10T09:30:00Z"))
+                .build();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(vnpayPayment));
+        when(orderItemRepository.findAllByOrderIdWithVariantOrderById(1L)).thenReturn(List.of());
+        when(orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(1L))
+                .thenReturn(List.of(cancelHistory));
+
+        StaffOrderDetailResponse response = staffOrderService.cancelOrder(
+                " ORD-1 ",
+                5L,
+                new StaffCancelOrderRequest("Customer requested cancellation")
+        );
+
+        assertEquals(OrderStatus.cancelled, order.getStatus());
+        assertEquals(OrderStatus.cancelled, response.getStatus());
+        assertEquals(PaymentStatus.completed, vnpayPayment.getStatus());
+        assertEquals("Customer requested cancellation", response.getTimeline().get(0).getReason());
+        assertEquals(true, response.getTimeline().get(0).getMetadata().get("requiresManualRefundReview"));
+        InOrder inOrder = inOrder(
+                userRepository,
+                orderRepository,
+                orderStatusTransitionPolicy,
+                paymentRepository,
+                orderInventoryAdjustmentService,
+                orderVoucherAdjustmentService,
+                orderStatusHistoryService,
+                eventPublisher
+        );
+        inOrder.verify(userRepository).findById(5L);
+        inOrder.verify(orderRepository).findByOrderCodeForUpdate("ORD-1");
+        inOrder.verify(orderStatusTransitionPolicy).validate(OrderStatus.processing, OrderStatus.cancelled);
+        inOrder.verify(paymentRepository).findAllByOrderId(1L);
+        inOrder.verify(orderInventoryAdjustmentService).restoreInventoryForCancelledOrder(order);
+        inOrder.verify(orderVoucherAdjustmentService).restoreVoucherUsageForCancelledOrder(order);
+        ArgumentCaptor<Map<String, Object>> metadataCaptor = ArgumentCaptor.forClass(Map.class);
+        inOrder.verify(orderStatusHistoryService).recordTransition(
+                eq(order),
+                eq(OrderStatus.processing),
+                eq(OrderStatus.cancelled),
+                eq(staff),
+                eq("Customer requested cancellation"),
+                metadataCaptor.capture()
+        );
+        assertEquals(true, metadataCaptor.getValue().get("inventoryRestored"));
+        assertEquals(true, metadataCaptor.getValue().get("voucherUsageRestored"));
+        assertEquals(false, metadataCaptor.getValue().get("refundPerformed"));
+        assertEquals(true, metadataCaptor.getValue().get("requiresManualRefundReview"));
+        ArgumentCaptor<OrderStatusChangedEvent> eventCaptor = ArgumentCaptor.forClass(OrderStatusChangedEvent.class);
+        inOrder.verify(eventPublisher).publishEvent(eventCaptor.capture());
+        OrderStatusChangedEvent event = eventCaptor.getValue();
+        assertEquals(OrderStatus.processing, event.fromStatus());
+        assertEquals(OrderStatus.cancelled, event.toStatus());
+        assertEquals(PaymentMethod.vnpay, event.paymentMethod());
+        assertEquals(PaymentStatus.completed, event.paymentStatus());
+        assertEquals(new BigDecimal("250000.00"), event.paidAmount());
+        assertEquals(true, event.requiresManualRefundReview());
+        assertEquals(fixedNow(), event.changedAt());
+        verify(paymentRepository, never()).findAllByOrderIdForUpdate(any());
+        verify(loyaltyPointService, never()).awardForCompletedOrder(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"shipping", "completed", "cancelled"})
+    void cancelOrder_invalidTransition_doesNotRestoreInventoryVoucherRecordHistoryOrPublishEvent(OrderStatus status) {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        order.setStatus(status);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        doThrow(new OrderStateConflictException("Cannot cancel from " + status))
+                .when(orderStatusTransitionPolicy).validate(status, OrderStatus.cancelled);
+
+        assertThrows(OrderStateConflictException.class,
+                () -> staffOrderService.cancelOrder("ORD-1", 5L, new StaffCancelOrderRequest("Too late")));
+
+        assertEquals(status, order.getStatus());
+        verify(paymentRepository, never()).findAllByOrderId(any());
+        verify(orderInventoryAdjustmentService, never()).restoreInventoryForCancelledOrder(any());
+        verify(orderVoucherAdjustmentService, never()).restoreVoucherUsageForCancelledOrder(any());
+        verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void cancelOrder_blankReason_doesNotLockOrder() {
+        assertThrows(IllegalArgumentException.class,
+                () -> staffOrderService.cancelOrder("ORD-1", 5L, new StaffCancelOrderRequest("   ")));
+
+        verify(userRepository, never()).findById(any());
+        verify(orderRepository, never()).findByOrderCodeForUpdate(any());
+    }
+
+    @Test
+    void cancelOrder_inventoryRestoreFailure_doesNotRecordHistoryOrPublishEvent() {
+        stubClock();
+        Order order = order("ORD-1", 1L);
+        User staff = staff();
+        when(userRepository.findById(5L)).thenReturn(Optional.of(staff));
+        when(orderRepository.findByOrderCodeForUpdate("ORD-1")).thenReturn(Optional.of(order));
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of());
+        doThrow(new RuntimeException("Cannot restore inventory"))
+                .when(orderInventoryAdjustmentService).restoreInventoryForCancelledOrder(order);
+
+        assertThrows(RuntimeException.class,
+                () -> staffOrderService.cancelOrder("ORD-1", 5L, new StaffCancelOrderRequest("Customer request")));
+
+        assertEquals(OrderStatus.pending, order.getStatus());
+        verify(orderVoucherAdjustmentService, never()).restoreVoucherUsageForCancelledOrder(any());
         verify(orderStatusHistoryService, never()).recordTransition(any(), any(), any(), any(), any(), any());
         verify(eventPublisher, never()).publishEvent(any());
     }

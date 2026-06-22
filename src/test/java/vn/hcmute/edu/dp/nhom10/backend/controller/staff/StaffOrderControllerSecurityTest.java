@@ -140,13 +140,54 @@ class StaffOrderControllerSecurityTest {
 
     @Test
     @WithMockUser(username = "staff@test.com", roles = "STAFF")
-    void statusAndCancelEndpointsAreNotAvailable() throws Exception {
-        mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isNotFound());
+    void staffCanCancelOrder() throws Exception {
+        when(authenticatedUserProvider.getCurrentUserId(any(Authentication.class))).thenReturn(5L);
+        when(staffOrderService.cancelOrder(Mockito.eq("ORD-1"), Mockito.eq(5L), any())).thenReturn(StaffOrderDetailResponse.builder()
+                .orderCode("ORD-1")
+                .status(OrderStatus.cancelled)
+                .items(List.of())
+                .timeline(List.of())
+                .build());
 
         mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "Customer requested cancellation"
+                                }
+                                """))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "customer@test.com", roles = "CUSTOMER")
+    void customerCannotCancelOrder() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "Customer requested cancellation"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void anonymousCannotCancelOrder() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "Customer requested cancellation"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "staff@test.com", roles = "STAFF")
+    void statusEndpointIsNotAvailable() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isNotFound());

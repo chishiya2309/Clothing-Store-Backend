@@ -403,7 +403,8 @@ public abstract class AbstractPostgresIntegrationTest {
                         String reason,
                         Map<String, Object> metadata
                 ) {
-                    if (HISTORY_TRANSITION_FAILS.get() && toStatus == OrderStatus.completed) {
+                    if (HISTORY_TRANSITION_FAILS.get()
+                            && (toStatus == OrderStatus.completed || toStatus == OrderStatus.cancelled)) {
                         throw new RuntimeException("Cannot write history");
                     }
                     return delegate.recordTransition(order, fromStatus, toStatus, changedBy, reason, metadata);

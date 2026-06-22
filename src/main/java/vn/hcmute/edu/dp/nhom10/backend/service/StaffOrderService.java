@@ -1,5 +1,6 @@
 package vn.hcmute.edu.dp.nhom10.backend.service;
 
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCancelOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
@@ -27,4 +28,6 @@ public interface StaffOrderService {
     StaffOrderDetailResponse shipOrder(String orderCode, Long staffUserId);
 
     StaffOrderDetailResponse completeOrder(String orderCode, Long staffUserId, StaffCompleteOrderRequest request);
+
+    StaffOrderDetailResponse cancelOrder(String orderCode, Long staffUserId, StaffCancelOrderRequest request);
 }

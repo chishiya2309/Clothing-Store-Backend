@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCancelOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
@@ -38,7 +39,9 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointAwardResult;
 import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderInventoryAdjustmentService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderVoucherAdjustmentService;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
 
 import java.time.Clock;
@@ -76,6 +79,8 @@ public class StaffOrderServiceImpl implements StaffOrderService {
     private final OrderStatusHistoryService orderStatusHistoryService;
     private final OrderStatusTransitionPolicy orderStatusTransitionPolicy;
     private final LoyaltyPointService loyaltyPointService;
+    private final OrderInventoryAdjustmentService orderInventoryAdjustmentService;
+    private final OrderVoucherAdjustmentService orderVoucherAdjustmentService;
     private final ApplicationEventPublisher eventPublisher;
     private final Clock clock;
 
@@ -184,6 +189,50 @@ public class StaffOrderServiceImpl implements StaffOrderService {
         return toDetailResponse(order);
     }
 
+    @Override
+    @Transactional
+    public StaffOrderDetailResponse cancelOrder(String orderCode, Long staffUserId, StaffCancelOrderRequest request) {
+        validateCancelRequest(request);
+
+        String normalizedOrderCode = normalizeOrderCode(orderCode);
+        User staffUser = findStaffActor(staffUserId);
+        Order order = orderRepository.findByOrderCodeForUpdate(normalizedOrderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with code: " + normalizedOrderCode));
+        OrderStatus fromStatus = order.getStatus();
+        OffsetDateTime cancelledAt = OffsetDateTime.now(clock);
+
+        orderStatusTransitionPolicy.validate(fromStatus, OrderStatus.cancelled);
+        PaymentSnapshot paymentSnapshot = representativePaymentSnapshot(order);
+        boolean requiresManualRefundReview = requiresManualRefundReview(paymentSnapshot);
+        boolean hasVoucher = order.getVoucher() != null;
+
+        orderInventoryAdjustmentService.restoreInventoryForCancelledOrder(order);
+        orderVoucherAdjustmentService.restoreVoucherUsageForCancelledOrder(order);
+        order.setStatus(OrderStatus.cancelled);
+
+        Map<String, Object> metadata = cancellationMetadata(hasVoucher, requiresManualRefundReview);
+        orderStatusHistoryService.recordTransition(
+                order,
+                fromStatus,
+                OrderStatus.cancelled,
+                staffUser,
+                request.reason(),
+                metadata
+        );
+        publishStatusChangedEvent(
+                order,
+                staffUser,
+                fromStatus,
+                OrderStatus.cancelled,
+                request.reason(),
+                paymentSnapshot,
+                requiresManualRefundReview,
+                cancelledAt
+        );
+
+        return toDetailResponse(order);
+    }
+
     private StaffOrderDetailResponse transitionOrder(String orderCode, Long staffUserId, OrderStatus targetStatus) {
         String normalizedOrderCode = normalizeOrderCode(orderCode);
         User staffUser = findStaffActor(staffUserId);
@@ -205,6 +254,18 @@ public class StaffOrderServiceImpl implements StaffOrderService {
         publishStatusChangedEvent(order, staffUser, fromStatus, targetStatus, null, OffsetDateTime.now());
 
         return toDetailResponse(order);
+    }
+
+    private void validateCancelRequest(StaffCancelOrderRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Cancel order request is required");
+        }
+        if (request.reason() == null || request.reason().trim().isEmpty()) {
+            throw new IllegalArgumentException("Cancellation reason is required");
+        }
+        if (request.reason().length() > 500) {
+            throw new IllegalArgumentException("Cancellation reason must not exceed 500 characters");
+        }
     }
 
     private void validateCompleteRequest(StaffCompleteOrderRequest request) {
@@ -275,6 +336,15 @@ public class StaffOrderServiceImpl implements StaffOrderService {
         return metadata;
     }
 
+    private Map<String, Object> cancellationMetadata(boolean hasVoucher, boolean requiresManualRefundReview) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        metadata.put("inventoryRestored", true);
+        metadata.put("voucherUsageRestored", hasVoucher);
+        metadata.put("refundPerformed", false);
+        metadata.put("requiresManualRefundReview", requiresManualRefundReview);
+        return metadata;
+    }
+
     private User findStaffActor(Long staffUserId) {
         if (staffUserId == null) {
             throw new IllegalArgumentException("Staff user ID is required");
@@ -291,6 +361,19 @@ public class StaffOrderServiceImpl implements StaffOrderService {
             String reason,
             OffsetDateTime changedAt
     ) {
+        publishStatusChangedEvent(order, staffUser, fromStatus, toStatus, reason, null, false, changedAt);
+    }
+
+    private void publishStatusChangedEvent(
+            Order order,
+            User staffUser,
+            OrderStatus fromStatus,
+            OrderStatus toStatus,
+            String reason,
+            PaymentSnapshot paymentSnapshot,
+            boolean requiresManualRefundReview,
+            OffsetDateTime changedAt
+    ) {
         User customer = order.getUser();
         eventPublisher.publishEvent(new OrderStatusChangedEvent(
                 order.getId(),
@@ -302,8 +385,33 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 fromStatus,
                 toStatus,
                 reason,
+                paymentSnapshot == null ? null : paymentSnapshot.method(),
+                paymentSnapshot == null ? null : paymentSnapshot.status(),
+                paymentSnapshot == null ? null : paymentSnapshot.amount(),
+                requiresManualRefundReview,
                 changedAt
         ));
+    }
+
+    private PaymentSnapshot representativePaymentSnapshot(Order order) {
+        List<Payment> payments = paymentRepository.findAllByOrderId(order.getId()).stream()
+                .sorted(paymentCreatedAtDesc())
+                .toList();
+        Payment representativePayment = chooseRepresentativePayment(payments);
+        if (representativePayment == null) {
+            return null;
+        }
+        return new PaymentSnapshot(
+                representativePayment.getMethod(),
+                representativePayment.getStatus(),
+                representativePayment.getAmount()
+        );
+    }
+
+    private boolean requiresManualRefundReview(PaymentSnapshot paymentSnapshot) {
+        return paymentSnapshot != null
+                && paymentSnapshot.method() != PaymentMethod.cod
+                && paymentSnapshot.status() == PaymentStatus.completed;
     }
 
     private Map<Long, Payment> representativePayments(List<Order> orders) {
@@ -568,5 +676,8 @@ public class StaffOrderServiceImpl implements StaffOrderService {
         static CodPaymentCompletionResult alreadyCompleted(Payment payment) {
             return new CodPaymentCompletionResult(true, false, true, payment.getId());
         }
+    }
+
+    private record PaymentSnapshot(PaymentMethod method, PaymentStatus status, java.math.BigDecimal amount) {
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCancelOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCompleteOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderDetailResponse;
@@ -406,15 +407,90 @@ class StaffOrderControllerTest {
     }
 
     @Test
-    void patchStatusEndpoint_doesNotExist() throws Exception {
-        mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
-                        .principal(authentication()))
-                .andExpect(status().isNotFound());
+    void cancelOrder_withValidRequest_returnsDetailResponseAndPassesRequest() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.cancelOrder(eq("ORD-1"), eq(5L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(StaffOrderDetailResponse.builder()
+                        .orderCode("ORD-1")
+                        .status(OrderStatus.cancelled)
+                        .items(List.of())
+                        .timeline(List.of())
+                        .build());
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "Customer requested cancellation"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Hủy đơn hàng thành công"))
+                .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
+                .andExpect(jsonPath("$.data.status").value("cancelled"));
+
+        ArgumentCaptor<StaffCancelOrderRequest> requestCaptor =
+                ArgumentCaptor.forClass(StaffCancelOrderRequest.class);
+        verify(authenticatedUserProvider).getCurrentUserId(authentication);
+        verify(staffOrderService).cancelOrder(eq("ORD-1"), eq(5L), requestCaptor.capture());
+        assertEquals("Customer requested cancellation", requestCaptor.getValue().reason());
     }
 
     @Test
-    void cancelEndpoint_doesNotExist() throws Exception {
+    void cancelOrder_conflict_returnsConflict() throws Exception {
+        Authentication authentication = authentication();
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(5L);
+        when(staffOrderService.cancelOrder(eq("ORD-1"), eq(5L), org.mockito.ArgumentMatchers.any()))
+                .thenThrow(new OrderStateConflictException("Cannot cancel shipped order"));
+
         mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "Customer requested cancellation"
+                                }
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    void cancelOrder_blankReason_returnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "   "
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void cancelOrder_reasonTooLong_returnsBadRequest() throws Exception {
+        String longReason = "a".repeat(501);
+
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/cancel")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "reason": "%s"
+                                }
+                                """.formatted(longReason)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void patchStatusEndpoint_doesNotExist() throws Exception {
+        mockMvc.perform(patch("/api/staff/orders/ORD-1/status")
                         .principal(authentication()))
                 .andExpect(status().isNotFound());
     }
