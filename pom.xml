@@ -129,6 +129,13 @@
             <artifactId>s3</artifactId>
             <version>2.31.15</version>
         </dependency>
+
+        <!-- Smile ML - K-Means Clustering for Product Recommendations (UC-29) -->
+        <dependency>
+            <groupId>com.github.haifengl</groupId>
+            <artifactId>smile-core</artifactId>
+            <version>3.1.1</version>
+        </dependency>
     </dependencies>
 
     <profiles>
