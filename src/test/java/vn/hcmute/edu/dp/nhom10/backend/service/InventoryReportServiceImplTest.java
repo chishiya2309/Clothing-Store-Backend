@@ -13,13 +13,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.InventoryReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ReportExportDescriptor;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Category;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.enums.InventoryReportStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.ReportExportFormat;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.factory.report.ReportExporterFactory;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.strategy.report.ReportExportStrategy;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.InventoryReportServiceImpl;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +40,12 @@ class InventoryReportServiceImplTest {
 
     @Mock
     private ProductVariantRepository productVariantRepository;
+
+    @Mock
+    private ReportExporterFactory reportExporterFactory;
+
+    @Mock
+    private ReportExportStrategy<InventoryReportResponse> reportExportStrategy;
 
     @InjectMocks
     private InventoryReportServiceImpl inventoryReportService;
@@ -186,6 +197,121 @@ class InventoryReportServiceImplTest {
                 () -> inventoryReportService.getInventoryReport(null, null, null, 0, 10, "stockQuantity"));
 
         verify(productVariantRepository, never()).findInventoryReport(any(), any(), any(), any(), any(Pageable.class));
+    }
+
+    @Test
+    void describeInventoryExport_usesFactoryMetadata() {
+        when(reportExporterFactory.getInventoryReportExporter(ReportExportFormat.CSV))
+                .thenReturn(reportExportStrategy);
+        when(reportExportStrategy.contentType()).thenReturn("text/csv");
+        when(reportExportStrategy.fileName()).thenReturn("inventory_report.csv");
+
+        ReportExportDescriptor descriptor = inventoryReportService.describeInventoryExport(ReportExportFormat.CSV);
+
+        assertEquals("text/csv", descriptor.contentType());
+        assertEquals("inventory_report.csv", descriptor.fileName());
+        verify(reportExporterFactory).getInventoryReportExporter(ReportExportFormat.CSV);
+    }
+
+    @Test
+    void exportInventoryReport_lowStock_usesFiltersLimitAndFactoryStrategy() throws Exception {
+        ProductVariant variant = variant(10L, 1L, "Áo Polo Nam Cotton", "Áo Polo", "L", "Trắng", 5);
+        Page<ProductVariant> page = new PageImpl<>(List.of(variant), PageRequest.of(0, 10_000), 10_001);
+        when(productVariantRepository.findInventoryReport(any(), any(), any(), any(), any(Pageable.class)))
+                .thenReturn(page);
+        when(reportExporterFactory.getInventoryReportExporter(ReportExportFormat.CSV))
+                .thenReturn(reportExportStrategy);
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        ArgumentCaptor<List<InventoryReportResponse>> dataCaptor = ArgumentCaptor.forClass(List.class);
+
+        inventoryReportService.exportInventoryReport(
+                new ByteArrayOutputStream(),
+                InventoryReportStatus.LOW_STOCK,
+                3L,
+                " polo ",
+                "stockAsc",
+                ReportExportFormat.CSV
+        );
+
+        verify(productVariantRepository).findInventoryReport(
+                org.mockito.ArgumentMatchers.eq(3L),
+                org.mockito.ArgumentMatchers.eq("polo"),
+                org.mockito.ArgumentMatchers.eq(1),
+                org.mockito.ArgumentMatchers.eq(9),
+                pageableCaptor.capture());
+        assertEquals(10_000, pageableCaptor.getValue().getPageSize());
+        assertEquals(Sort.Direction.ASC, pageableCaptor.getValue().getSort().getOrderFor("stockQuantity").getDirection());
+        verify(reportExporterFactory).getInventoryReportExporter(ReportExportFormat.CSV);
+        verify(reportExportStrategy).export(any(ByteArrayOutputStream.class), dataCaptor.capture());
+        assertEquals(1, dataCaptor.getValue().size());
+        assertEquals("SP001", dataCaptor.getValue().get(0).productCode());
+        assertEquals(InventoryReportStatus.LOW_STOCK, dataCaptor.getValue().get(0).status());
+    }
+
+    @Test
+    void exportInventoryReport_outOfStockRange_isAppliedInRepository() throws Exception {
+        when(productVariantRepository.findInventoryReport(any(), any(), any(), any(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10_000), 0));
+        when(reportExporterFactory.getInventoryReportExporter(ReportExportFormat.CSV))
+                .thenReturn(reportExportStrategy);
+
+        inventoryReportService.exportInventoryReport(
+                new ByteArrayOutputStream(),
+                InventoryReportStatus.OUT_OF_STOCK,
+                null,
+                null,
+                "stockAsc",
+                ReportExportFormat.CSV
+        );
+
+        verify(productVariantRepository).findInventoryReport(
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.eq(0),
+                org.mockito.ArgumentMatchers.eq(0),
+                any(Pageable.class));
+        verify(reportExportStrategy).export(any(ByteArrayOutputStream.class), org.mockito.ArgumentMatchers.eq(List.of()));
+    }
+
+    @Test
+    void exportInventoryReport_inStockRange_isAppliedInRepository() throws Exception {
+        when(productVariantRepository.findInventoryReport(any(), any(), any(), any(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10_000), 0));
+        when(reportExporterFactory.getInventoryReportExporter(ReportExportFormat.CSV))
+                .thenReturn(reportExportStrategy);
+
+        inventoryReportService.exportInventoryReport(
+                new ByteArrayOutputStream(),
+                InventoryReportStatus.IN_STOCK,
+                null,
+                null,
+                "stockAsc",
+                ReportExportFormat.CSV
+        );
+
+        verify(productVariantRepository).findInventoryReport(
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.eq(10),
+                org.mockito.ArgumentMatchers.isNull(),
+                any(Pageable.class));
+        verify(reportExportStrategy).export(any(ByteArrayOutputStream.class), org.mockito.ArgumentMatchers.eq(List.of()));
+    }
+
+    @Test
+    void exportInventoryReport_invalidSort_throwsBeforeRepository() {
+        assertThrows(IllegalArgumentException.class,
+                () -> inventoryReportService.exportInventoryReport(
+                        new ByteArrayOutputStream(),
+                        null,
+                        null,
+                        null,
+                        "stockQuantity",
+                        ReportExportFormat.CSV
+                ));
+
+        verify(productVariantRepository, never()).findInventoryReport(any(), any(), any(), any(), any(Pageable.class));
+        verify(reportExporterFactory, never()).getInventoryReportExporter(any());
     }
 
     private Page<ProductVariant> pageOf(ProductVariant variant) {

@@ -7,16 +7,21 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.InventoryReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ReportExportDescriptor;
 import vn.hcmute.edu.dp.nhom10.backend.enums.InventoryReportStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.ReportExportFormat;
 import vn.hcmute.edu.dp.nhom10.backend.exception.GlobalExceptionHandling;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReportService;
 
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,9 +31,13 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -217,6 +226,73 @@ class StaffInventoryReportControllerTest {
         assertEquals(2, pageCaptor.getValue());
         assertEquals(50, sizeCaptor.getValue());
         assertEquals("skuAsc", sortCaptor.getValue());
+    }
+
+    @Test
+    void exportInventoryReport_success_setsDownloadHeadersAndPassesParams() throws Exception {
+        when(inventoryReportService.describeInventoryExport(ReportExportFormat.CSV))
+                .thenReturn(new ReportExportDescriptor("text/csv", "inventory_report.csv"));
+        doAnswer(invocation -> {
+            OutputStream outputStream = invocation.getArgument(0);
+            outputStream.write("\uFEFFMã SP,Tên sản phẩm\nSP001,Áo Polo".getBytes(StandardCharsets.UTF_8));
+            return null;
+        }).when(inventoryReportService).exportInventoryReport(
+                any(OutputStream.class),
+                eq(InventoryReportStatus.LOW_STOCK),
+                eq(3L),
+                eq("polo"),
+                eq("stockAsc"),
+                eq(ReportExportFormat.CSV)
+        );
+
+        mockMvc.perform(get("/api/staff/reports/inventory/export")
+                        .param("status", "LOW_STOCK")
+                        .param("categoryId", "3")
+                        .param("keyword", "polo")
+                        .param("sortBy", "stockAsc")
+                        .param("format", "CSV"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/csv"))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=inventory_report.csv"));
+
+        verify(inventoryReportService).describeInventoryExport(ReportExportFormat.CSV);
+        verify(inventoryReportService).exportInventoryReport(
+                any(OutputStream.class),
+                eq(InventoryReportStatus.LOW_STOCK),
+                eq(3L),
+                eq("polo"),
+                eq("stockAsc"),
+                eq(ReportExportFormat.CSV)
+        );
+    }
+
+    @Test
+    void exportInventoryReport_defaultsFormatToCsv() throws Exception {
+        when(inventoryReportService.describeInventoryExport(ReportExportFormat.CSV))
+                .thenReturn(new ReportExportDescriptor("text/csv", "inventory_report.csv"));
+
+        mockMvc.perform(get("/api/staff/reports/inventory/export"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=inventory_report.csv"));
+
+        verify(inventoryReportService).describeInventoryExport(ReportExportFormat.CSV);
+        verify(inventoryReportService).exportInventoryReport(
+                any(OutputStream.class),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq("stockAsc"),
+                eq(ReportExportFormat.CSV)
+        );
+    }
+
+    @Test
+    void exportInventoryReport_invalidFormat_returns400() throws Exception {
+        mockMvc.perform(get("/api/staff/reports/inventory/export")
+                        .param("format", "XLSX"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(inventoryReportService);
     }
 
     @Test

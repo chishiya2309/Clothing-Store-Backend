@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -8,23 +9,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.InventoryReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ReportExportDescriptor;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Category;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.enums.InventoryReportStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.ReportExportFormat;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.factory.report.ReportExporterFactory;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.strategy.report.ReportExportStrategy;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReportService;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "INVENTORY-REPORT-SERVICE")
 public class InventoryReportServiceImpl implements InventoryReportService {
     private static final int LOW_STOCK_THRESHOLD = 10;
     private static final int MAX_PAGE_SIZE = 100;
+    private static final int MAX_EXPORT_ROWS = 10_000;
     private static final String DEFAULT_SORT = "stockAsc";
 
     private final ProductVariantRepository productVariantRepository;
+    private final ReportExporterFactory reportExporterFactory;
 
     @Override
     @Transactional(readOnly = true)
@@ -59,6 +69,52 @@ public class InventoryReportServiceImpl implements InventoryReportService {
                 .totalPages(variantPage.getTotalPages())
                 .content(content)
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReportExportDescriptor describeInventoryExport(ReportExportFormat format) {
+        ReportExportStrategy<InventoryReportResponse> exporter =
+                reportExporterFactory.getInventoryReportExporter(format);
+
+        return new ReportExportDescriptor(exporter.contentType(), exporter.fileName());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void exportInventoryReport(
+            OutputStream outputStream,
+            InventoryReportStatus status,
+            Long categoryId,
+            String keyword,
+            String sortBy,
+            ReportExportFormat format
+    ) throws IOException {
+        StockRange stockRange = resolveStockRange(status);
+        PageRequest exportLimit = PageRequest.of(0, MAX_EXPORT_ROWS, resolveSort(sortBy));
+        Page<ProductVariant> variantPage = productVariantRepository.findInventoryReport(
+                categoryId,
+                normalizeKeyword(keyword),
+                stockRange.minStock(),
+                stockRange.maxStock(),
+                exportLimit
+        );
+
+        if (variantPage.getTotalElements() > MAX_EXPORT_ROWS) {
+            log.warn(
+                    "Inventory report export limited to {} rows out of {} matching records",
+                    MAX_EXPORT_ROWS,
+                    variantPage.getTotalElements()
+            );
+        }
+
+        List<InventoryReportResponse> data = variantPage.getContent().stream()
+                .map(this::toResponse)
+                .toList();
+
+        ReportExportStrategy<InventoryReportResponse> exporter =
+                reportExporterFactory.getInventoryReportExporter(format);
+        exporter.export(outputStream, data);
     }
 
     private void validatePageRequest(int page, int size) {
