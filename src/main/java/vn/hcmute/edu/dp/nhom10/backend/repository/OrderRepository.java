@@ -1,5 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,9 +10,12 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.BestsellerReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
+
 
 /**
  * Repository cung cấp các phương thức truy xuất dữ liệu gộp nhóm từ bảng orders.
@@ -21,6 +26,26 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     boolean existsByOrderCode(String orderCode);
+
+    // Customer order history: paginated, ordered newest first
+    @Query("SELECT o FROM Order o JOIN FETCH o.orderItems oi " +
+           "WHERE o.user.email = :email " +
+           "ORDER BY o.createdAt DESC")
+    Page<Order> findByUserEmail(
+            @Param("email") String email,
+            Pageable pageable);
+
+    // Customer order history with status filter: paginated, ordered newest first
+    @Query("SELECT o FROM Order o JOIN FETCH o.orderItems oi " +
+           "WHERE o.user.email = :email " +
+           "AND o.status = :status " +
+           "ORDER BY o.createdAt DESC")
+    Page<Order> findByUserEmailAndStatus(
+            @Param("email") String email,
+            @Param("status") OrderStatus status,
+            Pageable pageable);
+
+    Optional<Order> findByOrderCodeAndUserEmail(String orderCode, String email);
 
     @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse(" +
            "  CAST(o.createdAt AS date), " +

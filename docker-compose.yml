@@ -16,6 +16,9 @@ services:
       BREVO_API_KEY: ${BREVO_API_KEY}
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-mock}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY:-mock}
+      AWS_REGION: ${AWS_REGION:-ap-southeast-1}
     networks:
       - default
 

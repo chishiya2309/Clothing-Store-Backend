@@ -8,5 +8,7 @@ public interface EmailService {
     void sendAccountStatusEmail(String toEmail, String fullName, Boolean isActive);
 
     void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product);
+
+    void sendOrderCancellationEmail(String toEmail, String fullName, String orderCode);
 }
 

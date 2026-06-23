@@ -126,6 +126,43 @@ public class BrevoEmailServiceImpl implements EmailService {
 
     @Async
     @Override
+    public void sendOrderCancellationEmail(String toEmail, String fullName, String orderCode) {
+        String htmlContent = String.format("""
+                <html>
+                <body>
+                    <h2>Thông báo hủy đơn hàng thành công</h2>
+                    <p>Chào %s,</p>
+                    <p>Đơn hàng <strong>#%s</strong> của bạn đã được hủy thành công trên hệ thống của chúng tôi.</p>
+                    <p>Số tiền thanh toán (nếu có) sẽ được xử lý hoàn trả theo chính sách của cửa hàng.</p>
+                    <p>Cảm ơn bạn đã đồng hành cùng Clothing Store.</p>
+                </body>
+                </html>
+                """, fullName, orderCode);
+
+        Map<String, Object> requestBody = Map.of(
+                "sender", Map.of("name", senderName, "email", senderEmail),
+                "to", List.of(Map.of("email", toEmail, "name", fullName)),
+                "subject", "Clothing Store - Hủy đơn hàng #" + orderCode,
+                "htmlContent", htmlContent);
+
+        try {
+            restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Order cancellation email sent successfully to {} for order {}", toEmail, orderCode);
+        } catch (Exception e) {
+            log.error("Failed to send order cancellation email to {} for order {}", toEmail, orderCode, e);
+        }
+    }
+
+
+    @Async
+    @Override
     public void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product) {
         String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
         String productUrl = baseUrl + "/product/" + product.getSlug();
