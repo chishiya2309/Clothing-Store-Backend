@@ -37,4 +37,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             @Param("categoryId") Long categoryId,
             @Param("excludeProductId") Long excludeProductId,
             Pageable pageable);
+
+    List<Product> findTop8ByIsActiveTrueOrderByCreatedAtDesc();
+
+    Page<Product> findByIsActiveTrue(Pageable pageable);
 }

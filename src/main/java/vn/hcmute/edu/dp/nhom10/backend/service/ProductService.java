@@ -23,4 +23,10 @@ public interface ProductService {
 
     /** UC-11: Autocomplete gợi ý khi gõ từ khóa */
     List<ProductGridResponse> getAutocompleteSuggestions(String keyword, int limit);
+
+    /** Lấy danh sách Hàng Mới Về (áp dụng cache) */
+    List<ProductGridResponse> getNewArrivals();
+
+    /** Lấy danh sách Sản phẩm bán chạy nhất */
+    List<ProductGridResponse> getBestSellers(int limit);
 }
