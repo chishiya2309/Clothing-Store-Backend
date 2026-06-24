@@ -171,7 +171,7 @@ class StaffOrderControllerTest {
                         .principal(authentication))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("Xác nhận đơn hàng thành công"))
+                .andExpect(jsonPath("$.message").value("Confirm order successful"))
                 .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
                 .andExpect(jsonPath("$.data.status").value("processing"));
 
@@ -194,7 +194,7 @@ class StaffOrderControllerTest {
                         .principal(authentication))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("Chuyển đơn hàng sang trạng thái giao hàng thành công"))
+                .andExpect(jsonPath("$.message").value("Ship order successful"))
                 .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
                 .andExpect(jsonPath("$.data.status").value("shipping"));
 
@@ -252,7 +252,7 @@ class StaffOrderControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("HoÃ n thÃ nh Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng"))
+                .andExpect(jsonPath("$.message").value("Complete order successful"))
                 .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
                 .andExpect(jsonPath("$.data.status").value("completed"));
 
@@ -428,7 +428,7 @@ class StaffOrderControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("Hủy đơn hàng thành công"))
+                .andExpect(jsonPath("$.message").value("Cancel order successful"))
                 .andExpect(jsonPath("$.data.orderCode").value("ORD-1"))
                 .andExpect(jsonPath("$.data.status").value("cancelled"));
 

@@ -27,11 +27,30 @@ import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
 import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
+import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
+import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
+import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
+import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.strategy.order.CustomerOrderCancellationStrategy;
+import vn.hcmute.edu.dp.nhom10.backend.pattern.observer.order.OrderCancellationManager;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderDetailResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderHistoryItemResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
+import vn.hcmute.edu.dp.nhom10.backend.entity.ProductImage;
+import vn.hcmute.edu.dp.nhom10.backend.enums.ImageType;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +68,10 @@ public class OrderServiceImpl implements OrderService {
     private final VoucherReservationService voucherService;
     private final OrderStatusHistoryService orderStatusHistoryService;
     private final ApplicationEventPublisher eventPublisher;
+    private final ProductVariantRepository productVariantRepository;
+    private final VoucherRepository voucherRepository;
+    private final CustomerOrderCancellationStrategy customerOrderCancellationStrategy;
+    private final OrderCancellationManager orderCancellationManager;
 
     @Override
     @Transactional
@@ -189,5 +212,126 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         throw new InvalidDataException("Unable to generate unique order code");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<OrderHistoryItemResponse> getOrderHistory(String email, OrderStatus status, int page, int size) {
+        Page<Order> orderPage = (status == null)
+                ? orderRepository.findByUserEmail(email, PageRequest.of(page, size))
+                : orderRepository.findByUserEmailAndStatus(email, status, PageRequest.of(page, size));
+
+        List<OrderHistoryItemResponse> items = orderPage.getContent().stream().map(order -> {
+            // Lấy tối đa 3 ảnh thumbnail từ các sản phẩm trong đơn
+            List<OrderHistoryItemResponse.OrderHistoryProductImage> images = order.getOrderItems().stream()
+                    .limit(3)
+                    .map(oi -> {
+                        // Lấy ảnh thumbnail đầu tiên của sản phẩm
+                        String imageUrl = oi.getProductVariant().getProduct().getImages().stream()
+                                .filter(img -> ImageType.thumbnail.equals(img.getImageType()))
+                                .findFirst()
+                                .or(() -> oi.getProductVariant().getProduct().getImages().stream().findFirst())
+                                .map(ProductImage::getImageUrl)
+                                .orElse(null);
+                        return OrderHistoryItemResponse.OrderHistoryProductImage.builder()
+                                .imageUrl(imageUrl)
+                                .productName(oi.getProductName())
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
+            return OrderHistoryItemResponse.builder()
+                    .id(order.getId())
+                    .orderCode(order.getOrderCode())
+                    .totalAmount(order.getTotalAmount())
+                    .discountAmount(order.getDiscountAmount())
+                    .status(order.getStatus())
+                    .createdAt(order.getCreatedAt())
+                    .itemCount(order.getOrderItems().size())
+                    .productImages(images)
+                    .build();
+        }).collect(Collectors.toList());
+
+        return PageResponse.<OrderHistoryItemResponse>builder()
+                .pageNumber(orderPage.getNumber())
+                .pageSize(orderPage.getSize())
+                .totalPages(orderPage.getTotalPages())
+                .totalElements(orderPage.getTotalElements())
+                .content(items)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderDetailResponse getOrderDetail(String orderCode, String email) {
+        Order order = orderRepository.findByOrderCodeAndUserEmail(orderCode, email)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderCode));
+
+        List<OrderDetailResponse.OrderDetailItemResponse> itemResponses = order.getOrderItems().stream()
+                .map(oi -> {
+                    String imageUrl = oi.getProductVariant().getProduct().getImages().stream()
+                            .filter(img -> ImageType.thumbnail.equals(img.getImageType()))
+                            .findFirst()
+                            .or(() -> oi.getProductVariant().getProduct().getImages().stream().findFirst())
+                            .map(ProductImage::getImageUrl)
+                            .orElse(null);
+                    String productSlug = oi.getProductVariant().getProduct().getSlug();
+                    return OrderDetailResponse.OrderDetailItemResponse.builder()
+                            .id(oi.getId())
+                            .productName(oi.getProductName())
+                            .variantInfo(oi.getVariantInfo())
+                            .quantity(oi.getQuantity())
+                            .unitPrice(oi.getUnitPrice())
+                            .subtotal(oi.getSubtotal())
+                            .imageUrl(imageUrl)
+                            .productSlug(productSlug)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        PaymentMethod paymentMethod = order.getPayments().stream()
+                .map(Payment::getMethod)
+                .findFirst()
+                .orElse(null);
+        PaymentStatus paymentStatus = order.getPayments().stream()
+                .map(Payment::getStatus)
+                .findFirst()
+                .orElse(null);
+
+        return OrderDetailResponse.builder()
+                .id(order.getId())
+                .orderCode(order.getOrderCode())
+                .subtotal(order.getSubtotal())
+                .shippingFee(order.getShippingFee())
+                .discountAmount(order.getDiscountAmount())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .createdAt(order.getCreatedAt())
+                .note(order.getNote())
+                .paymentMethod(paymentMethod)
+                .paymentStatus(paymentStatus)
+                .shippingName(order.getShippingName())
+                .shippingPhone(order.getShippingPhone())
+                .shippingProvince(order.getShippingProvince())
+                .shippingDistrict(order.getShippingDistrict())
+                .shippingWard(order.getShippingWard())
+                .shippingAddress(order.getShippingAddress())
+                .items(itemResponses)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(String orderCode, String email) {
+        Order order = orderRepository.findByOrderCodeAndUserEmail(orderCode, email)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderCode));
+
+        // Use Strategy pattern to check cancellation rules and set status to cancelled
+        customerOrderCancellationStrategy.cancel(order);
+
+        // Notify observers to handle post-cancellation events (stock restoration, voucher restoration, email notifications)
+        orderCancellationManager.notifyObservers(order);
+
+        orderRepository.save(order);
     }
 }

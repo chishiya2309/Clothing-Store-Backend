@@ -69,7 +69,7 @@ public class StaffOrderController {
         StaffOrderDetailResponse response = staffOrderService.confirmOrder(orderCode, staffUserId);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("Xác nhận đơn hàng thành công")
+                .message("Confirm order successful")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
@@ -81,7 +81,7 @@ public class StaffOrderController {
         StaffOrderDetailResponse response = staffOrderService.shipOrder(orderCode, staffUserId);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("Chuyển đơn hàng sang trạng thái giao hàng thành công")
+                .message("Ship order successful")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
@@ -97,7 +97,7 @@ public class StaffOrderController {
         StaffOrderDetailResponse response = staffOrderService.completeOrder(orderCode, staffUserId, request);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("Hoàn thành đơn hàng thành công")
+                .message("Complete order successful")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
@@ -113,7 +113,7 @@ public class StaffOrderController {
         StaffOrderDetailResponse response = staffOrderService.cancelOrder(orderCode, staffUserId, request);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("Hủy đơn hàng thành công")
+                .message("Cancel order successful")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
