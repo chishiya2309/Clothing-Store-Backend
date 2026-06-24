@@ -97,7 +97,7 @@ public class StaffOrderController {
         StaffOrderDetailResponse response = staffOrderService.completeOrder(orderCode, staffUserId, request);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("HoÃ n thÃ nh Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng")
+                .message("Hoàn thành đơn hàng thành công")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
@@ -113,7 +113,7 @@ public class StaffOrderController {
         StaffOrderDetailResponse response = staffOrderService.cancelOrder(orderCode, staffUserId, request);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("H\u1ee7y \u0111\u01a1n h\u00e0ng th\u00e0nh c\u00f4ng")
+                .message("Hủy đơn hàng thành công")
                 .data(response)
                 .timestamp(OffsetDateTime.now())
                 .build();
