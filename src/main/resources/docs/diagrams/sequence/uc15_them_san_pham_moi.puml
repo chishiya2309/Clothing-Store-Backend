@@ -1,0 +1,145 @@
+@startuml uc15_them_san_pham_moi
+skinparam style strictuml
+skinparam BoxPadding 10
+skinparam ParticipantPadding 10
+
+actor "Staff / Admin" as User
+box "Frontend (React SPA)" #LightBlue
+    participant "ProductForm" as UI
+end box
+
+box "Backend (Spring Boot API)" #LightGreen
+    participant "AdminProductController" as Ctrl
+    participant "S3StorageService" as S3Service
+    participant "ProductService" as Service
+    participant "CategoryRepository" as CategoryRepo
+    participant "ProductRepository" as ProductRepo
+    participant "ProductVariantRepository" as VariantRepo
+    participant "ProductImageRepository" as ImageRepo
+    participant "ActivityLogRepository" as LogRepo
+end box
+
+database "PostgreSQL" as DB
+entity "AWS S3" as S3
+
+== 1. Upload Images (Preview/Temporary) ==
+User -> UI : Choose image files
+activate UI
+loop for each image file
+    UI -> Ctrl : POST /api/admin/products/images/upload (multipart file)
+    activate Ctrl
+    Ctrl -> S3Service : uploadFile(file)
+    activate S3Service
+    S3Service -> S3 : Upload file
+    S3 --> S3Service : S3 URL
+    S3Service --> Ctrl : S3 URL
+    deactivate S3Service
+    Ctrl --> UI : 200 OK (imageUrl)
+    deactivate Ctrl
+    UI --> User : Show image preview
+end
+deactivate UI
+
+== 2. Submit Form ==
+User -> UI : Fill details, add variants, click "Tạo sản phẩm"
+activate UI
+UI -> Ctrl : POST /api/admin/products (CreateProductRequest, Bearer Token)
+activate Ctrl
+
+Ctrl -> Service : createProduct(request, currentUser)
+activate Service
+
+Service -> CategoryRepo : findById(categoryId)
+activate CategoryRepo
+CategoryRepo -> DB : SELECT * FROM categories WHERE id = ?
+DB --> CategoryRepo : Category entity / Optional
+CategoryRepo --> Service : Category entity
+deactivate CategoryRepo
+
+alt Category not found
+    Service --> Ctrl : throw ResourceNotFoundException
+    Ctrl --> UI : 404 Not Found (ErrorResponse)
+    UI --> User : Display "Danh mục không tồn tại"
+else Category found
+    Service -> ProductRepo : existsByNameAndCategoryIdAndDeletedAtIsNull(name, categoryId)
+    activate ProductRepo
+    ProductRepo -> DB : SELECT EXISTS (SELECT 1 FROM products WHERE name = ? AND category_id = ? AND deleted_at IS NULL)
+    DB --> ProductRepo : true / false
+    ProductRepo --> Service : true / false
+    deactivate ProductRepo
+
+    alt [5a] Name duplicate in same category
+        Service --> Ctrl : throw InvalidDataException("Tên sản phẩm đã tồn tại...")
+        Ctrl --> UI : 400 Bad Request
+        UI --> User : Display "Tên sản phẩm đã tồn tại trong danh mục này"
+    else Name is unique
+        alt [5b] Images list is empty
+            Service --> Ctrl : throw InvalidDataException("Vui lòng upload ít nhất 1 hình ảnh")
+            Ctrl --> UI : 400 Bad Request
+            UI --> User : Display "Vui lòng upload ít nhất 1 hình ảnh"
+        else Images exist
+            alt [5c] Variants list is empty
+                Service --> Ctrl : throw InvalidDataException("Vui lòng thêm ít nhất 1 biến thể")
+                Ctrl --> UI : 400 Bad Request
+                UI --> User : Display "Vui lòng thêm ít nhất 1 biến thể (size + màu)"
+            else Variants exist
+                loop for each variant in request
+                    Service -> VariantRepo : existsBySku(sku)
+                    activate VariantRepo
+                    VariantRepo -> DB : SELECT EXISTS (SELECT 1 FROM product_variants WHERE sku = ?)
+                    DB --> VariantRepo : true / false
+                    VariantRepo --> Service : true / false
+                    deactivate VariantRepo
+                    alt SKU duplicate
+                        Service --> Ctrl : throw InvalidDataException("SKU đã tồn tại")
+                        Ctrl --> UI : 400 Bad Request
+                        UI --> User : Display "Mã SKU [sku] đã tồn tại trên hệ thống"
+                    end
+                end
+
+                Service -> Service : Generate slug from name
+                Service -> ProductRepo : save(Product)
+                activate ProductRepo
+                ProductRepo -> DB : INSERT INTO products (name, slug, base_price, sale_price, category_id, ...)
+                DB --> ProductRepo : saved Product entity (id generated)
+                ProductRepo --> Service : Product entity
+                deactivate ProductRepo
+
+                loop for each image URL
+                    Service -> ImageRepo : save(ProductImage)
+                    activate ImageRepo
+                    ImageRepo -> DB : INSERT INTO product_images (product_id, image_url, image_type, display_order)
+                    DB --> ImageRepo : saved image
+                    ImageRepo --> Service : saved image
+                    deactivate ImageRepo
+                end
+
+                loop for each variant
+                    Service -> VariantRepo : save(ProductVariant)
+                    activate VariantRepo
+                    VariantRepo -> DB : INSERT INTO product_variants (product_id, sku, size, color, stock_quantity, additional_price)
+                    DB --> VariantRepo : saved variant
+                    VariantRepo --> Service : saved variant
+                    deactivate VariantRepo
+                end
+
+                Service -> LogRepo : save(ActivityLog)
+                activate LogRepo
+                LogRepo -> DB : INSERT INTO activity_logs (user_id, action, entity_type, entity_id, ...)
+                DB --> LogRepo : saved log
+                LogRepo --> Service : saved log
+                deactivate LogRepo
+
+                Service --> Ctrl : ProductResponse DTO
+                deactivate Service
+
+                Ctrl --> UI : 201 Created (ApiResponse with data)
+                deactivate Ctrl
+
+                UI --> User : Display "Thêm sản phẩm thành công" and redirect to product list
+                deactivate UI
+            end
+        end
+    end
+end
+@enduml

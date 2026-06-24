@@ -1,0 +1,83 @@
+@startuml uc14_xem_chi_tiet_san_pham
+skinparam style strictuml
+skinparam BoxPadding 10
+skinparam ParticipantPadding 10
+
+actor "Guest / Customer" as User
+box "Frontend (React SPA)" #LightBlue
+    participant "ProductDetailPage" as UI
+end box
+
+box "Backend (Spring Boot API)" #LightGreen
+    participant "ProductController" as Ctrl
+    participant "ProductService" as Service
+    participant "ProductRepository" as ProductRepo
+    participant "ProductVariantRepository" as VariantRepo
+    participant "ReviewRepository" as ReviewRepo
+    participant "ActivityLogRepository" as LogRepo
+end box
+
+database "PostgreSQL" as DB
+
+User -> UI : Click product card (slug)
+activate UI
+UI -> Ctrl : GET /api/products/{slug}
+activate Ctrl
+
+Ctrl -> Service : getProductDetails(slug, currentUser)
+activate Service
+
+Service -> ProductRepo : findBySlugAndIsActiveTrueAndDeletedAtIsNull(slug)
+activate ProductRepo
+ProductRepo -> DB : SELECT * FROM products WHERE slug = ? AND is_active = true AND deleted_at IS NULL
+DB --> ProductRepo : Product entity data
+ProductRepo --> Service : Product entity / Optional
+deactivate ProductRepo
+
+alt Product not found or inactive
+    Service --> Ctrl : throw ResourceNotFoundException
+    Ctrl --> UI : 404 Not Found (ErrorResponse)
+    UI --> User : Display "Sản phẩm không tồn tại hoặc đã bị ẩn"
+else Product found
+    Service -> VariantRepo : findByProductIdAndIsActiveTrue(productId)
+    activate VariantRepo
+    VariantRepo -> DB : SELECT * FROM product_variants WHERE product_id = ? AND is_active = true
+    DB --> VariantRepo : List<ProductVariant>
+    VariantRepo --> Service : List<ProductVariant>
+    deactivate VariantRepo
+
+    Service -> ReviewRepo : findByProductIdAndIsApprovedTrue(productId)
+    activate ReviewRepo
+    ReviewRepo -> DB : SELECT * FROM reviews WHERE product_id = ? AND is_approved = true
+    DB --> ReviewRepo : List<Review>
+    ReviewRepo --> Service : List<Review>
+    deactivate ReviewRepo
+
+    Service -> ProductRepo : findTop8ByCategoryIdAndIdNotAndIsActiveTrue(categoryId, productId)
+    activate ProductRepo
+    ProductRepo -> DB : SELECT * FROM products WHERE category_id = ? AND id != ? AND is_active = true LIMIT 8
+    DB --> ProductRepo : List<Product>
+    ProductRepo --> Service : List<Product>
+    deactivate ProductRepo
+
+    alt currentUser is authenticated (logged in)
+        Service -> LogRepo : save(ActivityLog)
+        activate LogRepo
+        LogRepo -> DB : INSERT INTO activity_logs (user_id, action, entity_type, entity_id, ...)
+        DB --> LogRepo : saved log
+        LogRepo --> Service : saved log
+        deactivate LogRepo
+    end
+
+    Service -> Service : Map entities to ProductDetailResponse DTO
+    Service --> Ctrl : ProductDetailResponse DTO
+    deactivate Service
+
+    Ctrl --> UI : 200 OK (ApiResponse with data)
+    deactivate Ctrl
+
+    UI --> User : Display product details (gallery, variants, price, reviews, recommendations)
+    deactivate UI
+end
+
+@enduml
