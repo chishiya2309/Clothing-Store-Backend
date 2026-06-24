@@ -2,6 +2,7 @@ package vn.hcmute.edu.dp.nhom10.backend.dto.response;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductGridResponse {
+public class ProductGridResponse implements Serializable {
     private Long id;
     private String name;
     private String slug;
