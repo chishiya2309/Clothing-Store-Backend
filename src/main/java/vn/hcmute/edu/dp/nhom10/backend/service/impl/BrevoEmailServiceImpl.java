@@ -260,6 +260,7 @@ public class BrevoEmailServiceImpl implements EmailService {
     }
 
 
+
     @Async
     @Override
     public void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product) {
