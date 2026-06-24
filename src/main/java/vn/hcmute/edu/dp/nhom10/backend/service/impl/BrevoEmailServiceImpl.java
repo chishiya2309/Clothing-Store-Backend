@@ -10,6 +10,7 @@ import org.springframework.web.util.HtmlUtils;
 import org.springframework.web.client.RestClient;
 import vn.hcmute.edu.dp.nhom10.backend.service.EmailService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class BrevoEmailServiceImpl implements EmailService {
         Map<String, Object> requestBody = Map.of(
                 "sender", Map.of("name", senderName, "email", senderEmail),
                 "to", List.of(Map.of("email", toEmail, "name", fullName)),
-                "subject", "Clothing Store - Verify your email",
+                "subject", "Clothing Store - Xác thực email của bạn",
                 "htmlContent", htmlContent);
 
         try {
@@ -69,7 +70,7 @@ public class BrevoEmailServiceImpl implements EmailService {
         Map<String, Object> requestBody = Map.of(
                 "sender", Map.of("name", senderName, "email", senderEmail),
                 "to", List.of(Map.of("email", toEmail, "name", fullName)),
-                "subject", "Clothing Store - Reset your password",
+                "subject", "Clothing Store - Đặt lại mật khẩu của bạn",
                 "htmlContent", htmlContent);
 
         try {
@@ -123,6 +124,104 @@ public class BrevoEmailServiceImpl implements EmailService {
         }
     }
 
+    @Async
+    @Override
+    public void sendOrderCancellationEmailToCustomer(
+            String toEmail,
+            String orderCode,
+            String reason,
+            boolean requiresManualRefundReview
+    ) {
+        String htmlContent = """
+                <html>
+                <body>
+                    <h2>Đơn hàng đã bị hủy</h2>
+                    <p>Đơn hàng <strong>%s</strong> của bạn đã bị hủy.</p>
+                    <p>Lý do: %s</p>
+                    <p>Nếu bạn cần hỗ trợ, vui lòng liên hệ bộ phậm chăm sóc khách hàng để được hỗ trợ.</p>
+                    %s
+                </body>
+                </html>
+                """.formatted(
+                HtmlUtils.htmlEscape(orderCode),
+                HtmlUtils.htmlEscape(reason),
+                requiresManualRefundReview
+                        ? "<p>Cửa hàng sẽ xem xét riêng giao dịch thanh toán trực tuyến đã hoàn tất.</p>"
+                        : ""
+        );
+
+        sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Đơn hàng đã bị hủy", htmlContent);
+    }
+
+    @Async
+    @Override
+    public void sendOrderCancellationEmailToAdmin(
+            String toEmail,
+            String orderCode,
+            String customerEmail,
+            String staffEmail,
+            String fromStatus,
+            String reason,
+            String paymentMethod,
+            String paymentStatus,
+            BigDecimal paidAmount,
+            boolean requiresManualRefundReview
+    ) {
+        String htmlContent = """
+                <html>
+                <body>
+                    <h2>Nhân viên đã hủy đơn hàng của khách</h2>
+                    <p>Đơn hàng: <strong>%s</strong></p>
+                    <p>Khách hàng: %s</p>
+                    <p>Nhân viên: %s</p>
+                    <p>Từ trạng thái: %s</p>
+                    <p>Lý do: %s</p>
+                    <p>Phương thức thanh toán: %s</p>
+                    <p>Trạng thái thanh toán: %s</p>
+                    <p>Số tiền đã thanh toán: %s</p>
+                    <p>Việc nhân viên hủy đơn không bao gồm việc hoàn tiền.</p>
+                    %s
+                </body>
+                </html>
+                """.formatted(
+                HtmlUtils.htmlEscape(orderCode),
+                HtmlUtils.htmlEscape(customerEmail == null ? "" : customerEmail),
+                HtmlUtils.htmlEscape(staffEmail == null ? "" : staffEmail),
+                HtmlUtils.htmlEscape(fromStatus == null ? "" : fromStatus),
+                HtmlUtils.htmlEscape(reason),
+                HtmlUtils.htmlEscape(paymentMethod == null ? "" : paymentMethod),
+                HtmlUtils.htmlEscape(paymentStatus == null ? "" : paymentStatus),
+                paidAmount == null ? "" : paidAmount.toPlainString(),
+                requiresManualRefundReview
+                        ? "<p>Cần xem xét hoàn tiền thủ công đối với khoản thanh toán trực tuyến đã hoàn thành tất này.</p>"
+                        : "<p>Việc xem xét hoàn tiền thủ công không bắt buộc với đơn hàng này.</p>"
+        );
+
+        sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Staff cancelled order", htmlContent);
+    }
+
+    private void sendTransactionalEmail(String toEmail, String toName, String subject, String htmlContent) {
+        Map<String, Object> requestBody = Map.of(
+                "sender", Map.of("name", senderName, "email", senderEmail),
+                "to", List.of(Map.of("email", toEmail, "name", toName == null ? toEmail : toName)),
+                "subject", subject,
+                "htmlContent", htmlContent);
+
+        try {
+            restClient.post()
+                    .uri("https://api.brevo.com/v3/smtp/email")
+                    .header("api-key", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Transactional email sent successfully to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send transactional email to {}", toEmail, e);
+        }
+    }
+
 
     @Async
     @Override
@@ -159,6 +258,7 @@ public class BrevoEmailServiceImpl implements EmailService {
             log.error("Failed to send order cancellation email to {} for order {}", toEmail, orderCode, e);
         }
     }
+
 
 
     @Async

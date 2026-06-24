@@ -167,6 +167,28 @@ public class ProductServiceImpl implements ProductService {
                                 .collect(Collectors.toList());
         }
 
+        @Override
+        @Transactional(readOnly = true)
+        @org.springframework.cache.annotation.Cacheable(value = "newArrivals", key = "'top8'")
+        public List<ProductGridResponse> getNewArrivals() {
+                List<Product> products = productRepository.findTop8ByIsActiveTrueOrderByCreatedAtDesc();
+                return products.stream()
+                                .map(this::mapToGridResponse)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        @org.springframework.cache.annotation.Cacheable(value = "bestSellers", key = "#limit")
+        public List<ProductGridResponse> getBestSellers(int limit) {
+                PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "totalSold"));
+                Page<Product> productPage = productRepository.findByIsActiveTrue(pageRequest);
+                return productPage.getContent().stream()
+                                .map(this::mapToGridResponse)
+                                .collect(Collectors.toList());
+        }
+
+
         // ─────────────────────────── Private helpers ───────────────────────────
 
         private List<Long> resolveCategoryIds(String categorySlug) {

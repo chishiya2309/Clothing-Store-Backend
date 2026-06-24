@@ -17,6 +17,6 @@ public class ApiResponse implements Serializable {
 
     private int status;
     private String message;
-    private Serializable data;
+    private Object data;
     private OffsetDateTime timestamp;
 }

@@ -66,4 +66,15 @@ public class GuestProductController {
                 .timestamp(OffsetDateTime.now())
                 .build();
     }
+
+    @GetMapping("/best-sellers")
+    @Operation(summary = "Lấy danh sách sản phẩm bán chạy nhất")
+    public ApiResponse getBestSellers(@RequestParam(defaultValue = "4") int limit) {
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Best sellers")
+                .data(productService.getBestSellers(limit))
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
 }

@@ -31,4 +31,16 @@ public class ProductController {
                 .timestamp(OffsetDateTime.now())
                 .build();
     }
+
+    @GetMapping("/new-arrivals")
+    @Operation(summary = "Lấy danh sách 8 sản phẩm mới nhất")
+    public ApiResponse getNewArrivals() {
+        log.info("Fetching new arrivals");
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Fetch new arrivals successfully")
+                .data(productService.getNewArrivals())
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
 }
