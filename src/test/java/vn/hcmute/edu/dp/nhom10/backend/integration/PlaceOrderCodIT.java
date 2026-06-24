@@ -7,6 +7,7 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.InventoryReservation;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
 import vn.hcmute.edu.dp.nhom10.backend.entity.OrderItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.OrderStatusHistory;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
@@ -20,6 +21,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.InventoryReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentAttemptRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
@@ -49,6 +51,9 @@ class PlaceOrderCodIT extends AbstractPostgresIntegrationTest {
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private OrderStatusHistoryRepository orderStatusHistoryRepository;
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -88,6 +93,7 @@ class PlaceOrderCodIT extends AbstractPostgresIntegrationTest {
         List<Order> orders = orderRepository.findAll();
         assertThat(orders).hasSize(1);
         assertThat(orders.get(0).getOrderCode()).isEqualTo(response.order().getOrderCode());
+        assertInitialStatusHistory(orders.get(0));
 
         List<OrderItem> orderItems = orderItemRepository.findAll();
         assertThat(orderItems).hasSize(1);
@@ -110,5 +116,15 @@ class PlaceOrderCodIT extends AbstractPostgresIntegrationTest {
         assertThat(variant.getStockQuantity()).isEqualTo(3);
         assertThat(cartItemRepository.findAllByUserId(fixture.userId())).isEmpty();
         assertThat(paymentAttemptRepository.findAll()).isEmpty();
+    }
+
+    private void assertInitialStatusHistory(Order order) {
+        List<OrderStatusHistory> histories =
+                orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(order.getId());
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getFromStatus()).isNull();
+        assertThat(histories.get(0).getToStatus()).isEqualTo(OrderStatus.pending);
+        assertThat(histories.get(0).getChangedBy()).isNull();
+        assertThat(histories.get(0).getChangedByRole()).isNull();
     }
 }

@@ -175,6 +175,19 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
+    @ExceptionHandler(OrderStateConflictException.class)
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.CONFLICT)
+    public ErrorResponse handleOrderStateConflictException(OrderStateConflictException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
+        errorResponse.setStatus(CONFLICT.value());
+        errorResponse.setError(CONFLICT.getReasonPhrase());
+        errorResponse.setMessage(e.getMessage());
+
+        return errorResponse;
+    }
+
     @ExceptionHandler(PaymentGatewayUnavailableException.class)
     public ResponseEntity<ErrorResponse> handlePaymentGatewayUnavailableException(
             PaymentGatewayUnavailableException e,
