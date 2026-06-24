@@ -17,15 +17,25 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.testcontainers.containers.PostgreSQLContainer;
 import vn.hcmute.edu.dp.nhom10.backend.entity.PaymentAttempt;
+import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
+import vn.hcmute.edu.dp.nhom10.backend.entity.OrderStatusHistory;
+import vn.hcmute.edu.dp.nhom10.backend.entity.User;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentAttemptStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.event.OrderCreatedEvent;
+import vn.hcmute.edu.dp.nhom10.backend.event.OrderStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentInitializationException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCreationCommand;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.GatewayPaymentCreationResult;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.PaymentGatewayAdapter;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.adapter.payment.PaymentGatewayAdapterFactory;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentAttemptRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointAwardResult;
+import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
+import vn.hcmute.edu.dp.nhom10.backend.service.impl.LoyaltyPointServiceImpl;
+import vn.hcmute.edu.dp.nhom10.backend.service.impl.OrderStatusHistoryServiceImpl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -51,10 +61,15 @@ public abstract class AbstractPostgresIntegrationTest {
 
     private static final AtomicBoolean GATEWAY_FAILS = new AtomicBoolean(false);
     private static final AtomicBoolean GATEWAY_OBSERVED_PENDING_ATTEMPT = new AtomicBoolean(false);
+    private static final AtomicBoolean LOYALTY_AWARD_FAILS = new AtomicBoolean(false);
+    private static final AtomicBoolean HISTORY_TRANSITION_FAILS = new AtomicBoolean(false);
     private static final AtomicBoolean SCHEMA_INITIALIZED = new AtomicBoolean(false);
 
     @Autowired
     protected OrderCreatedEventProbe orderCreatedEventProbe;
+
+    @Autowired
+    protected OrderStatusChangedEventProbe orderStatusChangedEventProbe;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -78,6 +93,10 @@ public abstract class AbstractPostgresIntegrationTest {
         registry.add("brevo.api-key", () -> "test-api-key");
         registry.add("brevo.sender-email", () -> "noreply@example.test");
         registry.add("brevo.sender-name", () -> "Clothing Store Test");
+        registry.add("aws.s3.access-key", () -> "test-access-key");
+        registry.add("aws.s3.secret-key", () -> "test-secret-key");
+        registry.add("aws.s3.region", () -> "ap-southeast-1");
+        registry.add("aws.s3.bucket-name", () -> "test-bucket");
         registry.add("app.verification-token-ttl", () -> "900");
         registry.add("app.refresh-token-ttl", () -> "604800");
         registry.add("app.remember-me-token-ttl", () -> "2592000");
@@ -90,7 +109,10 @@ public abstract class AbstractPostgresIntegrationTest {
     void resetIntegrationState() {
         GATEWAY_FAILS.set(false);
         GATEWAY_OBSERVED_PENDING_ATTEMPT.set(false);
+        LOYALTY_AWARD_FAILS.set(false);
+        HISTORY_TRANSITION_FAILS.set(false);
         orderCreatedEventProbe.clear();
+        orderStatusChangedEventProbe.clear();
     }
 
     protected void makeGatewayFail() {
@@ -99,6 +121,14 @@ public abstract class AbstractPostgresIntegrationTest {
 
     protected boolean gatewayObservedPendingAttempt() {
         return GATEWAY_OBSERVED_PENDING_ATTEMPT.get();
+    }
+
+    protected void makeLoyaltyAwardFail() {
+        LOYALTY_AWARD_FAILS.set(true);
+    }
+
+    protected void makeHistoryTransitionFail() {
+        HISTORY_TRANSITION_FAILS.set(true);
     }
 
     private static void initializeDatabaseSchema() {
@@ -335,6 +365,52 @@ public abstract class AbstractPostgresIntegrationTest {
         OrderCreatedEventProbe orderCreatedEventProbe() {
             return new OrderCreatedEventProbe();
         }
+
+        @Bean
+        OrderStatusChangedEventProbe orderStatusChangedEventProbe() {
+            return new OrderStatusChangedEventProbe();
+        }
+
+        @Bean
+        @Primary
+        LoyaltyPointService loyaltyPointService(LoyaltyPointServiceImpl delegate) {
+            return new LoyaltyPointService() {
+                @Override
+                public LoyaltyPointAwardResult awardForCompletedOrder(Order order) {
+                    if (LOYALTY_AWARD_FAILS.get()) {
+                        throw new RuntimeException("Cannot award points");
+                    }
+                    return delegate.awardForCompletedOrder(order);
+                }
+            };
+        }
+
+        @Bean
+        @Primary
+        OrderStatusHistoryService orderStatusHistoryService(OrderStatusHistoryServiceImpl delegate) {
+            return new OrderStatusHistoryService() {
+                @Override
+                public void recordInitialStatus(Order order) {
+                    delegate.recordInitialStatus(order);
+                }
+
+                @Override
+                public OrderStatusHistory recordTransition(
+                        Order order,
+                        OrderStatus fromStatus,
+                        OrderStatus toStatus,
+                        User changedBy,
+                        String reason,
+                        Map<String, Object> metadata
+                ) {
+                    if (HISTORY_TRANSITION_FAILS.get()
+                            && (toStatus == OrderStatus.completed || toStatus == OrderStatus.cancelled)) {
+                        throw new RuntimeException("Cannot write history");
+                    }
+                    return delegate.recordTransition(order, fromStatus, toStatus, changedBy, reason, metadata);
+                }
+            };
+        }
     }
 
     public static class OrderCreatedEventProbe {
@@ -350,6 +426,23 @@ public abstract class AbstractPostgresIntegrationTest {
         }
 
         public synchronized List<OrderCreatedEvent> events() {
+            return List.copyOf(events);
+        }
+    }
+
+    public static class OrderStatusChangedEventProbe {
+        private final List<OrderStatusChangedEvent> events = new ArrayList<>();
+
+        @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+        public synchronized void onOrderStatusChanged(OrderStatusChangedEvent event) {
+            events.add(event);
+        }
+
+        public synchronized void clear() {
+            events.clear();
+        }
+
+        public synchronized List<OrderStatusChangedEvent> events() {
             return List.copyOf(events);
         }
     }

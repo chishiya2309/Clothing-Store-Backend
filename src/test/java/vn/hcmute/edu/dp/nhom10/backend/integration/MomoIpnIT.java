@@ -10,12 +10,15 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.MomoReturnResponseDTO;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PlaceOrderResponseDTO;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.InventoryReservation;
+import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
+import vn.hcmute.edu.dp.nhom10.backend.entity.OrderStatusHistory;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
 import vn.hcmute.edu.dp.nhom10.backend.entity.PaymentAttempt;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentAttemptStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
@@ -27,6 +30,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.InventoryReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.OrderStatusHistoryRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentAttemptRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
@@ -104,6 +108,9 @@ class MomoIpnIT extends AbstractPostgresIntegrationTest {
     private OrderItemRepository orderItemRepository;
 
     @Autowired
+    private OrderStatusHistoryRepository orderStatusHistoryRepository;
+
+    @Autowired
     private PaymentRepository paymentRepository;
 
     @Test
@@ -124,7 +131,9 @@ class MomoIpnIT extends AbstractPostgresIntegrationTest {
         assertThat(attempt.getGatewayPayload()).doesNotContainKeys("signature", "accessKey", "secretKey");
         assertThat(checkoutSession.getStatus()).isEqualTo(CheckoutSessionStatus.completed);
 
-        assertThat(orderRepository.findAll()).hasSize(1);
+        List<Order> orders = orderRepository.findAll();
+        assertThat(orders).hasSize(1);
+        assertInitialStatusHistory(orders.get(0));
         assertThat(orderItemRepository.findAll()).hasSize(1);
         Payment payment = paymentRepository.findAll().get(0);
         assertThat(payment.getMethod()).isEqualTo(PaymentMethod.momo);
@@ -146,6 +155,16 @@ class MomoIpnIT extends AbstractPostgresIntegrationTest {
         assertThat(voucher.getTimesUsed()).isEqualTo(1);
         assertThat(cartItemRepository.findAllByUserId(context.fixture().userId())).isEmpty();
         assertThat(orderCreatedEventProbe.events()).hasSize(1);
+    }
+
+    private void assertInitialStatusHistory(Order order) {
+        List<OrderStatusHistory> histories =
+                orderStatusHistoryRepository.findAllByOrder_IdOrderByCreatedAtAscIdAsc(order.getId());
+        assertThat(histories).hasSize(1);
+        assertThat(histories.get(0).getFromStatus()).isNull();
+        assertThat(histories.get(0).getToStatus()).isEqualTo(OrderStatus.pending);
+        assertThat(histories.get(0).getChangedBy()).isNull();
+        assertThat(histories.get(0).getChangedByRole()).isNull();
     }
 
     @Test
