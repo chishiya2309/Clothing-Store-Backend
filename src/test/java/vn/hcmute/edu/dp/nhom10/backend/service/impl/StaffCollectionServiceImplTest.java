@@ -20,6 +20,7 @@ import vn.hcmute.edu.dp.nhom10.backend.pattern.command.catalog.CatalogCommandExe
 import vn.hcmute.edu.dp.nhom10.backend.pattern.state.collection.CollectionStateResolver;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CollectionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductRepository;
+import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -100,6 +101,76 @@ public class StaffCollectionServiceImplTest {
     }
 
     @Test
+    public void testGetCollectionDetail() {
+        Collection collection = Collection.builder().id(1L).name("Autumn").isActive(true).collectionProducts(new ArrayList<>()).build();
+        when(collectionRepository.findById(1L)).thenReturn(Optional.of(collection));
+        when(stateResolver.resolve(collection)).thenReturn(CollectionStatusState.ACTIVE);
+
+        StaffCollectionDetailResponse detail = staffCollectionService.getCollectionDetail(1L);
+
+        assertNotNull(detail);
+        assertEquals("Autumn", detail.getCollection().getName());
+        verify(collectionRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void testGetCollectionDetailNotFound() {
+        when(collectionRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCollectionService.getCollectionDetail(1L)
+        );
+    }
+
+    @Test
+    public void testUpdateCollection() {
+        Collection existing = Collection.builder().id(1L).name("Old Name").isActive(true).collectionProducts(new ArrayList<>()).build();
+        StaffCollectionRequest request = StaffCollectionRequest.builder().name("New Name").isActive(true).build();
+        Collection updated = Collection.builder().id(1L).name("New Name").slug("new-name").isActive(true).collectionProducts(new ArrayList<>()).build();
+
+        when(collectionRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(collectionRepository.save(any(Collection.class))).thenReturn(updated);
+        when(stateResolver.resolve(any())).thenReturn(CollectionStatusState.ACTIVE);
+
+        StaffCollectionResponse response = staffCollectionService.updateCollection(1L, request, "staff@store.com");
+
+        assertNotNull(response);
+        assertEquals("New Name", response.getName());
+        assertEquals("new-name", response.getSlug());
+        verify(collectionRepository, times(1)).save(any(Collection.class));
+    }
+
+    @Test
+    public void testUpdateCollectionNotFound() {
+        StaffCollectionRequest request = StaffCollectionRequest.builder().name("New Name").build();
+        when(collectionRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCollectionService.updateCollection(1L, request, "staff@store.com")
+        );
+    }
+
+    @Test
+    public void testDeleteCollection() {
+        Collection collection = Collection.builder().id(1L).name("Autumn").isActive(true).build();
+        when(collectionRepository.findById(1L)).thenReturn(Optional.of(collection));
+
+        staffCollectionService.deleteCollection(1L, "staff@store.com");
+
+        verify(collectionRepository, times(1)).delete(collection);
+    }
+
+    @Test
+    public void testDeleteCollectionNotFound() {
+        when(collectionRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCollectionService.deleteCollection(1L, "staff@store.com")
+        );
+        verify(collectionRepository, never()).delete(any());
+    }
+
+    @Test
     public void testAddProductsToCollection() {
         Collection collection = Collection.builder().id(1L).name("Autumn").isActive(true).collectionProducts(new ArrayList<>()).build();
         Product product = Product.builder().id(100L).name("Coat").images(new ArrayList<>()).variants(new ArrayList<>()).build();
@@ -118,5 +189,59 @@ public class StaffCollectionServiceImplTest {
         assertNotNull(response);
         assertEquals(1, response.getProducts().size());
         assertEquals("Coat", response.getProducts().get(0).getName());
+    }
+
+    @Test
+    public void testAddProductsToCollectionProductNotFound() {
+        Collection collection = Collection.builder().id(1L).name("Autumn").isActive(true).collectionProducts(new ArrayList<>()).build();
+
+        when(collectionRepository.findById(1L)).thenReturn(Optional.of(collection));
+        when(productRepository.findById(100L)).thenReturn(Optional.empty());
+
+        StaffCollectionProductsRequest request = StaffCollectionProductsRequest.builder()
+                .productIds(List.of(100L))
+                .build();
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCollectionService.addProductsToCollection(1L, request, "staff@store.com")
+        );
+    }
+
+    @Test
+    public void testRemoveProductsFromCollection() {
+        Product product = Product.builder().id(100L).name("Coat").images(new ArrayList<>()).variants(new ArrayList<>()).build();
+        Collection collection = Collection.builder().id(1L).name("Autumn").isActive(true).collectionProducts(new ArrayList<>()).build();
+        vn.hcmute.edu.dp.nhom10.backend.entity.CollectionProduct cp = vn.hcmute.edu.dp.nhom10.backend.entity.CollectionProduct.builder()
+                .collection(collection)
+                .product(product)
+                .build();
+        collection.getCollectionProducts().add(cp);
+
+        when(collectionRepository.findById(1L)).thenReturn(Optional.of(collection));
+        when(collectionRepository.save(any(Collection.class))).thenReturn(collection);
+        when(stateResolver.resolve(collection)).thenReturn(CollectionStatusState.ACTIVE);
+
+        StaffCollectionProductsRequest request = StaffCollectionProductsRequest.builder()
+                .productIds(List.of(100L))
+                .build();
+
+        StaffCollectionDetailResponse response = staffCollectionService.removeProductsFromCollection(1L, request, "staff@store.com");
+
+        assertNotNull(response);
+        assertTrue(response.getProducts().isEmpty());
+        verify(collectionRepository, times(1)).save(collection);
+    }
+
+    @Test
+    public void testRemoveProductsFromCollectionNotFound() {
+        StaffCollectionProductsRequest request = StaffCollectionProductsRequest.builder()
+                .productIds(List.of(100L))
+                .build();
+
+        when(collectionRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCollectionService.removeProductsFromCollection(1L, request, "staff@store.com")
+        );
     }
 }

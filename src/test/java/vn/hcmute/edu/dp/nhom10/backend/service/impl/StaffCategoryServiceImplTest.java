@@ -89,8 +89,22 @@ public class StaffCategoryServiceImplTest {
     }
 
     @Test
+    public void testCreateChildCategoryParentNotFound() {
+        StaffCategoryRequest request = StaffCategoryRequest.builder()
+                .name("Child")
+                .parentId(999L)
+                .build();
+
+        when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCategoryService.createCategory(request, "staff@store.com")
+        );
+        verify(categoryRepository, never()).save(any());
+    }
+
+    @Test
     public void testCreateChildCategoryExceedingMaxDepth() {
-        // Root (depth 1) -> Sub (depth 2) -> SubSub (depth 3)
         Category root = Category.builder().id(1L).name("Root").build();
         Category sub = Category.builder().id(2L).name("Sub").parent(root).build();
         Category subSub = Category.builder().id(3L).name("SubSub").parent(sub).build();
@@ -102,15 +116,61 @@ public class StaffCategoryServiceImplTest {
                 .parentId(3L)
                 .build();
 
-        InvalidDataException ex = assertThrows(InvalidDataException.class, () -> 
+        InvalidDataException ex = assertThrows(InvalidDataException.class, () ->
             staffCategoryService.createCategory(request, "staff@store.com")
         );
         assertTrue(ex.getMessage().contains("Vượt quá độ sâu"));
     }
 
     @Test
+    public void testUpdateCategoryNotFound() {
+        StaffCategoryRequest request = StaffCategoryRequest.builder()
+                .name("Category")
+                .build();
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCategoryService.updateCategory(1L, request, "staff@store.com")
+        );
+        verify(categoryRepository, never()).save(any());
+    }
+
+    @Test
+    public void testUpdateCategoryParentNotFound() {
+        Category category = Category.builder().id(1L).name("Category").build();
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        StaffCategoryRequest request = StaffCategoryRequest.builder()
+                .name("Category New Name")
+                .parentId(999L)
+                .build();
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCategoryService.updateCategory(1L, request, "staff@store.com")
+        );
+        verify(categoryRepository, never()).save(any());
+    }
+
+    @Test
+    public void testUpdateCategoryParentIsSelf() {
+        Category category = Category.builder().id(1L).name("Category").build();
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+
+        StaffCategoryRequest request = StaffCategoryRequest.builder()
+                .name("Category New Name")
+                .parentId(1L)
+                .build();
+
+        InvalidDataException ex = assertThrows(InvalidDataException.class, () ->
+                staffCategoryService.updateCategory(1L, request, "staff@store.com")
+        );
+        assertTrue(ex.getMessage().contains("không thể là chính nó"));
+    }
+
+    @Test
     public void testUpdateCategoryCycleDetected() {
-        // Root (1L) -> Child (2L)
         Category root = Category.builder().id(1L).name("Root").children(new ArrayList<>()).build();
         Category child = Category.builder().id(2L).name("Child").parent(root).children(new ArrayList<>()).build();
         root.getChildren().add(child);
@@ -118,7 +178,6 @@ public class StaffCategoryServiceImplTest {
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(root));
         when(categoryRepository.findById(2L)).thenReturn(Optional.of(child));
 
-        // Attempting to set parent of Root (1L) to Child (2L)
         StaffCategoryRequest request = StaffCategoryRequest.builder()
                 .name("Root New")
                 .parentId(2L)
@@ -131,6 +190,42 @@ public class StaffCategoryServiceImplTest {
     }
 
     @Test
+    public void testUpdateCategorySubtreeExceedsMaxDepth() {
+        // Parent: Root (depth 1) -> Sub (depth 2)
+        Category root = Category.builder().id(1L).name("Root").build();
+        Category newParent = Category.builder().id(2L).name("Sub").parent(root).build();
+
+        // Target Category being updated has depth 2 subtree (itself (1) + leaf (1))
+        Category target = Category.builder().id(3L).name("Target").children(new ArrayList<>()).build();
+        Category targetChild = Category.builder().id(4L).name("Target Child").parent(target).children(new ArrayList<>()).build();
+        target.getChildren().add(targetChild);
+
+        when(categoryRepository.findById(3L)).thenReturn(Optional.of(target));
+        when(categoryRepository.findById(2L)).thenReturn(Optional.of(newParent));
+
+        // Moving target to parent will make: Root (1) -> Sub (2) -> Target (3) -> Target Child (4) -> exceeds 3!
+        StaffCategoryRequest request = StaffCategoryRequest.builder()
+                .name("Target")
+                .parentId(2L)
+                .build();
+
+        InvalidDataException ex = assertThrows(InvalidDataException.class, () ->
+                staffCategoryService.updateCategory(3L, request, "staff@store.com")
+        );
+        assertTrue(ex.getMessage().contains("vượt quá độ sâu tối đa"));
+    }
+
+    @Test
+    public void testDeleteCategoryNotFound() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                staffCategoryService.deleteCategory(1L, "staff@store.com")
+        );
+        verify(categoryRepository, never()).delete(any());
+    }
+
+    @Test
     public void testDeleteCategoryEnforcesPolicy() {
         Category category = Category.builder().id(1L).name("Category").build();
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
@@ -140,5 +235,16 @@ public class StaffCategoryServiceImplTest {
             staffCategoryService.deleteCategory(1L, "staff@store.com")
         );
         verify(categoryRepository, never()).delete(any());
+    }
+
+    @Test
+    public void testDeleteCategorySuccess() {
+        Category category = Category.builder().id(1L).name("Category").build();
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        doNothing().when(categoryDeletionPolicy).checkCanDelete(category);
+
+        staffCategoryService.deleteCategory(1L, "staff@store.com");
+
+        verify(categoryRepository, times(1)).delete(category);
     }
 }
