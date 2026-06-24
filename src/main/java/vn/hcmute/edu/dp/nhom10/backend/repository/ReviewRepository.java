@@ -76,6 +76,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Dem tong so review da duyet cua mot san pham
     long countByProductIdAndIsApprovedTrue(Long productId);
 
+    boolean existsByProductId(Long productId);
+
     // Lay danh sach review chua duyet (Staff)
     Page<Review> findByIsApprovedFalse(Pageable pageable);
 }

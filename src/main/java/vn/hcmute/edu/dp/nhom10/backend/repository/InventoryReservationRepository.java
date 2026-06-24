@@ -42,4 +42,7 @@ public interface InventoryReservationRepository extends JpaRepository<InventoryR
     List<InventoryReservation> findAllByCheckoutSessionIdForUpdate(
             @Param("checkoutSessionId") Long checkoutSessionId
     );
+
+    @Query("SELECT COUNT(ir) > 0 FROM InventoryReservation ir WHERE ir.productVariant.product.id = :productId")
+    boolean existsByProductVariantProductId(@Param("productId") Long productId);
 }

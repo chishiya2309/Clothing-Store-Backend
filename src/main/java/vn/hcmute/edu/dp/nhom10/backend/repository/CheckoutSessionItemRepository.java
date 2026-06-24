@@ -22,4 +22,7 @@ public interface CheckoutSessionItemRepository extends JpaRepository<CheckoutSes
     List<CheckoutSessionItem> findAllByCheckoutSessionIdWithVariant(
             @Param("checkoutSessionId") Long checkoutSessionId
     );
+
+    @Query("SELECT COUNT(csi) > 0 FROM CheckoutSessionItem csi WHERE csi.productVariant.product.id = :productId")
+    boolean existsByProductVariantProductId(@Param("productId") Long productId);
 }

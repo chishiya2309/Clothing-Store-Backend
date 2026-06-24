@@ -18,7 +18,9 @@ import java.util.Optional;
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Long> {
     List<ProductVariant> findByProductId(Long productId);
     Optional<ProductVariant> findByIdAndIsActiveTrue(Long id);
+    Optional<ProductVariant> findByIdAndProductId(Long id, Long productId);
     Optional<ProductVariant> findByProductIdAndSizeIgnoreCaseAndColorIgnoreCaseAndIsActiveTrue(Long productId, String size, String color);
+    boolean existsBySkuIgnoreCase(String sku);
 
     @Query("""
             select pv
@@ -53,4 +55,17 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             order by pv.id
             """)
     List<ProductVariant> findAllByIdInForUpdate(@Param("ids") Collection<Long> ids);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select pv
+            from ProductVariant pv
+            join fetch pv.product p
+            where pv.id = :variantId
+              and p.id = :productId
+            """)
+    Optional<ProductVariant> findByIdAndProductIdForUpdate(
+            @Param("variantId") Long variantId,
+            @Param("productId") Long productId
+    );
 }
