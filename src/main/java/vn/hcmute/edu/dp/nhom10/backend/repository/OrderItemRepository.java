@@ -22,4 +22,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
             LIMIT :limit
             """)
     List<Long> findCoPurchasedProductIds(@Param("productId") Long productId, @Param("limit") int limit);
+
+    List<OrderItem> findByOrderIdAndProductVariantProductId(Long orderId, Long productId);
 }

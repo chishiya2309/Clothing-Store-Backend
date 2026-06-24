@@ -19,6 +19,7 @@ services:
       AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-mock}
       AWS_SECRET_KEY: ${AWS_SECRET_KEY:-mock}
       AWS_REGION: ${AWS_REGION:-ap-southeast-1}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
     networks:
       - default
 
