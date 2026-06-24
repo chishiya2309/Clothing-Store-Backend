@@ -44,7 +44,7 @@ public class BrevoEmailServiceImpl implements EmailService {
         Map<String, Object> requestBody = Map.of(
                 "sender", Map.of("name", senderName, "email", senderEmail),
                 "to", List.of(Map.of("email", toEmail, "name", fullName)),
-                "subject", "Clothing Store - Verify your email",
+                "subject", "Clothing Store - Xác thực email của bạn",
                 "htmlContent", htmlContent);
 
         try {
@@ -70,7 +70,7 @@ public class BrevoEmailServiceImpl implements EmailService {
         Map<String, Object> requestBody = Map.of(
                 "sender", Map.of("name", senderName, "email", senderEmail),
                 "to", List.of(Map.of("email", toEmail, "name", fullName)),
-                "subject", "Clothing Store - Reset your password",
+                "subject", "Clothing Store - Đặt lại mật khẩu của bạn",
                 "htmlContent", htmlContent);
 
         try {
@@ -135,10 +135,10 @@ public class BrevoEmailServiceImpl implements EmailService {
         String htmlContent = """
                 <html>
                 <body>
-                    <h2>Order cancelled</h2>
-                    <p>Your order <strong>%s</strong> has been cancelled.</p>
-                    <p>Reason: %s</p>
-                    <p>If you need support, please contact the store.</p>
+                    <h2>Đơn hàng đã bị hủy</h2>
+                    <p>Đơn hàng <strong>%s</strong> của bạn đã bị hủy.</p>
+                    <p>Lý do: %s</p>
+                    <p>Nếu bạn cần hỗ trợ, vui lòng liên hệ bộ phậm chăm sóc khách hàng để được hỗ trợ.</p>
                     %s
                 </body>
                 </html>
@@ -146,11 +146,11 @@ public class BrevoEmailServiceImpl implements EmailService {
                 HtmlUtils.htmlEscape(orderCode),
                 HtmlUtils.htmlEscape(reason),
                 requiresManualRefundReview
-                        ? "<p>The store will review the completed online payment transaction separately.</p>"
+                        ? "<p>Cửa hàng sẽ xem xét riêng giao dịch thanh toán trực tuyến đã hoàn tất.</p>"
                         : ""
         );
 
-        sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Order cancelled", htmlContent);
+        sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Đơn hàng đã bị hủy", htmlContent);
     }
 
     @Async
@@ -170,16 +170,16 @@ public class BrevoEmailServiceImpl implements EmailService {
         String htmlContent = """
                 <html>
                 <body>
-                    <h2>Staff order cancellation</h2>
-                    <p>Order: <strong>%s</strong></p>
-                    <p>Customer: %s</p>
-                    <p>Staff: %s</p>
-                    <p>From status: %s</p>
-                    <p>Reason: %s</p>
-                    <p>Payment method: %s</p>
-                    <p>Payment status: %s</p>
-                    <p>Paid amount: %s</p>
-                    <p>Staff cancel does not perform a refund.</p>
+                    <h2>Nhân viên đã hủy đơn hàng của khách</h2>
+                    <p>Đơn hàng: <strong>%s</strong></p>
+                    <p>Khách hàng: %s</p>
+                    <p>Nhân viên: %s</p>
+                    <p>Từ trạng thái: %s</p>
+                    <p>Lý do: %s</p>
+                    <p>Phương thức thanh toán: %s</p>
+                    <p>Trạng thái thanh toán: %s</p>
+                    <p>Số tiền đã thanh toán: %s</p>
+                    <p>Việc nhân viên hủy đơn không bao gồm việc hoàn tiền.</p>
                     %s
                 </body>
                 </html>
@@ -193,8 +193,8 @@ public class BrevoEmailServiceImpl implements EmailService {
                 HtmlUtils.htmlEscape(paymentStatus == null ? "" : paymentStatus),
                 paidAmount == null ? "" : paidAmount.toPlainString(),
                 requiresManualRefundReview
-                        ? "<p>Manual refund review is required for this completed online payment.</p>"
-                        : "<p>Manual refund review is not required by this cancellation snapshot.</p>"
+                        ? "<p>Cần xem xét hoàn tiền thủ công đối với khoản thanh toán trực tuyến đã hoàn thành tất này.</p>"
+                        : "<p>Việc xem xét hoàn tiền thủ công không bắt buộc với đơn hàng này.</p>"
         );
 
         sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Staff cancelled order", htmlContent);
