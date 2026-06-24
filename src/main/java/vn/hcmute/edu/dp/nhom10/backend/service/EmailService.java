@@ -28,5 +28,7 @@ public interface EmailService {
             BigDecimal paidAmount,
             boolean requiresManualRefundReview
     );
+
+    void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product);
 }
 

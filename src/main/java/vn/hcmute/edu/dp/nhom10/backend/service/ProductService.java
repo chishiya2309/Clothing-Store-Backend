@@ -1,12 +1,20 @@
 package vn.hcmute.edu.dp.nhom10.backend.service;
 
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ProductSearchCriteria;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductGridResponse;
 
 import java.util.List;
-
 public interface ProductService {
+
+    /**
+     * Xem chi tiết sản phẩm theo slug.
+     * Chỉ trả về sản phẩm đang active.
+     *
+     * @throws vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException nếu không tìm thấy
+     */
+    ProductDetailResponse getProductBySlug(String slug);
 
     PageResponse<ProductGridResponse> getProductsByCategorySlug(String slug, int page, int size);
 
