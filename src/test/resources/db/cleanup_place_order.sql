@@ -1,6 +1,7 @@
 TRUNCATE TABLE
     payment_attempts,
     payments,
+    order_status_histories,
     order_items,
     orders,
     checkout_session_items,

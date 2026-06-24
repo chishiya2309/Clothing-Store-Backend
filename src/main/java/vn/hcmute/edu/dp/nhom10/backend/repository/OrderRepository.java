@@ -2,7 +2,10 @@ package vn.hcmute.edu.dp.nhom10.backend.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,14 +19,13 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  * Repository cung cấp các phương thức truy xuất dữ liệu gộp nhóm từ bảng orders.
  * Định nghĩa các câu truy vấn JPQL phức tạp gộp nhóm theo thời gian và liên kết thực thể
  *          để kết xuất trực tiếp các biểu mẫu thống kê doanh số, bán chạy và khách hàng thân thiết
  */
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
     boolean existsByOrderCode(String orderCode);
 
@@ -46,6 +48,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Pageable pageable);
 
     Optional<Order> findByOrderCodeAndUserEmail(String orderCode, String email);
+    Optional<Order> findByOrderCode(String orderCode);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            SELECT o
+            FROM Order o
+            WHERE o.orderCode = :orderCode
+            """)
+    Optional<Order> findByOrderCodeForUpdate(@Param("orderCode") String orderCode);
 
     @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse(" +
            "  CAST(o.createdAt AS date), " +

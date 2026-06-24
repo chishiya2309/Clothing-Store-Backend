@@ -256,7 +256,25 @@ CREATE TABLE orders (
 COMMENT ON TABLE orders IS 'Đơn hàng (QĐ8). Ship: đơn < 500K → 30K, đơn >= 500K → miễn phí (app logic).';
 
 -- ============================================================
--- 12. ORDER ITEMS
+-- 12. ORDER STATUS HISTORIES
+-- ============================================================
+
+CREATE TABLE order_status_histories (
+    id              BIGSERIAL       PRIMARY KEY,
+    order_id        BIGINT          NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    from_status     order_status,
+    to_status       order_status    NOT NULL,
+    changed_by      BIGINT          REFERENCES users(id) ON DELETE SET NULL,
+    changed_by_role user_role,
+    reason          TEXT,
+    metadata        JSONB,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE order_status_histories IS 'Timeline trang thai don hang phuc vu audit va Staff order detail.';
+
+-- ============================================================
+-- 13. ORDER ITEMS
 -- ============================================================
 
 CREATE TABLE order_items (
@@ -275,7 +293,7 @@ CREATE TABLE order_items (
 COMMENT ON TABLE order_items IS 'Chi tiết đơn hàng. Snapshot giá/tên SP tại thời điểm mua (QĐ3).';
 
 -- ============================================================
--- 13. PAYMENTS
+-- 14. PAYMENTS
 -- ============================================================
 
 CREATE TABLE payments (
@@ -612,6 +630,9 @@ CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_orders_user_status ON orders(user_id, status);
 CREATE INDEX idx_orders_created ON orders(created_at);
 CREATE INDEX idx_orders_code ON orders(order_code);
+
+-- Order Status Histories
+CREATE INDEX idx_order_status_history_order_time_id ON order_status_histories(order_id, created_at, id);
 
 -- Order Items
 CREATE INDEX idx_order_items_order ON order_items(order_id);

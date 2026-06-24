@@ -25,6 +25,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
 import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
@@ -65,6 +66,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
     private final InventoryReservationService inventoryReservationService;
     private final VoucherReservationService voucherService;
+    private final OrderStatusHistoryService orderStatusHistoryService;
     private final ApplicationEventPublisher eventPublisher;
     private final ProductVariantRepository productVariantRepository;
     private final VoucherRepository voucherRepository;
@@ -91,6 +93,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = createOrder(checkoutSession);
         Order savedOrder = orderRepository.save(order);
+        orderStatusHistoryService.recordInitialStatus(savedOrder);
 
         List<OrderItem> orderItems = checkoutItems.stream()
                 .map(item -> toOrderItem(savedOrder, item))

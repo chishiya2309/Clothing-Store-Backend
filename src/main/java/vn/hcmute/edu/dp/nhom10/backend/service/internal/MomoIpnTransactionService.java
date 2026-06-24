@@ -39,6 +39,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
@@ -70,6 +71,7 @@ public class MomoIpnTransactionService {
     private final CartItemRepository cartItemRepository;
     private final MomoAmountConverter amountConverter;
     private final MomoResultStatusClassifier resultStatusClassifier;
+    private final OrderStatusHistoryService orderStatusHistoryService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -186,6 +188,7 @@ public class MomoIpnTransactionService {
         Voucher lockedVoucher = lockVoucherIfNeeded(checkoutSession, voucherReservation);
 
         Order savedOrder = orderRepository.save(createOrder(checkoutSession));
+        orderStatusHistoryService.recordInitialStatus(savedOrder);
         orderItemRepository.saveAll(checkoutItems.stream()
                 .map(item -> toOrderItem(savedOrder, item))
                 .toList());
