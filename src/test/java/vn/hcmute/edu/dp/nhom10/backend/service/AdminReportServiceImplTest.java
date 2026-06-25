@@ -13,6 +13,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportRespons
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.AdminReportServiceImpl;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -50,7 +51,7 @@ class AdminReportServiceImplTest {
         assertEquals(1, result.size());
         assertEquals(10L, result.get(0).totalOrders());
         assertEquals(BigDecimal.valueOf(900), result.get(0).netRevenue());
-        verify(orderRepository, times(1)).findRevenueReport(start, end);
+        verify(orderRepository, times(1)).findRevenueReport(start, end, OrderStatus.completed, OrderStatus.cancelled);
     }
 
     @Test

@@ -303,14 +303,15 @@ class MomoIpnIT extends AbstractPostgresIntegrationTest {
     }
 
     @Test
-    void returnUrl_isReadOnlyBeforeAndAfterIpn() {
+    void returnUrl_finalizesCheckoutWhenIpnHasNotArrived() {
         CheckoutContext context = createOnlineCheckout(false);
         MomoIpnRequest request = callback(context.paymentAttempt(), 0);
 
         MomoReturnResponseDTO beforeIpn = returnService.handleReturn(parameters(request));
         assertThat(beforeIpn.signatureValid()).isTrue();
-        assertThat(beforeIpn.paymentStatus()).isEqualTo("processing");
-        assertThat(orderRepository.findAll()).isEmpty();
+        assertThat(beforeIpn.paymentStatus()).isEqualTo("success");
+        assertThat(beforeIpn.checkoutCode()).isEqualTo(context.checkoutCode());
+        assertThat(orderRepository.findAll()).hasSize(1);
 
         assertThat(ipnService.handleIpn(request)).isTrue();
 

@@ -151,6 +151,45 @@ class CheckoutDataServiceImplTest {
     }
 
     @Test
+    void getCheckoutData_subtotalBelowFreeShippingThreshold_usesStandardShippingFee() {
+        Product product = product(1L, "T-Shirt", "470000.00", null, true);
+        ProductVariant variant = variant(2L, "0.00", true);
+        CartItem cartItem = cartItem(3L, product, variant, 1);
+        mockCheckoutCart(List.of(cartItem));
+
+        CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
+
+        assertEquals(new BigDecimal("470000.00"), result.subtotal());
+        assertEquals(new BigDecimal("30000.00"), result.shippingFee());
+    }
+
+    @Test
+    void getCheckoutData_subtotalEqualFreeShippingThreshold_usesStandardShippingFee() {
+        Product product = product(1L, "T-Shirt", "500000.00", null, true);
+        ProductVariant variant = variant(2L, "0.00", true);
+        CartItem cartItem = cartItem(3L, product, variant, 1);
+        mockCheckoutCart(List.of(cartItem));
+
+        CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
+
+        assertEquals(new BigDecimal("500000.00"), result.subtotal());
+        assertEquals(new BigDecimal("30000.00"), result.shippingFee());
+    }
+
+    @Test
+    void getCheckoutData_subtotalGreaterThanFreeShippingThreshold_usesFreeShipping() {
+        Product product = product(1L, "T-Shirt", "500001.00", null, true);
+        ProductVariant variant = variant(2L, "0.00", true);
+        CartItem cartItem = cartItem(3L, product, variant, 1);
+        mockCheckoutCart(List.of(cartItem));
+
+        CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
+
+        assertEquals(new BigDecimal("500001.00"), result.subtotal());
+        assertEquals(BigDecimal.ZERO, result.shippingFee());
+    }
+
+    @Test
     void getCheckoutData_buildsAddressSnapshot() {
         Product product = product(1L, "T-Shirt", "100000.00", null, true);
         ProductVariant variant = variant(2L, "0.00", true);

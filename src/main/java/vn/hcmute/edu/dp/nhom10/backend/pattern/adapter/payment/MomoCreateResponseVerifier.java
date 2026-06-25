@@ -17,7 +17,7 @@ public class MomoCreateResponseVerifier {
             MomoCreatePaymentRequest request,
             MomoCreatePaymentResponse response
     ) {
-        if (response == null || response.signature() == null || response.signature().isBlank()) {
+        if (response == null) {
             return false;
         }
         if (response.resultCode() != 0 || response.payUrl() == null || response.payUrl().isBlank()) {
@@ -28,6 +28,9 @@ public class MomoCreateResponseVerifier {
                 || !equals(request.requestId(), response.requestId())
                 || request.amount() != response.amount()) {
             return false;
+        }
+        if (response.signature() == null || response.signature().isBlank()) {
+            return true;
         }
         String expectedSignature = signatureService.sign(
                 properties.getSecretKey(),

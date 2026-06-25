@@ -57,7 +57,8 @@ public class MomoAdapter implements PaymentGatewayAdapter {
         MomoCreatePaymentRequest request = requestFactory.create(properties, command);
         MomoCreatePaymentResponse response = sendCreatePaymentRequest(request, command.paymentReference());
         if (!responseVerifier.isValidSuccess(properties, request, response)) {
-            throw new PaymentInitializationException("MoMo create payment response is invalid");
+            throw new PaymentInitializationException("MoMo create payment response is invalid: "
+                    + responseSummary(response));
         }
 
         return new GatewayPaymentCreationResult(
@@ -84,6 +85,8 @@ public class MomoAdapter implements PaymentGatewayAdapter {
 
         try {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            log.info("MoMo create payment response: paymentReference={}, httpStatus={}, body={}",
+                    paymentReference, response.statusCode(), response.body());
             if (response.statusCode() >= 500) {
                 log.warn("MoMo create payment uncertain failure: paymentReference={}, httpStatus={}",
                         paymentReference, response.statusCode());
@@ -104,6 +107,16 @@ public class MomoAdapter implements PaymentGatewayAdapter {
             Thread.currentThread().interrupt();
             throw new PaymentGatewayUncertainException("MoMo create payment was interrupted", e);
         }
+    }
+
+    private String responseSummary(MomoCreatePaymentResponse response) {
+        if (response == null) {
+            return "empty response";
+        }
+        return "resultCode=" + response.resultCode()
+                + ", message=" + response.message()
+                + ", orderId=" + response.orderId()
+                + ", requestId=" + response.requestId();
     }
 
     private String serializeRequest(MomoCreatePaymentRequest request) {
