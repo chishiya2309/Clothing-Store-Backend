@@ -51,7 +51,7 @@ class AdminReportServiceImplTest {
         assertEquals(1, result.size());
         assertEquals(10L, result.get(0).totalOrders());
         assertEquals(BigDecimal.valueOf(900), result.get(0).netRevenue());
-        verify(orderRepository, times(1)).findRevenueReport(start, end, OrderStatus.completed, OrderStatus.cancelled);
+        verify(orderRepository, times(1)).findRevenueReport(start, end);
     }
 
     @Test
