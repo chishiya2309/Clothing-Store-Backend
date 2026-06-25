@@ -42,13 +42,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Lay danh sach review da duyet cua mot san pham (public)
     @Query("SELECT r FROM Review r " +
-           "WHERE r.product.id = :productId AND r.isApproved = true " +
+           "WHERE r.product.id = :productId AND r.isApproved = true AND r.isActive = true " +
            "ORDER BY r.createdAt DESC")
     Page<Review> findApprovedByProductId(@Param("productId") Long productId, Pageable pageable);
 
     // Loc danh sach review da duyet theo so sao
     @Query("SELECT r FROM Review r " +
-           "WHERE r.product.id = :productId AND r.isApproved = true AND r.rating = :rating " +
+           "WHERE r.product.id = :productId AND r.isApproved = true AND r.rating = :rating AND r.isActive = true " +
            "ORDER BY r.createdAt DESC")
     Page<Review> findApprovedByProductIdAndRating(
             @Param("productId") Long productId, 
@@ -58,26 +58,32 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Loc danh sach review da duyet va co anh
     @Query("SELECT DISTINCT r FROM Review r " +
            "JOIN r.images img " +
-           "WHERE r.product.id = :productId AND r.isApproved = true " +
+           "WHERE r.product.id = :productId AND r.isApproved = true AND r.isActive = true " +
            "ORDER BY r.createdAt DESC")
     Page<Review> findApprovedWithImagesByProductId(@Param("productId") Long productId, Pageable pageable);
 
     // Thong ke phan bo so sao
     @Query("SELECT r.rating, COUNT(r) FROM Review r " +
-           "WHERE r.product.id = :productId AND r.isApproved = true " +
+           "WHERE r.product.id = :productId AND r.isApproved = true AND r.isActive = true " +
            "GROUP BY r.rating")
     List<Object[]> countRatingDistribution(@Param("productId") Long productId);
 
     // Tinh trung binh rating cua mot san pham tu cac review da duyet
     @Query("SELECT COALESCE(AVG(CAST(r.rating as double)), 0.0) FROM Review r " +
-           "WHERE r.product.id = :productId AND r.isApproved = true")
+           "WHERE r.product.id = :productId AND r.isApproved = true AND r.isActive = true")
     Double calculateAverageRating(@Param("productId") Long productId);
 
     // Dem tong so review da duyet cua mot san pham
-    long countByProductIdAndIsApprovedTrue(Long productId);
+    long countByProductIdAndIsApprovedTrueAndIsActiveTrue(Long productId);
 
     boolean existsByProductId(Long productId);
 
     // Lay danh sach review chua duyet (Staff)
-    Page<Review> findByIsApprovedFalse(Pageable pageable);
+    Page<Review> findByIsApprovedFalseAndIsActiveTrue(Pageable pageable);
+
+    // Lay danh sach review da duyet (Staff)
+    Page<Review> findByIsApprovedTrueAndIsActiveTrue(Pageable pageable);
+
+    // Lay danh sach review da xoa (Staff)
+    Page<Review> findByIsActiveFalse(Pageable pageable);
 }

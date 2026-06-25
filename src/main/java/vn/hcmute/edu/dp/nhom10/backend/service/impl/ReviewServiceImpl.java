@@ -163,7 +163,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // Tinh rating trung binh
         Double avgRating = reviewRepository.calculateAverageRating(productId);
-        long totalReviews = reviewRepository.countByProductIdAndIsApprovedTrue(productId);
+        long totalReviews = reviewRepository.countByProductIdAndIsApprovedTrueAndIsActiveTrue(productId);
 
         return ProductReviewSummary.builder()
                 .averageRating(avgRating)
@@ -207,7 +207,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public PageResponse<ReviewResponse> getPendingReviews(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Review> pendingPage = reviewRepository.findByIsApprovedFalse(pageable);
+        Page<Review> pendingPage = reviewRepository.findByIsApprovedFalseAndIsActiveTrue(pageable);
 
         List<ReviewResponse> responseList = pendingPage.getContent().stream()
                 .map(review -> {

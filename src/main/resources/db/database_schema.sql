@@ -435,9 +435,11 @@ CREATE TABLE reviews (
     order_id        BIGINT          NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     rating          SMALLINT        NOT NULL CHECK (rating >= 1 AND rating <= 5),
     content         TEXT            NOT NULL CHECK (LENGTH(content) >= 10),  -- QĐ13: min 10 ký tự
-    is_approved     BOOLEAN         NOT NULL DEFAULT FALSE,      -- QĐ9: admin duyệt
+    is_approved     BOOLEAN         NOT NULL DEFAULT FALSE,      -- QD9: admin duy?t
+    is_active       BOOLEAN         NOT NULL DEFAULT TRUE,       -- Xa m?m
     admin_reply     TEXT,
     replied_at      TIMESTAMPTZ,
+    delete_reason   TEXT,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 
