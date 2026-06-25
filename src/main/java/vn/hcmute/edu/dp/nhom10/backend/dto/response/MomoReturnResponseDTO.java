@@ -9,6 +9,7 @@ public record MomoReturnResponseDTO(
         String paymentReference,
         Integer resultCode,
         String gatewayTransactionId,
+        String checkoutCode,
         PaymentAttemptStatus attemptStatus,
         String paymentStatus,
         String message

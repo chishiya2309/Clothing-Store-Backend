@@ -18,13 +18,14 @@ public class MomoReturnService {
     private final MomoCallbackParser callbackParser;
     private final MomoCallbackVerifier callbackVerifier;
     private final PaymentAttemptRepository paymentAttemptRepository;
+    private final MomoIpnService ipnService;
 
     public MomoReturnResponseDTO handleReturn(MultiValueMap<String, String> parameters) {
         MomoIpnRequest request;
         try {
             request = callbackParser.parse(parameters);
         } catch (RuntimeException e) {
-            return response(false, null, null, null, null, "invalid_callback", "Invalid MoMo callback");
+            return response(false, null, null, null, null, null, "invalid_callback", "Invalid MoMo callback");
         }
 
         if (!callbackVerifier.hasValidSignature(request) || !callbackVerifier.matchesConfiguredPartner(request)) {
@@ -34,13 +35,16 @@ public class MomoReturnService {
                     request.resultCode(),
                     request.transId(),
                     null,
+                    null,
                     "invalid_signature",
                     "Invalid MoMo callback signature"
             );
         }
 
+        ipnService.handleIpn(request);
+
         PaymentAttempt paymentAttempt = paymentAttemptRepository
-                .findByPaymentReference(request.orderId())
+                .findByPaymentReferenceWithCheckoutSession(request.orderId())
                 .orElse(null);
         if (paymentAttempt == null) {
             return response(
@@ -48,6 +52,7 @@ public class MomoReturnService {
                     request.orderId(),
                     request.resultCode(),
                     request.transId(),
+                    null,
                     null,
                     "not_found",
                     "Payment attempt not found"
@@ -59,6 +64,7 @@ public class MomoReturnService {
                     request.orderId(),
                     request.resultCode(),
                     request.transId(),
+                    paymentAttempt.getCheckoutSession().getCheckoutCode(),
                     paymentAttempt.getStatus(),
                     "invalid_callback",
                     "MoMo callback does not match payment attempt"
@@ -69,7 +75,8 @@ public class MomoReturnService {
                 true,
                 request.orderId(),
                 request.resultCode(),
-                paymentAttempt.getGatewayTransactionId(),
+                firstNonBlank(paymentAttempt.getGatewayTransactionId(), request.transId()),
+                paymentAttempt.getCheckoutSession().getCheckoutCode(),
                 paymentAttempt.getStatus(),
                 toDisplayStatus(paymentAttempt.getStatus()),
                 "Payment status loaded"
@@ -81,6 +88,7 @@ public class MomoReturnService {
             String paymentReference,
             Integer resultCode,
             String gatewayTransactionId,
+            String checkoutCode,
             PaymentAttemptStatus attemptStatus,
             String paymentStatus,
             String message
@@ -90,10 +98,15 @@ public class MomoReturnService {
                 paymentReference,
                 resultCode,
                 gatewayTransactionId,
+                checkoutCode,
                 attemptStatus,
                 paymentStatus,
                 message
         );
+    }
+
+    private String firstNonBlank(String primary, String fallback) {
+        return primary == null || primary.isBlank() ? fallback : primary;
     }
 
     private String toDisplayStatus(PaymentAttemptStatus status) {

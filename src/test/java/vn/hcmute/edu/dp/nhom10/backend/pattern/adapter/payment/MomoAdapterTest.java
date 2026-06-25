@@ -8,6 +8,7 @@ import vn.hcmute.edu.dp.nhom10.backend.config.payment.MomoProperties;
 import vn.hcmute.edu.dp.nhom10.backend.dto.payment.MomoCreatePaymentResponse;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentGatewayUncertainException;
+import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentInitializationException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -62,6 +63,20 @@ class MomoAdapterTest {
     }
 
     @Test
+    void createPayment_nonSuccessResultIncludesMoMoDiagnostics() throws Exception {
+        MomoCreatePaymentResponse response = signedResponse(13, "Business authentication failed.", null);
+        MomoProperties properties = properties(200, new AtomicReference<>(), response);
+        MomoAdapter adapter = adapter(properties);
+
+        assertThatThrownBy(() -> adapter.createPayment(command()))
+                .isInstanceOf(PaymentInitializationException.class)
+                .hasMessageContaining("resultCode=13")
+                .hasMessageContaining("Business authentication failed.")
+                .hasMessageNotContaining("test-secret")
+                .hasMessageNotContaining("test-access");
+    }
+
+    @Test
     void supportMethod_returnsMomo() throws Exception {
         MomoProperties properties = properties(200, new AtomicReference<>());
         assertThat(adapter(properties).supportMethod()).isEqualTo(PaymentMethod.momo);
@@ -77,10 +92,18 @@ class MomoAdapterTest {
     }
 
     private MomoProperties properties(int statusCode, AtomicReference<String> receivedBody) throws IOException {
+        return properties(statusCode, receivedBody, signedResponse());
+    }
+
+    private MomoProperties properties(
+            int statusCode,
+            AtomicReference<String> receivedBody,
+            MomoCreatePaymentResponse response
+    ) throws IOException {
         server = HttpServer.create(new InetSocketAddress(0), 0);
         server.createContext("/create", exchange -> {
             receivedBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
-            String body = statusCode >= 500 ? "temporary failure" : objectMapper.writeValueAsString(signedResponse());
+            String body = statusCode >= 500 ? "temporary failure" : objectMapper.writeValueAsString(response);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(statusCode, body.getBytes(StandardCharsets.UTF_8).length);
             exchange.getResponseBody().write(body.getBytes(StandardCharsets.UTF_8));
@@ -102,14 +125,18 @@ class MomoAdapterTest {
     }
 
     private MomoCreatePaymentResponse signedResponse() {
+        return signedResponse(0, "Successful.", "https://test-payment.momo.vn/pay/PAY-1");
+    }
+
+    private MomoCreatePaymentResponse signedResponse(int resultCode, String message, String payUrl) {
         MomoCreatePaymentResponse unsigned = new MomoCreatePaymentResponse(
                 "TEST_PARTNER",
                 "PAY-1",
                 100000,
                 "PAY-1",
-                "Successful.",
-                0,
-                "https://test-payment.momo.vn/pay/PAY-1",
+                message,
+                resultCode,
+                payUrl,
                 1718770000000L,
                 null
         );

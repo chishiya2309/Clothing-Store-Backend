@@ -19,6 +19,7 @@ class MomoCreateResponseVerifierTest {
         MomoCreatePaymentResponse response = signedResponse(properties, 100000, "PAY-1", "PAY-1");
 
         assertThat(verifier.isValidSuccess(properties, request, response)).isTrue();
+        assertThat(verifier.isValidSuccess(properties, request, responseWithSignature(response, null))).isTrue();
         assertThat(verifier.isValidSuccess(properties, request, signedResponse(properties, 100001, "PAY-1", "PAY-1"))).isFalse();
         assertThat(verifier.isValidSuccess(properties, request, signedResponse(properties, 100000, "PAY-2", "PAY-1"))).isFalse();
         assertThat(verifier.isValidSuccess(properties, request, signedResponse(properties, 100000, "PAY-1", "REQ-2"))).isFalse();

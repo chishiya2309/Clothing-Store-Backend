@@ -6,13 +6,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import vn.hcmute.edu.dp.nhom10.backend.dto.payment.MomoIpnRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.MomoReturnResponseDTO;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentAttemptStatus;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.MomoIpnService;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.MomoReturnService;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class MomoCallbackControllerTest {
@@ -23,6 +28,17 @@ class MomoCallbackControllerTest {
             .standaloneSetup(new MomoCallbackController(returnService, ipnService))
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    void handleReturn_redirectsToCheckoutResult() throws Exception {
+        when(returnService.handleReturn(any())).thenReturn(new MomoReturnResponseDTO(
+                true, "PAY-1", 0, "TRANS-1", "CHK-1", PaymentAttemptStatus.completed, "success", "ok"));
+
+        mockMvc.perform(get("/api/payments/momo/return")
+                        .param("orderId", "PAY-1"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrlPattern("http://localhost:5173/checkout/result?status=success&paymentMethod=momo&checkoutCode=CHK-1&paymentReference=PAY-1&gatewayTransactionId=TRANS-1&message=*"));
+    }
 
     @Test
     void handleIpn_validRequestReturns204WithoutBody() throws Exception {
