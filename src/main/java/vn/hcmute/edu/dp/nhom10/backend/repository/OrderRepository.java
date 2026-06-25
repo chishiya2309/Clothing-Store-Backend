@@ -61,18 +61,20 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse(" +
            "  CAST(o.createdAt AS date), " +
            "  COUNT(o.id), " +
-           "  COUNT(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN 1L END), " +
-           "  COUNT(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.cancelled THEN 1L END), " +
-           "  SUM(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN (o.subtotal + o.shippingFee) END), " +
-           "  SUM(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN o.discountAmount END), " +
-           "  SUM(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN o.totalAmount END)) " +
+           "  COUNT(CASE WHEN o.status = :completedStatus THEN 1L END), " +
+           "  COUNT(CASE WHEN o.status = :cancelledStatus THEN 1L END), " +
+           "  SUM(CASE WHEN o.status = :completedStatus THEN (o.subtotal + o.shippingFee) END), " +
+           "  SUM(CASE WHEN o.status = :completedStatus THEN o.discountAmount END), " +
+           "  SUM(CASE WHEN o.status = :completedStatus THEN o.totalAmount END)) " +
            "FROM Order o " +
            "WHERE o.createdAt BETWEEN :startDate AND :endDate " +
            "GROUP BY CAST(o.createdAt AS date) " +
            "ORDER BY CAST(o.createdAt AS date) ASC")
     List<RevenueReportResponse> findRevenueReport(
             @Param("startDate") OffsetDateTime startDate, 
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("completedStatus") OrderStatus completedStatus,
+            @Param("cancelledStatus") OrderStatus cancelledStatus);
 
     @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.BestsellerReportResponse(" +
            "  p.id, p.name, " +
@@ -84,24 +86,26 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
            "JOIN p.category c " +
            "LEFT JOIN c.parent cp " +
            "JOIN oi.order o " +
-           "WHERE o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed " +
+           "WHERE o.status = :status " +
            "  AND o.createdAt BETWEEN :startDate AND :endDate " +
            "GROUP BY p.id, p.name, c.name, cp.id, cp.name " +
            "ORDER BY SUM(oi.quantity) DESC")
     List<BestsellerReportResponse> findBestsellingProducts(
             @Param("startDate") OffsetDateTime startDate, 
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("status") OrderStatus status);
 
     @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse(" +
            "  u.id, u.fullName, u.email, COALESCE(mt.name, 'Không có'), COUNT(o.id), SUM(o.totalAmount), u.loyaltyPoints) " +
            "FROM Order o " +
            "JOIN o.user u " +
            "LEFT JOIN u.membershipTier mt " +
-           "WHERE o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed " +
+           "WHERE o.status = :status " +
            "  AND o.createdAt BETWEEN :startDate AND :endDate " +
            "GROUP BY u.id, u.fullName, u.email, mt.name, u.loyaltyPoints " +
            "ORDER BY SUM(o.totalAmount) DESC")
     List<LoyaltyCustomerReportResponse> findLoyaltyCustomers(
             @Param("startDate") OffsetDateTime startDate, 
-            @Param("endDate") OffsetDateTime endDate);
+            @Param("endDate") OffsetDateTime endDate,
+            @Param("status") OrderStatus status);
 }
