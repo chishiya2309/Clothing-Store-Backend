@@ -78,6 +78,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     boolean existsByProductId(Long productId);
 
+    boolean existsByProductId(Long productId);
+
     // Lay danh sach review chua duyet (Staff)
     Page<Review> findByIsApprovedFalseAndIsActiveTrue(Pageable pageable);
 
