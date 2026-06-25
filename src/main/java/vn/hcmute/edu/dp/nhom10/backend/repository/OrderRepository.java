@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
-import vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse;
-import vn.hcmute.edu.dp.nhom10.backend.dto.response.BestsellerReportResponse;
-import vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.projection.RevenueReportProjection;
+import vn.hcmute.edu.dp.nhom10.backend.dto.projection.BestsellerReportProjection;
+import vn.hcmute.edu.dp.nhom10.backend.dto.projection.LoyaltyCustomerReportProjection;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 
 import java.time.OffsetDateTime;
@@ -58,50 +58,64 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             """)
     Optional<Order> findByOrderCodeForUpdate(@Param("orderCode") String orderCode);
 
-    @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse(" +
-           "  CAST(o.createdAt AS date), " +
-           "  COUNT(o.id), " +
-           "  COUNT(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN 1L END), " +
-           "  COUNT(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.cancelled THEN 1L END), " +
-           "  SUM(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN (o.subtotal + o.shippingFee) END), " +
-           "  SUM(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN o.discountAmount END), " +
-           "  SUM(CASE WHEN o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed THEN o.totalAmount END)) " +
-           "FROM Order o " +
-           "WHERE o.createdAt BETWEEN :startDate AND :endDate " +
-           "GROUP BY CAST(o.createdAt AS date) " +
-           "ORDER BY CAST(o.createdAt AS date) ASC")
-    List<RevenueReportResponse> findRevenueReport(
-            @Param("startDate") OffsetDateTime startDate, 
+    @Query(value = """
+            SELECT
+                o.created_at::date                                                          AS date,
+                COUNT(o.id)                                                                 AS totalOrders,
+                COUNT(CASE WHEN o.status = 'completed'::order_status THEN 1 END)            AS completedOrders,
+                COUNT(CASE WHEN o.status = 'cancelled'::order_status THEN 1 END)            AS cancelledOrders,
+                SUM(CASE WHEN o.status = 'completed'::order_status THEN (o.subtotal + o.shipping_fee) END) AS totalRevenue,
+                SUM(CASE WHEN o.status = 'completed'::order_status THEN o.discount_amount END)             AS totalDiscounts,
+                SUM(CASE WHEN o.status = 'completed'::order_status THEN o.total_amount END)                AS netRevenue
+            FROM orders o
+            WHERE o.created_at BETWEEN :startDate AND :endDate
+            GROUP BY o.created_at::date
+            ORDER BY o.created_at::date ASC
+            """, nativeQuery = true)
+    List<RevenueReportProjection> findRevenueReport(
+            @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
 
-    @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.BestsellerReportResponse(" +
-           "  p.id, p.name, " +
-           "  CASE WHEN cp.id IS NULL THEN c.name ELSE CONCAT(cp.name, ' > ', c.name) END, " +
-           "  SUM(oi.quantity), SUM(oi.subtotal)) " +
-           "FROM OrderItem oi " +
-           "JOIN oi.productVariant pv " +
-           "JOIN pv.product p " +
-           "JOIN p.category c " +
-           "LEFT JOIN c.parent cp " +
-           "JOIN oi.order o " +
-           "WHERE o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed " +
-           "  AND o.createdAt BETWEEN :startDate AND :endDate " +
-           "GROUP BY p.id, p.name, c.name, cp.id, cp.name " +
-           "ORDER BY SUM(oi.quantity) DESC")
-    List<BestsellerReportResponse> findBestsellingProducts(
-            @Param("startDate") OffsetDateTime startDate, 
+    @Query(value = """
+            SELECT
+                p.id                                                                        AS productId,
+                p.name                                                                      AS productName,
+                CASE WHEN cp.id IS NULL THEN c.name ELSE (cp.name || ' > ' || c.name) END  AS categoryName,
+                SUM(oi.quantity)                                                            AS totalQuantitySold,
+                SUM(oi.subtotal)                                                            AS totalRevenue
+            FROM order_items oi
+            JOIN product_variants pv ON pv.id = oi.product_variant_id
+            JOIN products p          ON p.id  = pv.product_id AND p.deleted_at IS NULL
+            JOIN categories c        ON c.id  = p.category_id
+            LEFT JOIN categories cp  ON cp.id = c.parent_id
+            JOIN orders o            ON o.id  = oi.order_id
+            WHERE o.status = 'completed'::order_status
+              AND o.created_at BETWEEN :startDate AND :endDate
+            GROUP BY p.id, p.name, c.name, cp.id, cp.name
+            ORDER BY SUM(oi.quantity) DESC
+            """, nativeQuery = true)
+    List<BestsellerReportProjection> findBestsellingProducts(
+            @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
 
-    @Query("SELECT new vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse(" +
-           "  u.id, u.fullName, u.email, COALESCE(mt.name, 'Không có'), COUNT(o.id), SUM(o.totalAmount), u.loyaltyPoints) " +
-           "FROM Order o " +
-           "JOIN o.user u " +
-           "LEFT JOIN u.membershipTier mt " +
-           "WHERE o.status = vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus.completed " +
-           "  AND o.createdAt BETWEEN :startDate AND :endDate " +
-           "GROUP BY u.id, u.fullName, u.email, mt.name, u.loyaltyPoints " +
-           "ORDER BY SUM(o.totalAmount) DESC")
-    List<LoyaltyCustomerReportResponse> findLoyaltyCustomers(
-            @Param("startDate") OffsetDateTime startDate, 
+    @Query(value = """
+            SELECT
+                u.id                                 AS userId,
+                u.full_name                          AS fullName,
+                u.email                              AS email,
+                COALESCE(mt.name, 'Kh\u00f4ng c\u00f3')        AS membershipTier,
+                COUNT(o.id)                          AS totalOrders,
+                SUM(o.total_amount)                  AS totalSpent,
+                u.loyalty_points                     AS loyaltyPoints
+            FROM orders o
+            JOIN users u         ON u.id  = o.user_id
+            LEFT JOIN membership_tiers mt ON mt.id = u.membership_tier_id
+            WHERE o.status = 'completed'::order_status
+              AND o.created_at BETWEEN :startDate AND :endDate
+            GROUP BY u.id, u.full_name, u.email, mt.name, u.loyalty_points
+            ORDER BY SUM(o.total_amount) DESC
+            """, nativeQuery = true)
+    List<LoyaltyCustomerReportProjection> findLoyaltyCustomers(
+            @Param("startDate") OffsetDateTime startDate,
             @Param("endDate") OffsetDateTime endDate);
 }

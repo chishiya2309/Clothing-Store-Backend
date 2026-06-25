@@ -21,6 +21,8 @@ import java.util.List;
  * Lớp triển khai các dịch vụ báo cáo thống kê cho Admin.
  * Kết hợp OrderRepository để truy xuất dữ liệu gộp nhóm và điều phối các
  *          lớp Exporter cụ thể (áp dụng Template Method Pattern) để xuất file CSV.
+ * Áp dụng Mapper Pattern: convert interface Projection (native query result)
+ *          sang domain DTO Record trước khi trả về controller/exporter.
  */
 @Slf4j(topic = "ADMIN-REPORT-SERVICE")
 @Service
@@ -33,7 +35,18 @@ public class AdminReportServiceImpl implements AdminReportService {
     @Transactional(readOnly = true)
     public List<RevenueReportResponse> getRevenueReport(OffsetDateTime startDate, OffsetDateTime endDate) {
         log.info("Fetching revenue report between {} and {}", startDate, endDate);
-        return orderRepository.findRevenueReport(startDate, endDate);
+        return orderRepository.findRevenueReport(startDate, endDate)
+                .stream()
+                .map(p -> new RevenueReportResponse(
+                        p.getDate(),
+                        p.getTotalOrders(),
+                        p.getCompletedOrders(),
+                        p.getCancelledOrders(),
+                        p.getTotalRevenue(),
+                        p.getTotalDiscounts(),
+                        p.getNetRevenue()
+                ))
+                .toList();
     }
 
     @Override
@@ -53,7 +66,16 @@ public class AdminReportServiceImpl implements AdminReportService {
     @Transactional(readOnly = true)
     public List<BestsellerReportResponse> getBestsellerReport(OffsetDateTime startDate, OffsetDateTime endDate) {
         log.info("Fetching bestseller report between {} and {}", startDate, endDate);
-        return orderRepository.findBestsellingProducts(startDate, endDate);
+        return orderRepository.findBestsellingProducts(startDate, endDate)
+                .stream()
+                .map(p -> new BestsellerReportResponse(
+                        p.getProductId(),
+                        p.getProductName(),
+                        p.getCategoryName(),
+                        p.getTotalQuantitySold(),
+                        p.getTotalRevenue()
+                ))
+                .toList();
     }
 
     @Override
@@ -73,7 +95,18 @@ public class AdminReportServiceImpl implements AdminReportService {
     @Transactional(readOnly = true)
     public List<LoyaltyCustomerReportResponse> getLoyaltyCustomerReport(OffsetDateTime startDate, OffsetDateTime endDate) {
         log.info("Fetching loyalty customer report between {} and {}", startDate, endDate);
-        return orderRepository.findLoyaltyCustomers(startDate, endDate);
+        return orderRepository.findLoyaltyCustomers(startDate, endDate)
+                .stream()
+                .map(p -> new LoyaltyCustomerReportResponse(
+                        p.getUserId(),
+                        p.getFullName(),
+                        p.getEmail(),
+                        p.getMembershipTier(),
+                        p.getTotalOrders(),
+                        p.getTotalSpent(),
+                        p.getLoyaltyPoints()
+                ))
+                .toList();
     }
 
     @Override

@@ -11,8 +11,6 @@ import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.RevenueCsvExporte
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,10 +22,9 @@ class CsvExporterTest {
         RevenueCsvExporter exporter = new RevenueCsvExporter();
         
         LocalDate localDate = LocalDate.of(2026, 6, 10);
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         
         List<RevenueReportResponse> data = List.of(
-                new RevenueReportResponse(date, 150L, 135L, 15L, BigDecimal.valueOf(450000000), BigDecimal.valueOf(25000000), BigDecimal.valueOf(425000000))
+                new RevenueReportResponse(localDate, 150L, 135L, 15L, BigDecimal.valueOf(450000000), BigDecimal.valueOf(25000000), BigDecimal.valueOf(425000000))
         );
 
         StringWriter writer = new StringWriter();

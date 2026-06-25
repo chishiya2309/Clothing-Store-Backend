@@ -1,7 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.dto.response;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * DTO đại diện cho dữ liệu báo cáo thống kê doanh thu theo ngày
@@ -9,7 +9,7 @@ import java.util.Date;
  *          và an toàn khi truyền tải dữ liệu doanh số tổng, chiết khấu và doanh số thực nhận.
  */
 public record RevenueReportResponse(
-        Date date,
+        LocalDate date,
         Long totalOrders,
         Long completedOrders,
         Long cancelledOrders,
