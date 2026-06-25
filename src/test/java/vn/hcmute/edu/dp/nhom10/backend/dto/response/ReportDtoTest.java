@@ -3,7 +3,7 @@ package vn.hcmute.edu.dp.nhom10.backend.dto.response;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,7 +13,7 @@ class ReportDtoTest {
     @Test
     void testRevenueReportResponse_compactConstructor_defaultsNulls() {
         // Construct with nulls
-        Date date = new Date();
+        LocalDate date = LocalDate.now();
         RevenueReportResponse response = new RevenueReportResponse(
                 date, null, null, null, null, null, null
         );

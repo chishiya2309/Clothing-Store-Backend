@@ -18,7 +18,7 @@ import vn.hcmute.edu.dp.nhom10.backend.service.AdminReportService;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +52,7 @@ class AdminReportControllerTest {
         OffsetDateTime end = OffsetDateTime.parse("2026-06-30T23:59:59Z");
         
         List<RevenueReportResponse> mockData = List.of(
-                new RevenueReportResponse(new Date(), 100L, 90L, 10L, BigDecimal.valueOf(300000), BigDecimal.valueOf(20000), BigDecimal.valueOf(280000))
+                new RevenueReportResponse(LocalDate.now(), 100L, 90L, 10L, BigDecimal.valueOf(300000), BigDecimal.valueOf(20000), BigDecimal.valueOf(280000))
         );
 
         when(reportService.getRevenueReport(eq(start), eq(end))).thenReturn(mockData);

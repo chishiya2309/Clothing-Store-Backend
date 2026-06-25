@@ -152,4 +152,47 @@ public class StaffReviewServiceImplTest {
 
         verify(commandExecutor, never()).execute(any(ReviewCommand.class), anyString());
     }
+
+    @Test
+    public void testGetReviewsByTabFlagged() {
+        User user = User.builder().fullName("Nguyễn Văn A").email("a@gmail.com").build();
+        Product product = Product.builder().name("Áo thun").build();
+        Review flaggedReview = Review.builder()
+                .id(1L)
+                .user(user)
+                .product(product)
+                .rating((short) 5)
+                .content("Đồ ngu dốt")
+                .isApproved(false)
+                .isActive(true)
+                .build();
+        Review normalReview = Review.builder()
+                .id(2L)
+                .user(user)
+                .product(product)
+                .rating((short) 5)
+                .content("Sản phẩm rất tốt")
+                .isApproved(false)
+                .isActive(true)
+                .build();
+        Page<Review> page = new PageImpl<>(List.of(flaggedReview, normalReview));
+
+        when(reviewRepository.findByIsApprovedFalseAndIsActiveTrue(any(Pageable.class))).thenReturn(page);
+
+        PageResponse<StaffReviewResponse> result = staffReviewService.getReviewsByTab("PENDING", 0, 10);
+
+        assertNotNull(result);
+        assertEquals(2, result.getContent().size());
+        
+        StaffReviewResponse flaggedRes = result.getContent().stream()
+                .filter(r -> r.getId().equals(1L))
+                .findFirst().orElseThrow();
+        assertTrue(flaggedRes.getIsFlagged(), "Review containing profanity should be flagged");
+
+        StaffReviewResponse normalRes = result.getContent().stream()
+                .filter(r -> r.getId().equals(2L))
+                .findFirst().orElseThrow();
+        assertFalse(normalRes.getIsFlagged(), "Normal review should not be flagged");
+    }
 }
+

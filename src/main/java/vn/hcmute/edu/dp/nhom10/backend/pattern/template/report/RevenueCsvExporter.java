@@ -4,7 +4,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.RevenueReportResponse;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Lớp triển khai cụ thể để xuất báo cáo thống kê doanh thu ra CSV.
@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
  */
 public class RevenueCsvExporter extends CsvReportExporterTemplate<RevenueReportResponse> {
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     protected void writeHeader(Writer writer) throws IOException {
@@ -23,7 +23,7 @@ public class RevenueCsvExporter extends CsvReportExporterTemplate<RevenueReportR
     @Override
     protected void writeRow(Writer writer, RevenueReportResponse item, int index) throws IOException {
         writer.write(String.format("%s,%s,%s,%s,%s,%s,%s\n",
-                escapeCsvField(item.date() != null ? dateFormat.format(item.date()) : ""),
+                escapeCsvField(item.date() != null ? item.date().format(dateFormat) : ""),
                 escapeCsvField(item.totalOrders()),
                 escapeCsvField(item.completedOrders()),
                 escapeCsvField(item.cancelledOrders()),

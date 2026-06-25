@@ -34,10 +34,10 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
               and (:minStock is null or pv.stockQuantity >= :minStock)
               and (:maxStock is null or pv.stockQuantity <= :maxStock)
               and (
-                  :keyword is null
-                  or lower(p.name) like lower(concat('%', :keyword, '%'))
-                  or lower(p.slug) like lower(concat('%', :keyword, '%'))
-                  or lower(pv.sku) like lower(concat('%', :keyword, '%'))
+                  cast(:keyword as string) is null
+                  or lower(p.name) like lower(concat('%', cast(:keyword as string), '%'))
+                  or lower(p.slug) like lower(concat('%', cast(:keyword as string), '%'))
+                  or lower(pv.sku) like lower(concat('%', cast(:keyword as string), '%'))
               )
             """)
     Page<ProductVariant> findInventoryReport(
