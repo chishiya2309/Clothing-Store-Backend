@@ -8,6 +8,7 @@ public record VnPayReturnResponseDTO(
         String responseCode,
         String transactionStatus,
         String gatewayTransactionId,
+        String checkoutCode,
         PaymentAttemptStatus paymentAttemptStatus,
         String paymentStatus,
         String message

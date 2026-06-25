@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.VnPayIpnResponse;
@@ -18,7 +19,9 @@ import vn.hcmute.edu.dp.nhom10.backend.service.impl.VnPayReturnService;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,20 +40,20 @@ class VnPayCallbackControllerTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(controller, "frontendUrl", "http://localhost:5173");
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
-    void handleReturn_returnsReadOnlyDto() throws Exception {
+    void handleReturn_redirectsToCheckoutResult() throws Exception {
         when(returnService.handleReturn(any())).thenReturn(new VnPayReturnResponseDTO(
-                true, "PAY-1", "00", "00", "GTW-1", null, "processing", "Payment status loaded"
+                true, "PAY-1", "00", "00", "GTW-1", "CHK-1", null, "processing", "Payment status loaded"
         ));
 
         mockMvc.perform(get("/api/payments/vnpay/return").params(parameters()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.signatureValid").value(true))
-                .andExpect(jsonPath("$.paymentReference").value("PAY-1"))
-                .andExpect(jsonPath("$.paymentStatus").value("processing"));
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/checkout/result")))
+                .andExpect(redirectedUrlPattern("http://localhost:5173/checkout/result?status=pending&paymentMethod=vnpay&checkoutCode=CHK-1&paymentReference=PAY-1&gatewayTransactionId=GTW-1&message=*"));
     }
 
     @Test
