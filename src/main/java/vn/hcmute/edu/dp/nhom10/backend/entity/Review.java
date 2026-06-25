@@ -42,11 +42,18 @@ public class Review {
     @Column(name = "is_approved", nullable = false)
     private Boolean isApproved = false;
 
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
+
     @Column(name = "admin_reply", columnDefinition = "TEXT")
     private String adminReply;
 
     @Column(name = "replied_at")
     private OffsetDateTime repliedAt;
+
+    @Column(name = "delete_reason", columnDefinition = "TEXT")
+    private String deleteReason;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
