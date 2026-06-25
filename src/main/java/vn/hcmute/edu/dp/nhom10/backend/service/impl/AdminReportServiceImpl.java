@@ -12,6 +12,7 @@ import vn.hcmute.edu.dp.nhom10.backend.service.AdminReportService;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.RevenueCsvExporter;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.BestsellerCsvExporter;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.template.report.LoyaltyCustomerCsvExporter;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 
 import java.io.Writer;
 import java.time.OffsetDateTime;
@@ -33,7 +34,7 @@ public class AdminReportServiceImpl implements AdminReportService {
     @Transactional(readOnly = true)
     public List<RevenueReportResponse> getRevenueReport(OffsetDateTime startDate, OffsetDateTime endDate) {
         log.info("Fetching revenue report between {} and {}", startDate, endDate);
-        return orderRepository.findRevenueReport(startDate, endDate);
+        return orderRepository.findRevenueReport(startDate, endDate, OrderStatus.completed, OrderStatus.cancelled);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class AdminReportServiceImpl implements AdminReportService {
     @Transactional(readOnly = true)
     public List<BestsellerReportResponse> getBestsellerReport(OffsetDateTime startDate, OffsetDateTime endDate) {
         log.info("Fetching bestseller report between {} and {}", startDate, endDate);
-        return orderRepository.findBestsellingProducts(startDate, endDate);
+        return orderRepository.findBestsellingProducts(startDate, endDate, OrderStatus.completed);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class AdminReportServiceImpl implements AdminReportService {
     @Transactional(readOnly = true)
     public List<LoyaltyCustomerReportResponse> getLoyaltyCustomerReport(OffsetDateTime startDate, OffsetDateTime endDate) {
         log.info("Fetching loyalty customer report between {} and {}", startDate, endDate);
-        return orderRepository.findLoyaltyCustomers(startDate, endDate);
+        return orderRepository.findLoyaltyCustomers(startDate, endDate, OrderStatus.completed);
     }
 
     @Override

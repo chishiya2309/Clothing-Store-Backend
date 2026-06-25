@@ -10,6 +10,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.BestsellerReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.LoyaltyCustomerReportResponse;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.AdminReportServiceImpl;
+import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -38,7 +39,7 @@ class AdminReportServiceImplTest {
                 new RevenueReportResponse(new Date(), 10L, 8L, 2L, BigDecimal.valueOf(1000), BigDecimal.valueOf(100), BigDecimal.valueOf(900))
         );
 
-        when(orderRepository.findRevenueReport(start, end)).thenReturn(mockData);
+        when(orderRepository.findRevenueReport(start, end, OrderStatus.completed, OrderStatus.cancelled)).thenReturn(mockData);
 
         List<RevenueReportResponse> result = reportService.getRevenueReport(start, end);
 
@@ -46,7 +47,7 @@ class AdminReportServiceImplTest {
         assertEquals(1, result.size());
         assertEquals(10L, result.get(0).totalOrders());
         assertEquals(BigDecimal.valueOf(900), result.get(0).netRevenue());
-        verify(orderRepository, times(1)).findRevenueReport(start, end);
+        verify(orderRepository, times(1)).findRevenueReport(start, end, OrderStatus.completed, OrderStatus.cancelled);
     }
 
     @Test
@@ -57,7 +58,7 @@ class AdminReportServiceImplTest {
                 new RevenueReportResponse(new Date(), 5L, 4L, 1L, BigDecimal.valueOf(500), BigDecimal.valueOf(50), BigDecimal.valueOf(450))
         );
 
-        when(orderRepository.findRevenueReport(start, end)).thenReturn(mockData);
+        when(orderRepository.findRevenueReport(start, end, OrderStatus.completed, OrderStatus.cancelled)).thenReturn(mockData);
 
         StringWriter writer = new StringWriter();
         reportService.exportRevenueReport(writer, start, end);
@@ -77,14 +78,14 @@ class AdminReportServiceImplTest {
                 new BestsellerReportResponse(1L, "Áo Thun Polo", "Nam > Polo", 50L, BigDecimal.valueOf(5000))
         );
 
-        when(orderRepository.findBestsellingProducts(start, end)).thenReturn(mockData);
+        when(orderRepository.findBestsellingProducts(start, end, OrderStatus.completed)).thenReturn(mockData);
 
         List<BestsellerReportResponse> result = reportService.getBestsellerReport(start, end);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Áo Thun Polo", result.get(0).productName());
-        verify(orderRepository, times(1)).findBestsellingProducts(start, end);
+        verify(orderRepository, times(1)).findBestsellingProducts(start, end, OrderStatus.completed);
     }
 
     @Test
@@ -95,7 +96,7 @@ class AdminReportServiceImplTest {
                 new BestsellerReportResponse(1L, "Áo Thun Polo", "Nam > Polo", 50L, BigDecimal.valueOf(5000))
         );
 
-        when(orderRepository.findBestsellingProducts(start, end)).thenReturn(mockData);
+        when(orderRepository.findBestsellingProducts(start, end, OrderStatus.completed)).thenReturn(mockData);
 
         StringWriter writer = new StringWriter();
         reportService.exportBestsellerReport(writer, start, end);
@@ -115,14 +116,14 @@ class AdminReportServiceImplTest {
                 new LoyaltyCustomerReportResponse(100L, "Nguyễn Văn A", "a@gmail.com", "Vàng", 5L, BigDecimal.valueOf(5000), 500)
         );
 
-        when(orderRepository.findLoyaltyCustomers(start, end)).thenReturn(mockData);
+        when(orderRepository.findLoyaltyCustomers(start, end, OrderStatus.completed)).thenReturn(mockData);
 
         List<LoyaltyCustomerReportResponse> result = reportService.getLoyaltyCustomerReport(start, end);
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Nguyễn Văn A", result.get(0).fullName());
-        verify(orderRepository, times(1)).findLoyaltyCustomers(start, end);
+        verify(orderRepository, times(1)).findLoyaltyCustomers(start, end, OrderStatus.completed);
     }
 
     @Test
@@ -133,7 +134,7 @@ class AdminReportServiceImplTest {
                 new LoyaltyCustomerReportResponse(100L, "Nguyễn Văn A", "a@gmail.com", "Vàng", 5L, BigDecimal.valueOf(5000), 500)
         );
 
-        when(orderRepository.findLoyaltyCustomers(start, end)).thenReturn(mockData);
+        when(orderRepository.findLoyaltyCustomers(start, end, OrderStatus.completed)).thenReturn(mockData);
 
         StringWriter writer = new StringWriter();
         reportService.exportLoyaltyCustomerReport(writer, start, end);
