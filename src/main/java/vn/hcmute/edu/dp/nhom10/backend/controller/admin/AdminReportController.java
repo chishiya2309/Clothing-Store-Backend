@@ -27,8 +27,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/reports")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')") // Security Proxy Pattern ở mức Class
-@Tag(name = "Admin Report", description = "Báo cáo và thống kê dành cho Admin")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')") // Allow both Admin and Staff to access reports by default (e.g. bestsellers)
+@Tag(name = "Admin Report", description = "Báo cáo và thống kê dành cho Admin và Nhân viên")
 @Slf4j(topic = "ADMIN-REPORT-CONTROLLER")
 public class AdminReportController {
 
@@ -36,6 +36,7 @@ public class AdminReportController {
 
     // --- BM1: THỐNG KÊ DOANH THU ---
     @GetMapping("/revenue")
+    @PreAuthorize("hasRole('ADMIN')") // Admin-only
     public ApiResponse getRevenueReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
@@ -51,6 +52,7 @@ public class AdminReportController {
     }
 
     @GetMapping("/revenue/export")
+    @PreAuthorize("hasRole('ADMIN')") // Admin-only
     public void exportRevenueReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
@@ -64,7 +66,7 @@ public class AdminReportController {
         reportService.exportRevenueReport(response.getWriter(), startDate, endDate);
     }
 
-    // --- BM2: THỐNG KÊ SẢN PHẨM BÁN CHẠY ---
+    // --- BM2: THỐNG KÊ SẢN PHẨM BÁN CHẠY (Admin & Staff) ---
     @GetMapping("/bestsellers")
     public ApiResponse getBestsellerReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
@@ -96,6 +98,7 @@ public class AdminReportController {
 
     // --- BM5: BÁO CÁO KHÁCH HÀNG THÂN THIẾT ---
     @GetMapping("/loyalty")
+    @PreAuthorize("hasRole('ADMIN')") // Admin-only
     public ApiResponse getLoyaltyReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
@@ -111,6 +114,7 @@ public class AdminReportController {
     }
 
     @GetMapping("/loyalty/export")
+    @PreAuthorize("hasRole('ADMIN')") // Admin-only
     public void exportLoyaltyReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate,
