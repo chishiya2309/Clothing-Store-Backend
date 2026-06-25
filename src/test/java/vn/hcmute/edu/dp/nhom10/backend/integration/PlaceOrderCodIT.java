@@ -83,9 +83,9 @@ class PlaceOrderCodIT extends AbstractPostgresIntegrationTest {
         assertThat(response.onlinePayment()).isNull();
         assertThat(response.order().getStatus()).isEqualTo(OrderStatus.pending);
         assertThat(response.order().getSubtotal()).isEqualByComparingTo(fixture.subtotal());
-        assertThat(response.order().getShippingFee()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(response.order().getShippingFee()).isEqualByComparingTo(new BigDecimal("30000.00"));
         assertThat(response.order().getDiscountAmount()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(response.order().getTotalAmount()).isEqualByComparingTo(fixture.subtotal());
+        assertThat(response.order().getTotalAmount()).isEqualByComparingTo(fixture.subtotal().add(new BigDecimal("30000.00")));
 
         CheckoutSession checkoutSession = checkoutSessionRepository.findByCheckoutCode(response.checkoutCode()).orElseThrow();
         assertThat(checkoutSession.getStatus()).isEqualTo(CheckoutSessionStatus.completed);
@@ -105,7 +105,7 @@ class PlaceOrderCodIT extends AbstractPostgresIntegrationTest {
         assertThat(payments).hasSize(1);
         assertThat(payments.get(0).getMethod()).isEqualTo(PaymentMethod.cod);
         assertThat(payments.get(0).getStatus()).isEqualTo(PaymentStatus.pending);
-        assertThat(payments.get(0).getAmount()).isEqualByComparingTo(fixture.subtotal());
+        assertThat(payments.get(0).getAmount()).isEqualByComparingTo(fixture.subtotal().add(new BigDecimal("30000.00")));
 
         List<InventoryReservation> reservations =
                 inventoryReservationRepository.findAllByCheckoutSessionId(checkoutSession.getId());

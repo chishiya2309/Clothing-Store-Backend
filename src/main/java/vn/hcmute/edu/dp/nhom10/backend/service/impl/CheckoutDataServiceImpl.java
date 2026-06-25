@@ -22,6 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CheckoutDataServiceImpl implements CheckoutDataService {
 
+    private static final BigDecimal STANDARD_SHIPPING_FEE = new BigDecimal("30000.00");
+    private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("500000.00");
+
     private final AddressRepository addressRepository;
     private final CartItemRepository cartItemRepository;
 
@@ -50,8 +53,12 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
                 toAddressSnapshot(address),
                 items,
                 subtotal,
-                BigDecimal.ZERO
+                calculateShippingFee(subtotal)
         );
+    }
+
+    private BigDecimal calculateShippingFee(BigDecimal subtotal) {
+        return subtotal.compareTo(FREE_SHIPPING_THRESHOLD) > 0 ? BigDecimal.ZERO : STANDARD_SHIPPING_FEE;
     }
 
     private CheckoutItemSnapshot toItemSnapshot(CartItem cartItem) {
