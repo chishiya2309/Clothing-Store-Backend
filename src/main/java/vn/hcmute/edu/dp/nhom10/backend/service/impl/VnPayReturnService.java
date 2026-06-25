@@ -18,6 +18,7 @@ public class VnPayReturnService {
     private final VnPayCallbackParser callbackParser;
     private final VnPayCallbackVerifier callbackVerifier;
     private final PaymentAttemptRepository paymentAttemptRepository;
+    private final VnPayIpnService ipnService;
 
     public VnPayReturnResponseDTO handleReturn(MultiValueMap<String, String> parameters) {
         VnPayCallbackData callbackData;
@@ -26,6 +27,7 @@ public class VnPayReturnService {
         } catch (RuntimeException e) {
             return new VnPayReturnResponseDTO(
                     false,
+                    null,
                     null,
                     null,
                     null,
@@ -46,13 +48,16 @@ public class VnPayReturnService {
                     callbackData.transactionStatus(),
                     callbackData.transactionNumber(),
                     null,
+                    null,
                     "invalid_signature",
                     "Invalid VNPay callback signature"
             );
         }
 
+        ipnService.handleIpn(parameters);
+
         PaymentAttempt paymentAttempt = paymentAttemptRepository
-                .findByPaymentReference(callbackData.paymentReference())
+                .findByPaymentReferenceWithCheckoutSession(callbackData.paymentReference())
                 .orElse(null);
         if (paymentAttempt == null) {
             return new VnPayReturnResponseDTO(
@@ -61,6 +66,7 @@ public class VnPayReturnService {
                     callbackData.responseCode(),
                     callbackData.transactionStatus(),
                     callbackData.transactionNumber(),
+                    null,
                     null,
                     "not_found",
                     "Payment attempt not found"
@@ -73,6 +79,7 @@ public class VnPayReturnService {
                 callbackData.responseCode(),
                 callbackData.transactionStatus(),
                 paymentAttempt.getGatewayTransactionId(),
+                paymentAttempt.getCheckoutSession().getCheckoutCode(),
                 paymentAttempt.getStatus(),
                 toDisplayStatus(paymentAttempt.getStatus()),
                 "Payment status loaded"
