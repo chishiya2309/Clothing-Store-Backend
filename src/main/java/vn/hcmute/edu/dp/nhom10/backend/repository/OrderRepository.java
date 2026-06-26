@@ -82,7 +82,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
                 p.name                                                                      AS productName,
                 CASE WHEN cp.id IS NULL THEN c.name ELSE (cp.name || ' > ' || c.name) END  AS categoryName,
                 SUM(oi.quantity)                                                            AS totalQuantitySold,
-                SUM(oi.subtotal)                                                            AS totalRevenue
+                SUM(oi.subtotal)                                                            AS totalRevenue,
+                (SELECT pi.image_url FROM product_images pi WHERE pi.product_id = p.id AND pi.image_type = 'main'::image_type ORDER BY pi.display_order ASC LIMIT 1) AS thumbnailUrl
             FROM order_items oi
             JOIN product_variants pv ON pv.id = oi.product_variant_id
             JOIN products p          ON p.id  = pv.product_id AND p.deleted_at IS NULL

@@ -16,7 +16,7 @@ import java.time.OffsetDateTime;
 @RestController
 @RequestMapping("/api/staff/collections")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
 public class StaffCollectionController {
 
     private final StaffCollectionService staffCollectionService;

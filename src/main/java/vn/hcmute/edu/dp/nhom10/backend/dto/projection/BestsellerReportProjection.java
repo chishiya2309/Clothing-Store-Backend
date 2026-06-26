@@ -13,4 +13,5 @@ public interface BestsellerReportProjection {
     String getCategoryName();
     Long getTotalQuantitySold();
     BigDecimal getTotalRevenue();
+    String getThumbnailUrl();
 }

@@ -23,7 +23,7 @@ import java.time.OffsetDateTime;
 @RestController
 @RequestMapping("/api/staff/reports/inventory")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
 public class StaffInventoryReportController {
 
     private final InventoryReportService inventoryReportService;

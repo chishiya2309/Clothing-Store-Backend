@@ -27,7 +27,7 @@ import java.time.OffsetDateTime;
 @RestController
 @RequestMapping("/api/staff/orders")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
 public class StaffOrderController {
 
     private final StaffOrderService staffOrderService;

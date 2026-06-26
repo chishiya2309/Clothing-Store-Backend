@@ -300,6 +300,6 @@ class StaffInventoryReportControllerTest {
         PreAuthorize preAuthorize = StaffInventoryReportController.class.getAnnotation(PreAuthorize.class);
 
         assertNotNull(preAuthorize);
-        assertEquals("hasRole('STAFF')", preAuthorize.value());
+        assertEquals("hasAnyRole('ADMIN', 'STAFF')", preAuthorize.value());
     }
 }

@@ -84,11 +84,11 @@ Chúng em xin trân trọng cảm ơn!
 
 **MỤC LỤC**
 
-[DANH MỤC HÌNH ẢNH [1](#danh-mục-hình-ảnh)](#danh-mục-hình-ảnh)
+[DANH MỤC HÌNH ẢNH](#danh-mục-hình-ảnh)
 
-[DANH MỤC BẢNG BIỂU [1](#danh-mục-bảng-biểu)](#danh-mục-bảng-biểu)
+[DANH MỤC BẢNG BIỂU](#danh-mục-bảng-biểu)
 
-[A. PHẦN MỞ ĐẦU [2](#a.-phần-mở-đầu)](#a.-phần-mở-đầu)
+[A. PHẦN MỞ ĐẦU [2](#section)](#section)
 
 [1. Giới thiệu [2](#giới-thiệu)](#giới-thiệu)
 
@@ -110,35 +110,35 @@ Chúng em xin trân trọng cảm ơn!
 
 [1.3. Khảo sát hệ thống YODY (yody.vn) [6](#khảo-sát-hệ-thống-yody-yody.vn)](#khảo-sát-hệ-thống-yody-yody.vn)
 
-[1.3.1. Trang chủ (Homepage) [6](#_Toc233321797)](#_Toc233321797)
+[1.3.1. Trang chủ (Homepage) [6](#_Toc233347711)](#_Toc233347711)
 
-[1.3.2. Trang danh mục sản phẩm [8](#_Toc233321798)](#_Toc233321798)
+[1.3.2. Trang danh mục sản phẩm [8](#_Toc233347712)](#_Toc233347712)
 
-[1.3.3. Trang chi tiết sản phẩm [10](#_Toc233321799)](#_Toc233321799)
+[1.3.3. Trang chi tiết sản phẩm [10](#_Toc233347713)](#_Toc233347713)
 
-[1.3.4. Tính năng nổi bật [11](#_Toc233321800)](#_Toc233321800)
+[1.3.4. Tính năng nổi bật [11](#_Toc233347714)](#_Toc233347714)
 
-[1.3.5. Điểm hạn chế [11](#_Toc233321801)](#_Toc233321801)
+[1.3.5. Điểm hạn chế [11](#_Toc233347715)](#_Toc233347715)
 
 [1.4. Khảo sát hệ thống COOLMATE (coolmate.me) [12](#khảo-sát-hệ-thống-coolmate-coolmate.me)](#khảo-sát-hệ-thống-coolmate-coolmate.me)
 
-[1.4.1. Trang chủ (Homepage) [12](#_Toc233321803)](#_Toc233321803)
+[1.4.1. Trang chủ (Homepage) [12](#_Toc233347717)](#_Toc233347717)
 
-[1.4.2. Trang danh mục sản phẩm [14](#_Toc233321804)](#_Toc233321804)
+[1.4.2. Trang danh mục sản phẩm [14](#_Toc233347718)](#_Toc233347718)
 
-[1.4.3. Trang chi tiết sản phẩm [15](#_Toc233321805)](#_Toc233321805)
+[1.4.3. Trang chi tiết sản phẩm [15](#_Toc233347719)](#_Toc233347719)
 
-[1.4.4. Tính năng nổi bật [18](#_Toc233321806)](#_Toc233321806)
+[1.4.4. Tính năng nổi bật [18](#_Toc233347720)](#_Toc233347720)
 
-[1.4.5. Hạn chế [18](#_Toc233321807)](#_Toc233321807)
+[1.4.5. Hạn chế [18](#_Toc233347721)](#_Toc233347721)
 
 [CHƯƠNG 2: PHÂN TÍCH VÀ MÔ HÌNH HÓA YÊU CẦU [20](#chương-2-phân-tích-và-mô-hình-hóa-yêu-cầu)](#chương-2-phân-tích-và-mô-hình-hóa-yêu-cầu)
 
 [2.1. Yêu cầu chức năng [20](#yêu-cầu-chức-năng)](#yêu-cầu-chức-năng)
 
-[2.1.1. Yêu cầu chức năng nghiệp vụ [20](#_Toc233321810)](#_Toc233321810)
+[2.1.1. Yêu cầu chức năng nghiệp vụ [20](#_Toc233347724)](#_Toc233347724)
 
-[2.1.2. Yêu cầu chức năng hệ thống [31](#_Toc233321811)](#_Toc233321811)
+[2.1.2. Yêu cầu chức năng hệ thống [31](#_Toc233347725)](#_Toc233347725)
 
 [2.2. Yêu cầu phi chức năng / Yêu cầu chất lượng [33](#yêu-cầu-phi-chức-năng-yêu-cầu-chất-lượng)](#yêu-cầu-phi-chức-năng-yêu-cầu-chất-lượng)
 
@@ -148,25 +148,25 @@ Chúng em xin trân trọng cảm ơn!
 
 [3.2. Mô tả chi tiết các Use Case [37](#mô-tả-chi-tiết-các-use-case)](#mô-tả-chi-tiết-các-use-case)
 
-[3.2.1. Module tài khoản & xác thực [37](#_Toc233321816)](#_Toc233321816)
+[3.2.1. Module tài khoản & xác thực [37](#_Toc233347730)](#_Toc233347730)
 
-[3.2.2. Module sản phẩm & danh mục [49](#_Toc233321817)](#_Toc233321817)
+[3.2.2. Module sản phẩm & danh mục [49](#_Toc233347731)](#_Toc233347731)
 
-[3.2.3. Module đơn hàng và giỏ hàng [62](#_Toc233321818)](#_Toc233321818)
+[3.2.3. Module đơn hàng và giỏ hàng [62](#_Toc233347732)](#_Toc233347732)
 
-[3.2.4. Module đánh giá, voucher, wishlist, thống kê và nội dung [73](#_Toc233321819)](#_Toc233321819)
+[3.2.4. Module đánh giá, voucher, wishlist, thống kê và nội dung [73](#_Toc233347733)](#_Toc233347733)
 
 [3.3. Lược đồ tuần tự của một số use case chính [87](#lược-đồ-tuần-tự-của-một-số-use-case-chính)](#lược-đồ-tuần-tự-của-một-số-use-case-chính)
 
-[3.3.1. Use case 04 - Quên mật khẩu [87](#_Toc233321821)](#_Toc233321821)
+[3.3.1. Use case 04 - Quên mật khẩu [87](#_Toc233347735)](#_Toc233347735)
 
-[3.3.2. Use case 14 - Xem chi tiết sản phẩm [89](#_Toc233321822)](#_Toc233321822)
+[3.3.2. Use case 14 - Xem chi tiết sản phẩm [89](#_Toc233347736)](#_Toc233347736)
 
-[3.3.3. Usecase 15 - Thêm sản phẩm mới [90](#_Toc233321823)](#_Toc233321823)
+[3.3.3. Usecase 15 - Thêm sản phẩm mới [90](#_Toc233347737)](#_Toc233347737)
 
-[3.3.4. Usecase 17 - Thêm sản phẩm vào giỏ hàng [91](#_Toc233321824)](#_Toc233321824)
+[3.3.4. Usecase 17 - Thêm sản phẩm vào giỏ hàng [91](#_Toc233347738)](#_Toc233347738)
 
-[3.3.5. Usecase 20 - Đặt hàng và thanh toán [93](#_Toc233321825)](#_Toc233321825)
+[3.3.5. Usecase 20 - Đặt hàng và thanh toán [93](#_Toc233347739)](#_Toc233347739)
 
 [CHƯƠNG 4: THIẾT KẾ HỆ THỐNG [99](#chương-4-thiết-kế-hệ-thống)](#chương-4-thiết-kế-hệ-thống)
 
@@ -174,75 +174,123 @@ Chúng em xin trân trọng cảm ơn!
 
 [4.2. ERD [100](#erd)](#erd)
 
-[4.3. Thiết kế giao diện [101](#thiết-kế-giao-diện)](#thiết-kế-giao-diện)
+[4.2.1. Bảng activity_logs [100](#_Toc233347743)](#_Toc233347743)
 
-[CHƯƠNG 5: ÁP DỤNG MẪU THIẾT KẾ [102](#chương-5-áp-dụng-mẫu-thiết-kế)](#chương-5-áp-dụng-mẫu-thiết-kế)
+[4.2.2. Bảng addresses [101](#_Toc233347744)](#_Toc233347744)
 
-[5.1. Nhóm mẫu thiết kế khởi tạo (Creational Patterns) [102](#nhóm-mẫu-thiết-kế-khởi-tạo-creational-patterns)](#nhóm-mẫu-thiết-kế-khởi-tạo-creational-patterns)
+[4.2.3. Bảng banners [103](#_Toc233347745)](#_Toc233347745)
 
-[5.1.1. Singleton Pattern [102](#_Toc233321832)](#_Toc233321832)
+[4.2.4. Bảng cart_items [104](#_Toc233347746)](#_Toc233347746)
 
-[5.1.2. Builder Pattern [102](#_Toc233321833)](#_Toc233321833)
+[4.2.5. Bảng categories [104](#_Toc233347747)](#_Toc233347747)
 
-[5.1.3. Factory Method Pattern [103](#_Toc233321834)](#_Toc233321834)
+[4.2.6. Bảng checkout_sessions [105](#_Toc233347748)](#_Toc233347748)
 
-[5.2. Nhóm mẫu thiết kế cấu trúc (Structural Patterns) [103](#nhóm-mẫu-thiết-kế-cấu-trúc-structural-patterns)](#nhóm-mẫu-thiết-kế-cấu-trúc-structural-patterns)
+[4.2.7. Bảng collections [108](#_Toc233347749)](#_Toc233347749)
 
-[5.2.1. Adapter Pattern [103](#_Toc233321836)](#_Toc233321836)
+[4.2.8. Bảng inventory_reservations [109](#_Toc233347750)](#_Toc233347750)
 
-[5.2.2. Facade Pattern [103](#_Toc233321837)](#_Toc233321837)
+[4.2.9. membership_tiers [111](#_Toc233347751)](#_Toc233347751)
 
-[5.2.3. Composite Pattern [104](#_Toc233321838)](#_Toc233321838)
+[4.2.10. Bảng order_items [112](#_Toc233347752)](#_Toc233347752)
 
-[5.2.4. Proxy Pattern [104](#_Toc233321839)](#_Toc233321839)
+[4.2.11. order_status_histories [113](#order_status_histories)](#order_status_histories)
 
-[5.3. Nhóm mẫu thiết kế hành vi (Behavioral Patterns) [105](#nhóm-mẫu-thiết-kế-hành-vi-behavioral-patterns)](#nhóm-mẫu-thiết-kế-hành-vi-behavioral-patterns)
+[4.2.12. Bảng orders [114](#_Toc233347754)](#_Toc233347754)
 
-[5.3.1. State Pattern [105](#_Toc233321841)](#_Toc233321841)
+[4.2.13. Bảng payment_attemps [117](#_Toc233347755)](#_Toc233347755)
 
-[5.3.2. Strategy Pattern [105](#_Toc233321842)](#_Toc233321842)
+[4.2.14. Bảng payment [119](#_Toc233347756)](#_Toc233347756)
 
-[5.3.3. Observer Pattern [106](#_Toc233321843)](#_Toc233321843)
+[4.2.15. product_variants [120](#_Toc233347757)](#_Toc233347757)
 
-[5.3.4. Template Method Pattern [106](#_Toc233321844)](#_Toc233321844)
+[4.2.16. Bảng products [122](#_Toc233347758)](#_Toc233347758)
 
-[5.3.5. Command Pattern [106](#_Toc233321845)](#_Toc233321845)
+[4.2.17. Bảng review_images [124](#_Toc233347759)](#_Toc233347759)
 
-[5.3.6. Chain of Responsibility [107](#_Toc233321846)](#_Toc233321846)
+[4.2.18. Bảng reviews [125](#_Toc233347760)](#_Toc233347760)
 
-[5.3.7. Visitor Pattern [107](#_Toc233321847)](#_Toc233321847)
+[4.2.19. Bảng users [127](#_Toc233347761)](#_Toc233347761)
 
-[5.4. Các mẫu thiết kế kiến trúc & dữ liệu (Architecture & Data Patterns) [108](#các-mẫu-thiết-kế-kiến-trúc-dữ-liệu-architecture-data-patterns)](#các-mẫu-thiết-kế-kiến-trúc-dữ-liệu-architecture-data-patterns)
+[4.2.20. Bảng voucher_reservations [129](#_Toc233347762)](#_Toc233347762)
 
-[5.4.1. Reservation Pattern [108](#_Toc233321849)](#_Toc233321849)
+[4.2.21. Bảng vouchers [130](#_Toc233347763)](#_Toc233347763)
 
-[5.4.2. Repository Pattern [108](#_Toc233321850)](#_Toc233321850)
+[4.2.22. Bảng wishlist [132](#_Toc233347764)](#_Toc233347764)
 
-[5.4.3. Unit of Work Pattern [108](#_Toc233321851)](#_Toc233321851)
+[4.3. Thiết kế giao diện [133](#thiết-kế-giao-diện)](#thiết-kế-giao-diện)
 
-[5.4.4. Specification Pattern [109](#_Toc233321852)](#_Toc233321852)
+[4.3.1. Trang đăng nhập [133](#_Toc233347766)](#_Toc233347766)
 
-[5.4.5. DTO Pattern [109](#_Toc233321853)](#_Toc233321853)
+[4.3.2. Trang đăng ký [135](#_Toc233347767)](#_Toc233347767)
 
-[5.4.6. Policy Pattern [110](#_Toc233321854)](#_Toc233321854)
+[4.3.3. Trang quên mật khẩu [136](#_Toc233347768)](#_Toc233347768)
 
-[CHƯƠNG 6: CÀI ĐẶT VÀ KẾT QUẢ THỰC NGHIỆM [111](#chương-6-cài-đặt-và-kết-quả-thực-nghiệm)](#chương-6-cài-đặt-và-kết-quả-thực-nghiệm)
+[CHƯƠNG 5: ÁP DỤNG MẪU THIẾT KẾ [138](#chương-5-áp-dụng-mẫu-thiết-kế)](#chương-5-áp-dụng-mẫu-thiết-kế)
 
-[C. PHẦN KẾT LUẬN [112](#c.-phần-kết-luận)](#c.-phần-kết-luận)
+[5.1. Nhóm mẫu thiết kế khởi tạo (Creational Patterns) [138](#nhóm-mẫu-thiết-kế-khởi-tạo-creational-patterns)](#nhóm-mẫu-thiết-kế-khởi-tạo-creational-patterns)
 
-[1. Kết quả đạt được [112](#kết-quả-đạt-được)](#kết-quả-đạt-được)
+[5.1.1. Singleton Pattern [138](#_Toc233347771)](#_Toc233347771)
 
-[1.1. Về mặt kiến thức [112](#về-mặt-kiến-thức)](#về-mặt-kiến-thức)
+[5.1.2. Builder Pattern [138](#_Toc233347772)](#_Toc233347772)
 
-[1.2. Về mặt kỹ năng [112](#về-mặt-kỹ-năng)](#về-mặt-kỹ-năng)
+[5.1.3. Factory Method Pattern [139](#_Toc233347773)](#_Toc233347773)
 
-[1.3. Về mặt sản phẩm [113](#về-mặt-sản-phẩm)](#về-mặt-sản-phẩm)
+[5.2. Nhóm mẫu thiết kế cấu trúc (Structural Patterns) [139](#nhóm-mẫu-thiết-kế-cấu-trúc-structural-patterns)](#nhóm-mẫu-thiết-kế-cấu-trúc-structural-patterns)
 
-[2. Những mặt hạn chế [113](#những-mặt-hạn-chế)](#những-mặt-hạn-chế)
+[5.2.1. Adapter Pattern [139](#_Toc233347775)](#_Toc233347775)
 
-[3. Hướng phát triển tương lai [114](#hướng-phát-triển-tương-lai)](#hướng-phát-triển-tương-lai)
+[5.2.2. Facade Pattern [139](#_Toc233347776)](#_Toc233347776)
 
-[TÀI LIỆU THAM KHẢO [115](#_Toc233321863)](#_Toc233321863)
+[5.2.3. Composite Pattern [140](#_Toc233347777)](#_Toc233347777)
+
+[5.2.4. Proxy Pattern [140](#_Toc233347778)](#_Toc233347778)
+
+[5.3. Nhóm mẫu thiết kế hành vi (Behavioral Patterns) [141](#nhóm-mẫu-thiết-kế-hành-vi-behavioral-patterns)](#nhóm-mẫu-thiết-kế-hành-vi-behavioral-patterns)
+
+[5.3.1. State Pattern [141](#_Toc233347780)](#_Toc233347780)
+
+[5.3.2. Strategy Pattern [141](#_Toc233347781)](#_Toc233347781)
+
+[5.3.3. Observer Pattern [142](#_Toc233347782)](#_Toc233347782)
+
+[5.3.4. Template Method Pattern [142](#_Toc233347783)](#_Toc233347783)
+
+[5.3.5. Command Pattern [142](#_Toc233347784)](#_Toc233347784)
+
+[5.3.6. Chain of Responsibility [143](#_Toc233347785)](#_Toc233347785)
+
+[5.3.7. Visitor Pattern [143](#_Toc233347786)](#_Toc233347786)
+
+[5.4. Các mẫu thiết kế kiến trúc & dữ liệu (Architecture & Data Patterns) [144](#các-mẫu-thiết-kế-kiến-trúc-dữ-liệu-architecture-data-patterns)](#các-mẫu-thiết-kế-kiến-trúc-dữ-liệu-architecture-data-patterns)
+
+[5.4.1. Reservation Pattern [144](#_Toc233347788)](#_Toc233347788)
+
+[5.4.2. Repository Pattern [144](#_Toc233347789)](#_Toc233347789)
+
+[5.4.3. Unit of Work Pattern [144](#_Toc233347790)](#_Toc233347790)
+
+[5.4.4. Specification Pattern [145](#_Toc233347791)](#_Toc233347791)
+
+[5.4.5. DTO Pattern [145](#_Toc233347792)](#_Toc233347792)
+
+[5.4.6. Policy Pattern [146](#_Toc233347793)](#_Toc233347793)
+
+[C. PHẦN KẾT LUẬN [147](#c.-phần-kết-luận)](#c.-phần-kết-luận)
+
+[1. Kết quả đạt được [147](#kết-quả-đạt-được)](#kết-quả-đạt-được)
+
+[1.1. Về mặt kiến thức [147](#về-mặt-kiến-thức)](#về-mặt-kiến-thức)
+
+[1.2. Về mặt kỹ năng [147](#về-mặt-kỹ-năng)](#về-mặt-kỹ-năng)
+
+[1.3. Về mặt sản phẩm [148](#về-mặt-sản-phẩm)](#về-mặt-sản-phẩm)
+
+[2. Những mặt hạn chế [148](#những-mặt-hạn-chế)](#những-mặt-hạn-chế)
+
+[3. Hướng phát triển tương lai [149](#hướng-phát-triển-tương-lai)](#hướng-phát-triển-tương-lai)
+
+[TÀI LIỆU THAM KHẢO [150](#_Toc233347801)](#_Toc233347801)
 
 # DANH MỤC HÌNH ẢNH {#danh-mục-hình-ảnh .P1}
 
@@ -280,43 +328,35 @@ Chúng em xin trân trọng cảm ơn!
 
 [Hình 1. 17. Hình ảnh gợi ý sản phẩm dựa trên nhiều tiêu chí trên website coolmate.me [17](#_Toc233321718)](#_Toc233321718)
 
-[Hình 3. 1. Usecase tổng quát của hệ thống [29](#_Toc232496327)](#_Toc232496327)
+[Hình 3. 1. Usecase tổng quát của hệ thống [36](#_Toc232496327)](#_Toc232496327)
 
-[Hình 3. 2. Usecase chi tiết module quản lý đơn hàng [30](#_Toc232496328)](#_Toc232496328)
+[Hình 3. 2. Sequence digram tổng quát cho use case 04 - quên mật khẩu [88](#_Toc232496334)](#_Toc232496334)
 
-[Hình 3. 3. Usecase chi tiết module quản lý sản phẩm [30](#_Toc232496329)](#_Toc232496329)
+[Hình 3. 3. Sequence Diagram Require reset password [88](#_Toc232496472)](#_Toc232496472)
 
-[Hình 3. 4. Usecase chi tiết module đặt hàng [31](#_Toc232496330)](#_Toc232496330)
+[Hình 3. 4. Sequence Diagram Reset password [89](#_Toc232496473)](#_Toc232496473)
 
-[Hình 3. 5. Usecase chi tiết module quản lý người dùng [31](#_Toc232496331)](#_Toc232496331)
+[Hình 3. 5. Sequence diagram cho use case 14 - xem chi tiết sản phẩm [90](#_Toc232496335)](#_Toc232496335)
 
-[Hình 3. 6. Usecase chi tiết module về tài khoản [32](#_Toc232496332)](#_Toc232496332)
+[Hình 3. 6. Sequence Diagram cho usecase Thêm sản phẩm mới [91](#_Toc232496336)](#_Toc232496336)
 
-[Hình 3. 7. Usecase chi tiết module thống kê [32](#_Toc232496333)](#_Toc232496333)
+[Hình 3. 7. Sequence Diagram cho thêm sản phẩm vào giỏ hàng - phần 1 [92](#_Toc232496510)](#_Toc232496510)
 
-[Hình 3. 8. Sequence digram tổng quát cho use case 04 - quên mật khẩu [80](#_Toc232496334)](#_Toc232496334)
+[Hình 3. 8. Sequence diagram cho thêm sản phẩm vào giỏ hàng - phần 2 [93](#_Toc232496511)](#_Toc232496511)
 
-[Hình 3. 9. Sequence diagram cho use case 14 - xem chi tiết sản phẩm [82](#_Toc232496335)](#_Toc232496335)
+[Hình 3. 9. Sequence Diagram cho use case đặt hành - phần 1 [94](#_Toc232496565)](#_Toc232496565)
 
-[Hình 3. 10. Sequence Diagram cho usecase Thêm sản phẩm mới [83](#_Toc232496336)](#_Toc232496336)
+[Hình 3. 10. Sequence Diagram cho use case đặt hàng - phần 2 [95](#_Toc232496566)](#_Toc232496566)
 
-[Hình 3. 8. 1. Sequence Diagram Require reset password [80](#_Toc232496472)](#_Toc232496472)
+[Hình 3. 11. Sequence Diagram cho use case thanh toán - phần 1 [96](#_Toc232496567)](#_Toc232496567)
 
-[Hình 3. 8. 2. Sequence Diagram Reset password [81](#_Toc232496473)](#_Toc232496473)
+[Hình 3. 12. Sequence diagram cho use case thanh toán - phần 2 [97](#_Toc232496568)](#_Toc232496568)
 
-[Hình 3. 11. 1. Sequence Diagram cho thêm sản phẩm vào giỏ hàng - phần 1 [84](#_Toc232496510)](#_Toc232496510)
+[Hình 3. 13. Sequence Diagram cho use case thanh toán - phần 3 [98](#_Toc232496569)](#_Toc232496569)
 
-[Hình 3. 11. 2. Sequence diagram cho thêm sản phẩm vào giỏ hàng - phần 2 [85](#_Toc232496511)](#_Toc232496511)
+[Hình 4. 1. Class Diagram cho usecase [98](#_Toc233347899)](#_Toc233347899)
 
-[Hình 3. 12. 1. Sequence Diagram cho use case đặt hành - phần 1 [86](#_Toc232496565)](#_Toc232496565)
-
-[Hình 3. 12. 2. Sequence Diagram cho use case đặt hàng - phần 2 [87](#_Toc232496566)](#_Toc232496566)
-
-[Hình 3. 12. 3. Sequence Diagram cho use case thanh toán - phần 1 [88](#_Toc232496567)](#_Toc232496567)
-
-[Hình 3. 12. 4. Sequence diagram cho use case thanh toán - phần 2 [89](#_Toc232496568)](#_Toc232496568)
-
-[Hình 3. 12. 5. Sequence Diagram cho use case thanh toán - phần 3 [90](#_Toc232496569)](#_Toc232496569)
+[Hình 4. 2. ERD cho hệ thống [99](#_Toc233347900)](#_Toc233347900)
 
 # DANH MỤC BẢNG BIỂU {#danh-mục-bảng-biểu .P1}
 
@@ -325,6 +365,20 @@ Chúng em xin trân trọng cảm ơn!
 [Bảng 1. 2. Điểm hạn chế của YODY [12](#_Toc233321866)](#_Toc233321866)
 
 [Bảng 1. 3. Hạn chế của Coolmate [19](#_Toc233321867)](#_Toc233321867)
+
+[Bảng 2. 1. Bảng chức năng nghiệp vụ của Quản trị viên [22](#_Toc233347389)](#_Toc233347389)
+
+[Bảng 2. 2. Bảng chức năng nghiệp vụ của nhân viên cửa hàng [24](#_Toc233347390)](#_Toc233347390)
+
+[Bảng 2. 3. Bảng chức năng nghiệp vụ của Khách hàng đã đăng ký [27](#_Toc233347391)](#_Toc233347391)
+
+[Bảng 2. 4. Danh sách các quy định / công thức [30](#_Toc233347392)](#_Toc233347392)
+
+[Bảng 2. 5. Danh sách yêu cầu chức năng hệ thống [33](#_Toc233347393)](#_Toc233347393)
+
+[Bảng 2. 6. Danh sách yêu cầu chất lượng / phi chức năng [35](#_Toc233347394)](#_Toc233347394)
+
+#  {#section .P1}
 
 # A. PHẦN MỞ ĐẦU {#a.-phần-mở-đầu .P1}
 
@@ -385,7 +439,7 @@ Nhóm tiến hành khảo sát bằng phương pháp quan sát trực tiếp (di
 | 1   | YODY         | <https://yody.vn>     | Gia đình, nam nữ, trẻ em    |
 | 2   | Coolmate     | <https://coolmate.me> | Nam nữ, phong cách tối giản |
 
-[]{#_Toc233321865 .anchor}Bảng 1. 1. Danh sách hệ thống dùng để khảo sát
+[]{#_Toc233321865 .anchor}Bảng 1. . Danh sách hệ thống dùng để khảo sát
 
 Các tiêu chí khảo sát bao gồm: giao diện chính (trang chủ, trang danh mục, trang chi tiết sản phẩm). Các tính năng dành cho khách hàng (người dùng cuối). Các tính năng hỗ trợ mua sắm (tìm kiếm, lọc, giỏ hàng, thanh toán). Chính sách bán hàng (đổi trả, giao hàng, bảo hành). Tính năng nổi bật và điểm hạn chế.
 
@@ -393,11 +447,11 @@ Các tiêu chí khảo sát bao gồm: giao diện chính (trang chủ, trang da
 
 YODY là một trong những chuỗi thời trang phổ thông lớn nhất Việt Nam, với hệ thống hơn 272 cửa hàng trên toàn quốc. Website yody.vn đóng vai trò là kênh bán hàng trực tuyến chính thức, tích hợp chặt chẽ với hệ thống cửa hàng vật lý theo mô hình omni-channel (bán hàng đa kênh). Địa chỉ website: <https://yody.vn>. Đối tượng khách hàng: Nam, nữ, trẻ em, gia đình. Về mô hình kinh doanh thì là thương hiệu tự sản xuất -- bán hàng trực tiếp (D2C). Một số đặc trưng có thể thấy là ứng dụng công nghệ vải mới (Nano, Bamboo, Café), phân khúc giá tầm trung.
 
-[]{#_Toc233321797 .anchor}1.3.1. Trang chủ (Homepage)
+[]{#_Toc233347711 .anchor}1.3.1. Trang chủ (Homepage)
 
 <figure>
 <img src="media/image2.png" style="width:6.34537in;height:2.67149in" alt="A screenshot of a website Description automatically generated" />
-<figcaption><p><span id="_Toc233321702" class="anchor"></span>Hình 1. 1. Homepage của website yody.vn</p></figcaption>
+<figcaption><p><span id="_Toc233321702" class="anchor"></span>Hình 1. . Homepage của website yody.vn</p></figcaption>
 </figure>
 
 <figure>
@@ -412,28 +466,28 @@ YODY là một trong những chuỗi thời trang phổ thông lớn nhất Vi�
 
 <figure>
 <img src="media/image5.png" style="width:6.56367in;height:3.09301in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p><span id="_Toc233321705" class="anchor"></span>Hình 1. 4. Footer của website yody.vn</p></figcaption>
+<figcaption><p><span id="_Toc233321705" class="anchor"></span>Hình 1. . Footer của website yody.vn</p></figcaption>
 </figure>
 
 Về mặt thiết kế thì sử dụng giao diện hiện đại, sử dụng tông màu nhận diện thương hiệu (vàng -- xanh dương), bố cục rõ ràng. Banner chính với Slider quảng cáo với hình ảnh bắt mắt, cập nhật bộ sưu tập mới và chương trình khuyến mãi.
 
 Thanh điều hướng (Navigation Bar): phân chia theo đối tượng bao gồm Nam -- Nữ -- Trẻ em, kèm theo các liên kết nhanh: \*BST (Bộ sưu tập), Cửa hàng, Tin tức, Mới về, Ưu đãi -50%, Đồng phục\*. Mỗi danh mục chính có menu con chi tiết (Áo polo, Áo khoác, Áo chống nắng, Quần,\...). Phần nội dung chính: Hiển thị sản phẩm mới, sản phẩm bán chạy, bộ sưu tập theo mùa. Footer: Thông tin công ty, chính sách, liên kết mạng xã hội, kênh hỗ trợ.
 
-[]{#_Toc233321798 .anchor}1.3.2. Trang danh mục sản phẩm
+[]{#_Toc233347712 .anchor}1.3.2. Trang danh mục sản phẩm
 
 <figure>
 <img src="media/image6.png" style="width:6.2931in;height:3.42978in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p><span id="_Toc233321706" class="anchor"></span>Hình 1. 5. Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (1)</p></figcaption>
+<figcaption><p><span id="_Toc233321706" class="anchor"></span>Hình 1. . Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image7.png" style="width:6.27129in;height:3.2103in" alt="A screenshot of a website Description automatically generated" />
-<figcaption><p><span id="_Toc233321707" class="anchor"></span>Hình 1. 6. Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (2)</p></figcaption>
+<figcaption><p><span id="_Toc233321707" class="anchor"></span>Hình 1. . Sản phẩm thuộc danh mục áo polo nam trên website yody.vn (2)</p></figcaption>
 </figure>
 
 Hiển thị danh sách sản phẩm dạng lưới (grid), mỗi sản phẩm có hình ảnh, tên, giá gốc, giá giảm. Về bộ lọc (Filter) thì hỗ trợ lọc theo kích cỡ, màu sắc, chất liệu, mức giá, kiểu dáng. Sắp xếp (Sort): Theo giá (tăng/giảm), mới nhất, ưu đãi.
 
-[]{#_Toc233321799 .anchor}1.3.3. Trang chi tiết sản phẩm
+[]{#_Toc233347713 .anchor}1.3.3. Trang chi tiết sản phẩm
 
 <figure>
 <img src="media/image8.png" style="width:6.33177in;height:3.42209in" alt="A person smiling in a yellow shirt Description automatically generated" />
@@ -449,11 +503,11 @@ Hình ảnh sản phẩm có chất lượng cao, nhiều góc chụp, có ảnh
 
 Có bảng quy đổi kích cỡ (Size Guide) để hướng dẫn chọn size cho phù hợp theo giới tính, loại đồ. Kiểm tra tồn kho với tính năng "Xem cửa hàng còn sản phẩm" giúp kiểm tra tồn kho tại cửa hàng gần nhất.
 
-[]{#_Toc233321800 .anchor}1.3.4. Tính năng nổi bật
+[]{#_Toc233347714 .anchor}1.3.4. Tính năng nổi bật
 
 Công nghệ vải đặc trưng**:** YODY chú trọng giới thiệu công nghệ vải (Nano, Bamboo, Café, Pima) ngay trên trang sản phẩm, giúp khách hàng hiểu rõ chất liệu trước khi mua. Kết nối đa kênh (Omni-channel): Website liên kết trực tiếp với hệ thống cửa hàng vật lý, hỗ trợ mua online - nhận tại cửa hàng, kiểm tra tồn kho tại cửa hàng gần nhất. Chính sách đổi trả linh hoạt: Cho phép đổi trả trong 15 ngày, khách hàng được thử đồ trước khi thanh toán với đơn hàng online.
 
-[]{#_Toc233321801 .anchor}1.3.5. Điểm hạn chế
+[]{#_Toc233347715 .anchor}1.3.5. Điểm hạn chế
 
 | STT | Điểm hạn chế | Mô tả chi tiết |
 |----|----|----|
@@ -463,55 +517,55 @@ Công nghệ vải đặc trưng**:** YODY chú trọng giới thiệu công ngh
 | 4 | Chưa có tính năng gợi ý bằng AI | Chưa phân tích hành vi cá nhân để gợi ý sản phẩm phù hợp |
 | 5 | Tính năng so sánh sản phẩm chưa có | Khách hàng không thể so sánh trực tiếp hai hoặc nhiều sản phẩm cùng lúc |
 
-[]{#_Toc233321866 .anchor}Bảng 1. 2. Điểm hạn chế của YODY
+[]{#_Toc233321866 .anchor}Bảng 1. . Điểm hạn chế của YODY
 
 # 1.4. Khảo sát hệ thống COOLMATE (coolmate.me) {#khảo-sát-hệ-thống-coolmate-coolmate.me .P2}
 
 Coolmate là thương hiệu thời trang nổi bật tại Việt Nam, hoạt động theo mô hình D2C (Direct-to-Consumer) - tự thiết kế, sản xuất và bán hàng trực tiếp đến người tiêu dùng qua website. Coolmate được biết đến với phong cách tối giản, tập trung vào trải nghiệm mua sắm tiện lợi và nhanh chóng. Địa chỉ website: <https://coolmate.me>. Về đối tượng khách hàng thì trước đây chủ yếu là hướng đến nam giới, hiện tại đã mở thêm cho nữ giới. Mô hình kinh doanh thực hiện theo D2C -- Tự sản xuất, bán trực tiếp. Đặc trưng: Lấy công nghệ làm cốt lõi vận hành, chính sách đổi trả 60 ngày đột phá.
 
-[]{#_Toc233321803 .anchor}1.4.1. Trang chủ (Homepage)
+[]{#_Toc233347717 .anchor}1.4.1. Trang chủ (Homepage)
 
 <figure>
 <img src="media/image10.png" style="width:6.30563in;height:3.4254in" alt="A person in shorts and a person in shorts Description automatically generated" />
-<figcaption><p><span id="_Toc233321710" class="anchor"></span>Hình 1. 9. Hình ảnh homepage trên website coolmate.me (1)</p></figcaption>
+<figcaption><p><span id="_Toc233321710" class="anchor"></span>Hình 1. . Hình ảnh homepage trên website coolmate.me (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image11.png" style="width:6.29358in;height:3.41615in" alt="A screenshot of a website Description automatically generated" />
-<figcaption><p><span id="_Toc233321711" class="anchor"></span>Hình 1. 10. Hình ảnh homepage trên website coolmate.me (2)</p></figcaption>
+<figcaption><p><span id="_Toc233321711" class="anchor"></span>Hình 1. . Hình ảnh homepage trên website coolmate.me (2)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image12.png" style="width:6.5in;height:3.42361in" alt="A screenshot of a person&#39;s body Description automatically generated" />
-<figcaption><p><span id="_Toc233321712" class="anchor"></span>Hình 1. 11. Hình ảnh homepage trên website coolmate.me (3)</p></figcaption>
+<figcaption><p><span id="_Toc233321712" class="anchor"></span>Hình 1. . Hình ảnh homepage trên website coolmate.me (3)</p></figcaption>
 </figure>
 
 Về mặt thiết kế thì sử dụng phong cách tối giản (minimalist), bố cục sạch sẽ, hình ảnh sản phẩm chất lượng cao, tốc độ tải trang nhanh. Thanh trên cùng (Top bar): Bên trái có các kênh thương hiệu (Về Coolmate, CXP by Coolmate, Care & Share); bên phải có tiện ích (CoolClub, Cửa hàng, Blog, CSKH, Đăng nhập, chuyển đổi ngôn ngữ VN/EN). Thanh điều hướng chính (Main Nav): Logo ở giữa bên trái, các danh mục chính: NEW, NAM, NỮ, THỂ THAO, PHỤ KIỆN, SALE (-50%). Widget tương tác: Nút gọi điện / Zalo Chat nổi và widget hỗ trợ khách hàng ở góc phải dưới.
 
-[]{#_Toc233321804 .anchor}1.4.2. Trang danh mục sản phẩm
+[]{#_Toc233347718 .anchor}1.4.2. Trang danh mục sản phẩm
 
 <figure>
 <img src="media/image13.png" style="width:6.29316in;height:3.42495in" alt="A screenshot of a web page Description automatically generated" />
-<figcaption><p><span id="_Toc233321713" class="anchor"></span>Hình 1. 12. Hình ảnh danh mục áo polo nam trên website coolmate.me</p></figcaption>
+<figcaption><p><span id="_Toc233321713" class="anchor"></span>Hình 1. . Hình ảnh danh mục áo polo nam trên website coolmate.me</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image14.png" style="width:6.30487in;height:2.92826in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p><span id="_Toc233321714" class="anchor"></span>Hình 1. 13. Hình ảnh các sản phẩm thuộc danh mục áo polo nam trên website coolmate.me</p></figcaption>
+<figcaption><p><span id="_Toc233321714" class="anchor"></span>Hình 1. . Hình ảnh các sản phẩm thuộc danh mục áo polo nam trên website coolmate.me</p></figcaption>
 </figure>
 
 Hiển thị dạng lưới, mỗi sản phẩm có hình ảnh rõ ràng, tên sản phẩm, giá, và các biến thể màu sắc. Về bộ lọc thì có phù hợp với (Daily, Home, Active, Office), giới tính, size (XS đến 4XL), màu sắc, khoảng giá. Có tính năng sắp xếp theo: bán chạy, mới nhất, giá tăng dần, giá giảm dần. Filter tags: Hiển thị tag bộ lọc đang áp dụng, có nút "Xóa lọc" nhanh.
 
-[]{#_Toc233321805 .anchor}1.4.3. Trang chi tiết sản phẩm
+[]{#_Toc233347719 .anchor}1.4.3. Trang chi tiết sản phẩm
 
 <figure>
 <img src="media/image15.png" style="width:6.50456in;height:3.25332in" alt="A person in a black shirt Description automatically generated" />
-<figcaption><p><span id="_Toc233321715" class="anchor"></span>Hình 1. 14. Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (1)</p></figcaption>
+<figcaption><p><span id="_Toc233321715" class="anchor"></span>Hình 1. . Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (1)</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image16.png" style="width:6.42438in;height:2.53429in" alt="A person in a blue shirt Description automatically generated" />
-<figcaption><p><span id="_Toc233321716" class="anchor"></span>Hình 1. 15. Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (2)</p></figcaption>
+<figcaption><p><span id="_Toc233321716" class="anchor"></span>Hình 1. . Hình ảnh trang chi tiết sản phẩm trên website coolmate.me (2)</p></figcaption>
 </figure>
 
 Về mặt hình ảnh thì có chất lượng cao, gallery sản phẩm đa góc. Thông tin chi tiết: giá, chỉ báo freeship, voucher khả dụng (Giảm 50k, 150k, 10%, 12%). Bên cạnh đó có tích hợp CoolClub để hiển thị số CoolCash được hoàn khi mua (ví dụ: "Được hoàn lên đến 21.000 CoolCash").
@@ -520,23 +574,23 @@ Ta có thể chọn size và màu theo nhu cầu bằng nút màu sắc trực q
 
 <figure>
 <img src="media/image17.png" style="width:6.25918in;height:3.43032in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p><span id="_Toc233321717" class="anchor"></span>Hình 1. 16. Sticky Buy Bar và vùng đánh giá sản phẩm trên website coolmate.me</p></figcaption>
+<figcaption><p><span id="_Toc233321717" class="anchor"></span>Hình 1. . Sticky Buy Bar và vùng đánh giá sản phẩm trên website coolmate.me</p></figcaption>
 </figure>
 
 Có 1 tính năng khá hay là Sticky Buy Bar đó là khi ta cuộn qua khối mua hàng, thanh mua hàng cố định xuất hiện ở trên cùng cho phép chọn size và thêm giỏ hàng mà không cần cuộn lại. Có phần đánh giá sản phẩm với hệ thống review nâng cao - lọc theo số sao (1-5), lọc review đã phản hồi, lọc review có ảnh.
 
 <figure>
 <img src="media/image18.png" style="width:6.28106in;height:3.41984in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p><span id="_Toc233321718" class="anchor"></span>Hình 1. 17. Hình ảnh gợi ý sản phẩm dựa trên nhiều tiêu chí trên website coolmate.me</p></figcaption>
+<figcaption><p><span id="_Toc233321718" class="anchor"></span>Hình 1. . Hình ảnh gợi ý sản phẩm dựa trên nhiều tiêu chí trên website coolmate.me</p></figcaption>
 </figure>
 
 Sản phẩm gợi ý: Carousel "GỢI Ý SẢN PHẨM" dựa trên lịch sử xem / tiêu chí động.
 
-[]{#_Toc233321806 .anchor}1.4.4. Tính năng nổi bật
+[]{#_Toc233347720 .anchor}1.4.4. Tính năng nổi bật
 
 Sticky Buy Bar: khi người dùng cuộn qua phần mua hàng, một thanh mua hàng cố định xuất hiện ở đầu trang, cho phép chọn size và thêm giỏ hàng ngay - trải nghiệm mua sắm liền mạch, không cần cuộn lại. Hệ thống review nâng cao cho phép lọc đánh giá theo số sao, xem review có ảnh thực tế, xem review đã được shop phản hồi - giúp khách hàng đưa ra quyết định mua hàng tốt hơn. CoolClub & CoolCash là chương trình khách hàng thân thiết tích hợp xuyên suốt hành trình mua sắm, hiển thị chính xác số CoolCash được hoàn trên mỗi sản phẩm. Chính sách đổi trả 60 ngày cho phép đổi trả trong 60 ngày với bất kỳ lý do gì, kể cả đã qua sử dụng - chính sách đột phá giúp xóa bỏ rào cản tâm lý khi mua sắm online. Tìm kiếm thông minh với modal tìm kiếm hiển thị từ khóa phổ biến, danh mục, và sản phẩm gợi ý ngay khi nhấp vào thanh tìm kiếm, trước khi người dùng gõ bất kỳ ký tự nào. Voucher hiển thị trên sản phẩm: Trang chi tiết sản phẩm hiển thị rõ các voucher khả dụng (Giảm 50k, 150k,\...) giúp khách hàng biết ngay ưu đãi có thể áp dụng.
 
-[]{#_Toc233321807 .anchor}1.4.5. Hạn chế
+[]{#_Toc233347721 .anchor}1.4.5. Hạn chế
 
 | **STT** | **Điểm hạn chế** | **Mô tả chi tiết** |
 |----|----|----|
@@ -544,13 +598,13 @@ Sticky Buy Bar: khi người dùng cuộn qua phần mua hàng, một thanh mua 
 | 2 | Tính năng tìm kiếm vẫn còn gây khó chịu cho người dùng | Khi nhập từ khóa và nhấn enter trong bàn phím thì không hiển thị được |
 | 3 | Chưa có tính năng so sánh sản phẩm | Không hỗ trợ so sánh trực tiếp nhiều sản phẩm |
 
-[]{#_Toc233321867 .anchor}Bảng 1. 3. Hạn chế của Coolmate
+[]{#_Toc233321867 .anchor}Bảng 1. . Hạn chế của Coolmate
 
 # CHƯƠNG 2: PHÂN TÍCH VÀ MÔ HÌNH HÓA YÊU CẦU {#chương-2-phân-tích-và-mô-hình-hóa-yêu-cầu .P1}
 
 # 2.1. Yêu cầu chức năng {#yêu-cầu-chức-năng .P2}
 
-[]{#_Toc233321810 .anchor}2.1.1. Yêu cầu chức năng nghiệp vụ
+[]{#_Toc233347724 .anchor}2.1.1. Yêu cầu chức năng nghiệp vụ
 
 **Lưu trữ các thông tin về:**
 
@@ -621,7 +675,9 @@ Xuất hóa đơn điện tử cho khách hàng.
 | 3 | Thống kê sản phẩm bán chạy | Tra cứu, Kết xuất | Top SP theo số lượng bán và doanh thu | BM2 |
 | 4 | Báo cáo khách hàng thân thiết | Kết xuất | Danh sách KH theo hạng, điểm tích lũy | BM5 |
 
-Bảng 2. 1. Bảng chức năng nghiệp vụ của Quản trị viên
+[]{#_Toc233347389 .anchor}Bảng 2. . Bảng chức năng nghiệp vụ của Quản trị viên
+
+Bên cạnh các chức năng trên thì admin cũng sẽ có toàn bộ quyền của staff.
 
 **Bộ phận: Nhân viên cửa hàng (Staff) - Mã: NV**
 
@@ -643,7 +699,7 @@ Bảng 2. 1. Bảng chức năng nghiệp vụ của Quản trị viên
 | 14 | Quản lý thông tin khách hàng | Tra cứu | Xem, tìm kiếm, phân hạng thành viên |  |
 | 15 | Quản lý banner / slider trang chủ | Lưu trữ | Upload hình, đặt link, thứ tự, thời gian hiển thị |  |
 
-Bảng 2. 2. Bảng chức năng nghiệp vụ của nhân viên cửa hàng
+[]{#_Toc233347390 .anchor}Bảng 2. . Bảng chức năng nghiệp vụ của nhân viên cửa hàng
 
 **Bộ phận: Khách hàng đã đăng ký - Mã: KH**
 
@@ -668,7 +724,7 @@ Bảng 2. 2. Bảng chức năng nghiệp vụ của nhân viên cửa hàng
 | 17 | Xem điểm tích lũy và hạng thành viên | Tra cứu | Hiển thị điểm, hạng, ưu đãi của hạng |  |
 | 18 | Xem sản phẩm gợi ý | Tra cứu | Dựa trên lịch sử xem/mua |  |
 
-Bảng 2. 3. Bảng chức năng nghiệp vụ của Khách hàng đã đăng ký
+[]{#_Toc233347391 .anchor}Bảng 2. . Bảng chức năng nghiệp vụ của Khách hàng đã đăng ký
 
 **Bộ phận: Khách vãng lai (chưa đăng ký) - Mã: KVL**
 
@@ -682,7 +738,7 @@ Bảng 2. 3. Bảng chức năng nghiệp vụ của Khách hàng đã đăng k�
 | 6 | Thêm SP vào giỏ hàng (session-based) | Lưu trữ | Giỏ hàng lưu trên session/localStorage |  |
 | 7 | Đăng ký tài khoản | Lưu trữ | QĐ16 |  |
 
-Bảng 3. 4. Bảng chức năng nghiệp vụ của Khách vãng lai
+Bảng 3. . Bảng chức năng nghiệp vụ của Khách vãng lai
 
 **Bảng Quy định / Công thức liên quan**
 
@@ -707,7 +763,7 @@ Bảng 3. 4. Bảng chức năng nghiệp vụ của Khách vãng lai
 | 17 | CT1 | Công thức tính tổng đơn hàng | Tổng tiền = Σ(đơn giá × số lượng) + phí vận chuyển -- giá trị voucher (nếu có) |
 | 18 | CT2 | Công thức giảm giá voucher | Nếu loại %: Giảm = Tổng SP × %. Nếu loại cố định: Giảm = Giá trị voucher. Giảm tối đa không vượt tổng SP |
 
-Bảng 2. 4. Danh sách các quy định / công thức
+[]{#_Toc233347392 .anchor}Bảng 2. . Danh sách các quy định / công thức
 
 **Bảng các biểu mẫu**
 
@@ -743,7 +799,7 @@ Bảng 2. 4. Danh sách các quy định / công thức
 |-------|--------------|------|---------------|---------------|-------------|
 | KH001 | Nguyễn Văn A | Vàng | 1.250         | 12.500.000    | 15          |
 
-[]{#_Toc233321811 .anchor}2.1.2. Yêu cầu chức năng hệ thống
+[]{#_Toc233347725 .anchor}2.1.2. Yêu cầu chức năng hệ thống
 
 | STT | Chức năng | Mô tả chi tiết |
 |----|----|----|
@@ -760,7 +816,7 @@ Bảng 2. 4. Danh sách các quy định / công thức
 | 11 | Tự động cập nhật trạng thái đơn hàng | Liên kết API đơn vị vận chuyển để tự động cập nhật trạng thái giao hàng |
 | 12 | Tự động gửi nhắc nhở đánh giá | Sau khi đơn hàng hoàn thành 3 ngày, tự động gửi email mời khách đánh giá sản phẩm |
 
-Bảng 2. 5. Danh sách yêu cầu chức năng hệ thống
+[]{#_Toc233347393 .anchor}Bảng 2. . Danh sách yêu cầu chức năng hệ thống
 
 # 2.2. Yêu cầu phi chức năng / Yêu cầu chất lượng {#yêu-cầu-phi-chức-năng-yêu-cầu-chất-lượng .P2}
 
@@ -779,7 +835,7 @@ Bảng 2. 5. Danh sách yêu cầu chức năng hệ thống
 | 11 | Dễ thao tác cho Admin | Tiện dụng | Dashboard quản trị trực quan, thao tác CRUD đơn giản, hỗ trợ bulk actions (cập nhật nhiều SP cùng lúc) |
 | 12 | Tái sử dụng mã nguồn | Tiến hóa | Kiến trúc component-based, code modular, có thể tái sử dụng cho các dự án tương tự |
 
-Bảng 2. 6. Danh sách yêu cầu chất lượng / phi chức năng
+[]{#_Toc233347394 .anchor}Bảng 2. . Danh sách yêu cầu chất lượng / phi chức năng
 
 # CHƯƠNG 3: MÔ HÌNH HÓA {#chương-3-mô-hình-hóa .P1}
 
@@ -787,12 +843,12 @@ Bảng 2. 6. Danh sách yêu cầu chất lượng / phi chức năng
 
 <figure>
 <img src="media/image19.png" style="width:6.26667in;height:7.75581in" />
-<figcaption><p><span id="_Toc232496327" class="anchor"></span>Hình 3. 1. Usecase tổng quát của hệ thống</p></figcaption>
+<figcaption><p><span id="_Toc232496327" class="anchor"></span>Hình 3. . Usecase tổng quát của hệ thống</p></figcaption>
 </figure>
 
 # 3.2. Mô tả chi tiết các Use Case {#mô-tả-chi-tiết-các-use-case .P2}
 
-[]{#_Toc233321816 .anchor}3.2.1. Module tài khoản & xác thực
+[]{#_Toc233347730 .anchor}3.2.1. Module tài khoản & xác thực
 
 UC-01: Đăng ký tài khoản
 
@@ -1056,7 +1112,7 @@ UC-09: Xem điểm tích lũy và hạng thành viên
 |----|----|----|
 | 1 | Truy cập "Hạng thành viên" trong trang cá nhân | Hiển thị: điểm tích lũy hiện tại, hạng hiện tại (Đồng/Bạc/Vàng/Kim cương), ưu đãi của hạng, điểm cần để lên hạng tiếp theo |
 
-[]{#_Toc233321817 .anchor}3.2.2. Module sản phẩm & danh mục
+[]{#_Toc233347731 .anchor}3.2.2. Module sản phẩm & danh mục
 
 UC-10: Xem danh sách sản phẩm theo danh mục
 
@@ -1330,7 +1386,7 @@ UC-16e: Cập nhật tồn kho (Staff)
 | 2 | Nhập số lượng tồn kho mới cho biến thể |  |
 | 3 | Nhấn "Lưu" | Cập nhật tồn kho. Nếu tồn \< 10, hiển thị cảnh báo \"Sản phẩm sắp hết hàng\" |
 
-[]{#_Toc233321818 .anchor}3.2.3. Module đơn hàng và giỏ hàng
+[]{#_Toc233347732 .anchor}3.2.3. Module đơn hàng và giỏ hàng
 
 UC-17: Thêm sản phẩm vào giỏ hàng
 
@@ -1539,7 +1595,7 @@ UC-23: Quản lý đơn hàng (Staff)
 |----|----|----|
 | 3b | Cập nhật trạng thái không hợp lệ (ví dụ: Hoàn thành → Đang xử lý) | Hiển thị lỗi \"Không thể chuyển từ trạng thái {A} sang {B}\" |
 
-[]{#_Toc233321819 .anchor}3.2.4. Module đánh giá, voucher, wishlist, thống kê và nội dung
+[]{#_Toc233347733 .anchor}3.2.4. Module đánh giá, voucher, wishlist, thống kê và nội dung
 
 UC-24: Đánh giá sản phẩm
 
@@ -1799,38 +1855,38 @@ UC-35: Quản lý thông tin khách hàng (Staff)
 
 # 3.3. Lược đồ tuần tự của một số use case chính {#lược-đồ-tuần-tự-của-một-số-use-case-chính .P2}
 
-[]{#_Toc233321821 .anchor}3.3.1. Use case 04 - Quên mật khẩu
+[]{#_Toc233347735 .anchor}3.3.1. Use case 04 - Quên mật khẩu
 
 <figure>
 <img src="media/image20.png" style="width:6.30233in;height:3.98958in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p><span id="_Toc232496334" class="anchor"></span>Hình 3. 2. Sequence digram tổng quát cho use case 04 - quên mật khẩu</p></figcaption>
+<figcaption><p><span id="_Toc232496334" class="anchor"></span>Hình 3. . Sequence digram tổng quát cho use case 04 - quên mật khẩu</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image21.png" style="width:6.30208in;height:3.84236in" alt="A diagram of a project Description automatically generated" />
-<figcaption><p><span id="_Toc232496472" class="anchor"></span>Hình 3. 3. Sequence Diagram Require reset password</p></figcaption>
+<figcaption><p><span id="_Toc232496472" class="anchor"></span>Hình 3. . Sequence Diagram Require reset password</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image22.png" style="width:6.31395in;height:6.63819in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p><span id="_Toc232496473" class="anchor"></span>Hình 3. 4. Sequence Diagram Reset password</p></figcaption>
+<figcaption><p><span id="_Toc232496473" class="anchor"></span>Hình 3. . Sequence Diagram Reset password</p></figcaption>
 </figure>
 
-[]{#_Toc233321822 .anchor}3.3.2. Use case 14 - Xem chi tiết sản phẩm
+[]{#_Toc233347736 .anchor}3.3.2. Use case 14 - Xem chi tiết sản phẩm
 
 <figure>
 <img src="media/image23.png" style="width:6.5in;height:4.62431in" alt="A diagram with many blue squares Description automatically generated with medium confidence" />
-<figcaption><p><span id="_Toc232496335" class="anchor"></span>Hình 3. 5. Sequence diagram cho use case 14 - xem chi tiết sản phẩm</p></figcaption>
+<figcaption><p><span id="_Toc232496335" class="anchor"></span>Hình 3. . Sequence diagram cho use case 14 - xem chi tiết sản phẩm</p></figcaption>
 </figure>
 
-[]{#_Toc233321823 .anchor}3.3.3. Usecase 15 - Thêm sản phẩm mới
+[]{#_Toc233347737 .anchor}3.3.3. Usecase 15 - Thêm sản phẩm mới
 
 <figure>
 <img src="media/image24.png" style="width:6.5in;height:5.92569in" alt="A screenshot of a computer screen Description automatically generated" />
 <figcaption><p><span id="_Toc232496336" class="anchor"></span>Hình 3. 6. Sequence Diagram cho usecase Thêm sản phẩm mới</p></figcaption>
 </figure>
 
-[]{#_Toc233321824 .anchor}3.3.4. Usecase 17 - Thêm sản phẩm vào giỏ hàng
+[]{#_Toc233347738 .anchor}3.3.4. Usecase 17 - Thêm sản phẩm vào giỏ hàng
 
 <figure>
 <img src="media/image25.png" style="width:6.48472in;height:8.50943in" alt="A screen shot of a computer Description automatically generated" />
@@ -1839,35 +1895,35 @@ UC-35: Quản lý thông tin khách hàng (Staff)
 
 <figure>
 <img src="media/image26.png" style="width:6.31395in;height:8.47126in" alt="A screen shot of a diagram Description automatically generated" />
-<figcaption><p><span id="_Toc232496511" class="anchor"></span>Hình 3. 8. Sequence diagram cho thêm sản phẩm vào giỏ hàng - phần 2</p></figcaption>
+<figcaption><p><span id="_Toc232496511" class="anchor"></span>Hình 3. . Sequence diagram cho thêm sản phẩm vào giỏ hàng - phần 2</p></figcaption>
 </figure>
 
-[]{#_Toc233321825 .anchor}3.3.5. Usecase 20 - Đặt hàng và thanh toán
+[]{#_Toc233347739 .anchor}3.3.5. Usecase 20 - Đặt hàng và thanh toán
 
 ![A diagram of a computer
 Description automatically generated with medium confidence](media/image27.png){width="6.255813648293963in" height="7.931463254593176in"}
 
 <figure>
 <img src="media/image28.png" style="width:6.19767in;height:8.53819in" alt="A diagram of a project Description automatically generated" />
-<figcaption><p><span id="_Toc232496565" class="anchor"></span>Hình 3. 9. Sequence Diagram cho use case đặt hành - phần 1</p></figcaption>
+<figcaption><p><span id="_Toc232496565" class="anchor"></span>Hình 3. . Sequence Diagram cho use case đặt hành - phần 1</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image29.png" style="width:6.5in;height:6.4125in" alt="A screenshot of a computer Description automatically generated" />
-<figcaption><p><span id="_Toc232496566" class="anchor"></span>Hình 3. 10. Sequence Diagram cho use case đặt hàng - phần 2</p></figcaption>
+<figcaption><p><span id="_Toc232496566" class="anchor"></span>Hình 3. . Sequence Diagram cho use case đặt hàng - phần 2</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image30.png" style="width:6.30233in;height:5.54653in" alt="A diagram of a project Description automatically generated" />
-<figcaption><p><span id="_Toc232496567" class="anchor"></span>Hình 3. 11. Sequence Diagram cho use case thanh toán - phần 1</p></figcaption>
+<figcaption><p><span id="_Toc232496567" class="anchor"></span>Hình 3. . Sequence Diagram cho use case thanh toán - phần 1</p></figcaption>
 </figure>
 
 <figure>
 <img src="media/image31.png" style="width:6.5in;height:4.09028in" alt="A screenshot of a computer program Description automatically generated" />
-<figcaption><p><span id="_Toc232496568" class="anchor"></span>Hình 3. 12. Sequence diagram cho use case thanh toán - phần 2</p></figcaption>
+<figcaption><p><span id="_Toc232496568" class="anchor"></span>Hình 3. . Sequence diagram cho use case thanh toán - phần 2</p></figcaption>
 </figure>
 
-[]{#_Toc232496569 .anchor}Hình 3. 13. Sequence Diagram cho use case thanh toán - phần 3
+[]{#_Toc232496569 .anchor}Hình 3. . Sequence Diagram cho use case thanh toán - phần 3
 
 # CHƯƠNG 4: THIẾT KẾ HỆ THỐNG {#chương-4-thiết-kế-hệ-thống .P1}
 
@@ -1875,540 +1931,570 @@ Description automatically generated with medium confidence](media/image27.png){w
 
 <figure>
 <img src="media/image32.png" style="width:6.3in;height:5.35903in" alt="A computer screen shot of a computer Description automatically generated" />
-<figcaption><p>Hình 4. 1. Class Diagram cho usecase</p></figcaption>
+<figcaption><p><span id="_Toc233347899" class="anchor"></span>Hình 4. . Class Diagram cho usecase</p></figcaption>
 </figure>
 
 # 4.2. ERD {#erd .P2}
 
 <figure>
 <img src="media/image33.png" style="width:6.29137in;height:7.95283in" alt="A screenshot of a computer screen Description automatically generated" />
-<figcaption><p>Hình 4. 2. ERD cho hệ thống</p></figcaption>
+<figcaption><p><span id="_Toc233347900" class="anchor"></span>Hình 4. . ERD cho hệ thống</p></figcaption>
 </figure>
 
-### Bảng: `activity_logs`
+[]{#_Toc233347743 .anchor}4.2.1. Bảng activity_logs
 
-**Ý nghĩa**: Log hoạt động (yêu cầu hệ thống #9): đăng nhập, thay đổi dữ liệu, xử lý đơn hàng.
+Ý nghĩa: Ghi lại log hoạt động đăng nhập, thay đổi dữ liệu, xử lý đơn hàng.
 
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của activity_logs |
-| 2 | `user_id` | bigint | Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 3 | `action` | character | NOT NULL | Thông tin action |
-| 4 | `entity_type` | character | None | Thông tin entity_type |
-| 5 | `entity_id` | bigint | None | Thông tin entity_id |
-| 6 | `old_data` | jsonb | None | Thông tin old_data |
-| 7 | `new_data` | jsonb | None | Thông tin new_data |
-| 8 | `ip_address` | inet | None | Thông tin ip_address |
-| 9 | `user_agent` | text | None | Thông tin user_agent |
-| 10 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 0%" />
+<col style="width: 16%" />
+<col style="width: 19%" />
+<col style="width: 26%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th colspan="2">STT</th>
+<th>Tên Field</th>
+<th>Kiểu dữ liệu</th>
+<th>Ràng buộc</th>
+<th>Ý nghĩa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td colspan="2">id</td>
+<td>bigint</td>
+<td>NOT NULL, Khóa chính (PK)</td>
+<td>Mã định danh của activity_logs</td>
+</tr>
+<tr>
+<td>2</td>
+<td colspan="2">user_id</td>
+<td>bigint</td>
+<td>Khóa ngoại (FK -&gt; users(id))</td>
+<td>Mã tham chiếu đến users(id)</td>
+</tr>
+<tr>
+<td>3</td>
+<td colspan="2">action</td>
+<td>character</td>
+<td>NOT NULL</td>
+<td>Thông tin action</td>
+</tr>
+<tr>
+<td>4</td>
+<td colspan="2">entity_type</td>
+<td>character</td>
+<td>None</td>
+<td>Thông tin entity_type</td>
+</tr>
+<tr>
+<td>5</td>
+<td colspan="2">entity_id</td>
+<td>bigint</td>
+<td>None</td>
+<td>Thông tin entity_id</td>
+</tr>
+<tr>
+<td>6</td>
+<td colspan="2">old_data</td>
+<td>jsonb</td>
+<td>None</td>
+<td>Thông tin old_data</td>
+</tr>
+<tr>
+<td>7</td>
+<td colspan="2">new_data</td>
+<td>jsonb</td>
+<td>None</td>
+<td>Thông tin new_data</td>
+</tr>
+<tr>
+<td>8</td>
+<td colspan="2">ip_address</td>
+<td>inet</td>
+<td>None</td>
+<td>Thông tin ip_address</td>
+</tr>
+<tr>
+<td>9</td>
+<td colspan="2">user_agent</td>
+<td>text</td>
+<td>None</td>
+<td>Thông tin user_agent</td>
+</tr>
+<tr>
+<td>10</td>
+<td colspan="2">created_at</td>
+<td>timestamp</td>
+<td>NOT NULL, DEFAULT</td>
+<td>Thông tin created_at</td>
+</tr>
+</tbody>
+</table>
 
-### Bảng: `addresses`
+[]{#_Toc233347744 .anchor}4.2.2. Bảng addresses
 
 **Ý nghĩa**: Địa chỉ giao hàng. Mỗi KH có nhiều địa chỉ, 1 địa chỉ mặc định.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của addresses |
-| 2 | `user_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 3 | `recipient_name` | character | NOT NULL | Thông tin recipient_name |
-| 4 | `phone` | character | NOT NULL | Thông tin phone |
-| 5 | `province` | character | NOT NULL | Thông tin province |
-| 6 | `district` | character | NOT NULL | Thông tin district |
-| 7 | `ward` | character | NOT NULL | Thông tin ward |
-| 8 | `street_address` | character | NOT NULL | Thông tin street_address |
-| 9 | `is_default` | boolean | NOT NULL, DEFAULT | Thông tin is_default |
-| 10 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 11 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của addresses |
+| 2 | user_id | bigint | NOT NULL, Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 3 | recipient_name | character | NOT NULL | Thông tin recipient_name |
+| 4 | phone | character | NOT NULL | Thông tin phone |
+| 5 | province | character | NOT NULL | Thông tin province |
+| 6 | district | character | NOT NULL | Thông tin district |
+| 7 | ward | character | NOT NULL | Thông tin ward |
+| 8 | street_address | character | NOT NULL | Thông tin street_address |
+| 9 | is_default | boolean | NOT NULL, DEFAULT | Thông tin is_default |
+| 10 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 11 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
 
-### Bảng: `banners`
+[]{#_Toc233347745 .anchor}4.2.3. Bảng banners
 
 **Ý nghĩa**: Banner/slider trang chủ. Admin quản lý thứ tự, thời gian hiển thị.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của banners |
-| 2 | `title` | character | NOT NULL | Thông tin title |
-| 3 | `image_url` | text | NOT NULL | Thông tin image_url |
-| 4 | `link_url` | text | None | Thông tin link_url |
-| 5 | `display_order` | integer | NOT NULL, DEFAULT | Thông tin display_order |
-| 6 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 7 | `start_date` | timestamp | None | Thông tin start_date |
-| 8 | `end_date` | timestamp | None | Thông tin end_date |
-| 9 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 10 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của banners |
+| 2 | title | character | NOT NULL | Thông tin title |
+| 3 | image_url | text | NOT NULL | Thông tin image_url |
+| 4 | link_url | text | None | Thông tin link_url |
+| 5 | display_order | integer | NOT NULL, DEFAULT | Thông tin display_order |
+| 6 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 7 | start_date | timestamp | None | Thông tin start_date |
+| 8 | end_date | timestamp | None | Thông tin end_date |
+| 9 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 10 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
 
-### Bảng: `blog_categories`
-
-**Ý nghĩa**: Danh mục blog: Xu hướng thời trang, Hướng dẫn phối đồ, Tin tức.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của blog_categories |
-| 2 | `name` | character | NOT NULL | Thông tin name |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `description` | text | None | Thông tin description |
-| 5 | `display_order` | integer | NOT NULL, DEFAULT | Thông tin display_order |
-| 6 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 7 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 8 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-
-### Bảng: `blog_post_tags`
-
-**Ý nghĩa**: Lưu thông tin về blog_post_tags.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của blog_post_tags |
-| 2 | `blog_post_id` | bigint | NOT NULL, Khóa ngoại (FK -> blog_posts(id)) | Mã tham chiếu đến blog_posts(id) |
-| 3 | `blog_tag_id` | bigint | NOT NULL, Khóa ngoại (FK -> blog_tags(id)) | Mã tham chiếu đến blog_tags(id) |
-
-### Bảng: `blog_posts`
-
-**Ý nghĩa**: Bài viết blog/tin tức thời trang.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của blog_posts |
-| 2 | `title` | character | NOT NULL | Thông tin title |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `content` | text | NOT NULL | Thông tin content |
-| 5 | `excerpt` | text | None | Thông tin excerpt |
-| 6 | `thumbnail_url` | text | None | Thông tin thumbnail_url |
-| 7 | `category_id` | bigint | Khóa ngoại (FK -> blog_categories(id)) | Mã tham chiếu đến blog_categories(id) |
-| 8 | `author_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 9 | `is_published` | boolean | NOT NULL, DEFAULT | Thông tin is_published |
-| 10 | `published_at` | timestamp | None | Thông tin published_at |
-| 11 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 12 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-
-### Bảng: `blog_tags`
-
-**Ý nghĩa**: Tags cho blog: áo polo, mùa hè, streetwear, v.v.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của blog_tags |
-| 2 | `name` | character | NOT NULL | Thông tin name |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-
-### Bảng: `cart_items`
+[]{#_Toc233347746 .anchor}4.2.4. Bảng cart_items
 
 **Ý nghĩa**: Giỏ hàng KH đã đăng nhập. Khách vãng lai dùng Redis (session-based).
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của cart_items |
-| 2 | `user_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 3 | `product_variant_id` | bigint | NOT NULL, Khóa ngoại (FK -> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
-| 4 | `quantity` | integer | NOT NULL, DEFAULT | Thông tin quantity |
-| 5 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 6 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 7 | `CONSTRAINT` | cart_items_quantity_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của cart_items |
+| 2 | user_id | bigint | NOT NULL, Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 3 | product_variant_id | bigint | NOT NULL, Khóa ngoại (FK -\> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
+| 4 | quantity | integer | NOT NULL, DEFAULT | Thông tin quantity |
+| 5 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 6 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 7 | CONSTRAINT | cart_items_quantity_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `categories`
+[]{#_Toc233347747 .anchor}4.2.5. Bảng categories
 
-**Ý nghĩa**: Danh mục sản phẩm đa cấp (QĐ5: tối đa 3 cấp). VD: Nam > Áo > Áo Polo.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của categories |
-| 2 | `name` | character | NOT NULL | Thông tin name |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `parent_id` | bigint | Khóa ngoại (FK -> categories(id)) | Mã tham chiếu đến categories(id) |
-| 5 | `description` | text | None | Thông tin description |
-| 6 | `display_order` | integer | NOT NULL, DEFAULT | Thông tin display_order |
-| 7 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 8 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 9 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-
-### Bảng: `checkout_session_items`
-
-**Ý nghĩa**: Snapshot san pham tai thoi diem checkout.
+**Ý nghĩa**: Danh mục sản phẩm đa cấp (QĐ5: tối đa 3 cấp). VD: Nam \> Áo \> Áo Polo.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của checkout_session_items |
-| 2 | `checkout_session_id` | bigint | NOT NULL, Khóa ngoại (FK -> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
-| 3 | `product_variant_id` | bigint | NOT NULL, Khóa ngoại (FK -> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
-| 4 | `product_name` | character | NOT NULL | Thông tin product_name |
-| 5 | `variant_info` | character | NOT NULL | Thông tin variant_info |
-| 6 | `quantity` | integer | NOT NULL | Thông tin quantity |
-| 7 | `unit_price` | numeric(12,2) | NOT NULL | Thông tin unit_price |
-| 8 | `subtotal` | numeric(12,2) | NOT NULL | Thông tin subtotal |
-| 9 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 10 | `CONSTRAINT` | checkout_session_items_quantity_check | None | Thông tin CONSTRAINT |
-| 11 | `CONSTRAINT` | checkout_session_items_subtotal_check | None | Thông tin CONSTRAINT |
-| 12 | `CONSTRAINT` | checkout_session_items_unit_price_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của categories |
+| 2 | name | character | NOT NULL | Thông tin name |
+| 3 | slug | character | NOT NULL | Thông tin slug |
+| 4 | parent_id | bigint | Khóa ngoại (FK -\> categories(id)) | Mã tham chiếu đến categories(id) |
+| 5 | description | text | None | Thông tin description |
+| 6 | display_order | integer | NOT NULL, DEFAULT | Thông tin display_order |
+| 7 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 8 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 9 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
 
-### Bảng: `checkout_sessions`
+[]{#_Toc233347748 .anchor}4.2.6. Bảng checkout_sessions
 
-**Ý nghĩa**: Checkout session luu snapshot gio hang va dia chi truoc khi tao don hang.
+**Ý nghĩa**: Checkout session lưu snapshot giỏ hàng và địa chỉ trước khi tạo đơn hàng.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của checkout_sessions |
-| 2 | `checkout_code` | character | NOT NULL | Thông tin checkout_code |
-| 3 | `user_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 4 | `shipping_name` | character | NOT NULL | Thông tin shipping_name |
-| 5 | `shipping_phone` | character | NOT NULL | Thông tin shipping_phone |
-| 6 | `shipping_province` | character | NOT NULL | Thông tin shipping_province |
-| 7 | `shipping_district` | character | NOT NULL | Thông tin shipping_district |
-| 8 | `shipping_ward` | character | NOT NULL | Thông tin shipping_ward |
-| 9 | `shipping_address` | character | NOT NULL | Thông tin shipping_address |
-| 10 | `subtotal` | numeric(12,2) | NOT NULL | Thông tin subtotal |
-| 11 | `shipping_fee` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin shipping_fee |
-| 12 | `discount_amount` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin discount_amount |
-| 13 | `total_amount` | numeric(12,2) | NOT NULL | Thông tin total_amount |
-| 14 | `voucher_id` | bigint | Khóa ngoại (FK -> vouchers(id)) | Mã tham chiếu đến vouchers(id) |
-| 15 | `payment_method` | public.payment_method | NOT NULL | Thông tin payment_method |
-| 16 | `status` | public.checkout_session_status | NOT NULL, DEFAULT | Thông tin status |
-| 17 | `expires_at` | timestamp | NOT NULL | Thông tin expires_at |
-| 18 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 19 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 20 | `CONSTRAINT` | checkout_sessions_discount_amount_check | None | Thông tin CONSTRAINT |
-| 21 | `CONSTRAINT` | checkout_sessions_shipping_fee_check | None | Thông tin CONSTRAINT |
-| 22 | `CONSTRAINT` | checkout_sessions_subtotal_check | None | Thông tin CONSTRAINT |
-| 23 | `CONSTRAINT` | checkout_sessions_total_amount_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của checkout_sessions |
+| 2 | checkout_code | character | NOT NULL | Thông tin checkout_code |
+| 3 | user_id | bigint | NOT NULL, Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 4 | shipping_name | character | NOT NULL | Thông tin shipping_name |
+| 5 | shipping_phone | character | NOT NULL | Thông tin shipping_phone |
+| 6 | shipping_province | character | NOT NULL | Thông tin shipping_province |
+| 7 | shipping_district | character | NOT NULL | Thông tin shipping_district |
+| 8 | shipping_ward | character | NOT NULL | Thông tin shipping_ward |
+| 9 | shipping_address | character | NOT NULL | Thông tin shipping_address |
+| 10 | subtotal | numeric(12,2) | NOT NULL | Thông tin subtotal |
+| 11 | shipping_fee | numeric(12,2) | NOT NULL, DEFAULT | Thông tin shipping_fee |
+| 12 | discount_amount | numeric(12,2) | NOT NULL, DEFAULT | Thông tin discount_amount |
+| 13 | total_amount | numeric(12,2) | NOT NULL | Thông tin total_amount |
+| 14 | voucher_id | bigint | Khóa ngoại (FK -\> vouchers(id)) | Mã tham chiếu đến vouchers(id) |
+| 15 | payment_method | public.payment_method | NOT NULL | Thông tin payment_method |
+| 16 | status | public.checkout_session_status | NOT NULL, DEFAULT | Thông tin status |
+| 17 | expires_at | timestamp | NOT NULL | Thông tin expires_at |
+| 18 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 19 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 20 | CONSTRAINT | checkout_sessions_discount_amount_check | None | Thông tin CONSTRAINT |
+| 21 | CONSTRAINT | checkout_sessions_shipping_fee_check | None | Thông tin CONSTRAINT |
+| 22 | CONSTRAINT | checkout_sessions_subtotal_check | None | Thông tin CONSTRAINT |
+| 23 | CONSTRAINT | checkout_sessions_total_amount_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `collection_products`
-
-**Ý nghĩa**: Lưu thông tin về collection_products.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của collection_products |
-| 2 | `collection_id` | bigint | NOT NULL, Khóa ngoại (FK -> collections(id)) | Mã tham chiếu đến collections(id) |
-| 3 | `product_id` | bigint | NOT NULL, Khóa ngoại (FK -> products(id)) | Mã tham chiếu đến products(id) |
-| 4 | `display_order` | integer | NOT NULL, DEFAULT | Thông tin display_order |
-
-### Bảng: `collections`
+[]{#_Toc233347749 .anchor}4.2.7. Bảng collections
 
 **Ý nghĩa**: Bộ sưu tập sản phẩm theo mùa/chủ đề.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của collections |
-| 2 | `name` | character | NOT NULL | Thông tin name |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `description` | text | None | Thông tin description |
-| 5 | `banner_url` | text | None | Thông tin banner_url |
-| 6 | `start_date` | timestamp | None | Thông tin start_date |
-| 7 | `end_date` | timestamp | None | Thông tin end_date |
-| 8 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 9 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 10 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của collections |
+| 2 | name | character | NOT NULL | Thông tin name |
+| 3 | slug | character | NOT NULL | Thông tin slug |
+| 4 | description | text | None | Thông tin description |
+| 5 | banner_url | text | None | Thông tin banner_url |
+| 6 | start_date | timestamp | None | Thông tin start_date |
+| 7 | end_date | timestamp | None | Thông tin end_date |
+| 8 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 9 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 10 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
 
-### Bảng: `inventory_reservations`
+[]{#_Toc233347750 .anchor}4.2.8. Bảng inventory_reservations
 
-**Ý nghĩa**: Giu ton kho tam thoi cho checkout, chua tru stock_quantity khi reserve.
+Ý nghĩa: Giữ tồn kho tạm thời cho checkout, chưa trừ stock_quantity khi reserve
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của inventory_reservations |
-| 2 | `checkout_session_id` | bigint | NOT NULL, Khóa ngoại (FK -> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
-| 3 | `product_variant_id` | bigint | NOT NULL, Khóa ngoại (FK -> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
-| 4 | `quantity` | integer | NOT NULL | Thông tin quantity |
-| 5 | `status` | public.reservation_status | NOT NULL, DEFAULT | Thông tin status |
-| 6 | `expires_at` | timestamp | NOT NULL | Thông tin expires_at |
-| 7 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 8 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 9 | `CONSTRAINT` | inventory_reservations_quantity_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của inventory_reservations |
+| 2 | checkout_session_id | bigint | NOT NULL, Khóa ngoại (FK -\> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
+| 3 | product_variant_id | bigint | NOT NULL, Khóa ngoại (FK -\> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
+| 4 | quantity | integer | NOT NULL | Thông tin quantity |
+| 5 | status | public.reservation_status | NOT NULL, DEFAULT | Thông tin status |
+| 6 | expires_at | timestamp | NOT NULL | Thông tin expires_at |
+| 7 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 8 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 9 | CONSTRAINT | inventory_reservations_quantity_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `membership_tiers`
+[]{#_Toc233347751 .anchor}4.2.9. membership_tiers
 
 **Ý nghĩa**: Hạng thành viên: Đồng, Bạc, Vàng, Kim cương. Admin có thể sửa qua CMS.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của membership_tiers |
-| 2 | `name` | character | NOT NULL | Thông tin name |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `min_points` | integer | NOT NULL, DEFAULT | Thông tin min_points |
-| 5 | `discount_percent` | numeric(5,2) | NOT NULL, DEFAULT | Thông tin discount_percent |
-| 6 | `description` | text | None | Thông tin description |
-| 7 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 8 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 9 | `CONSTRAINT` | membership_tiers_discount_percent_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của membership_tiers |
+| 2 | name | character | NOT NULL | Thông tin name |
+| 3 | slug | character | NOT NULL | Thông tin slug |
+| 4 | min_points | integer | NOT NULL, DEFAULT | Thông tin min_points |
+| 5 | discount_percent | numeric(5,2) | NOT NULL, DEFAULT | Thông tin discount_percent |
+| 6 | description | text | None | Thông tin description |
+| 7 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 8 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 9 | CONSTRAINT | membership_tiers_discount_percent_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `order_items`
+[]{#_Toc233347752 .anchor}*4.2.10. Bảng order_items*
 
-**Ý nghĩa**: Chi tiết đơn hàng. Snapshot giá/tên SP tại thời điểm mua (QĐ3).
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của order_items |
-| 2 | `order_id` | bigint | NOT NULL, Khóa ngoại (FK -> orders(id)) | Mã tham chiếu đến orders(id) |
-| 3 | `product_variant_id` | bigint | NOT NULL, Khóa ngoại (FK -> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
-| 4 | `product_name` | character | NOT NULL | Thông tin product_name |
-| 5 | `variant_info` | character | NOT NULL | Thông tin variant_info |
-| 6 | `quantity` | integer | NOT NULL | Thông tin quantity |
-| 7 | `unit_price` | numeric(12,2) | NOT NULL | Thông tin unit_price |
-| 8 | `subtotal` | numeric(12,2) | NOT NULL | Thông tin subtotal |
-| 9 | `CONSTRAINT` | order_items_quantity_check | None | Thông tin CONSTRAINT |
-| 10 | `CONSTRAINT` | order_items_subtotal_check | None | Thông tin CONSTRAINT |
-| 11 | `CONSTRAINT` | order_items_unit_price_check | None | Thông tin CONSTRAINT |
-
-### Bảng: `order_status_histories`
-
-**Ý nghĩa**: Timeline trang thai don hang phuc vu audit va Staff order detail.
+**Ý nghĩa**: Chi tiết đơn hàng. Snapshot giá/tên SP tại thời điểm mua.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của order_status_histories |
-| 2 | `order_id` | bigint | NOT NULL, Khóa ngoại (FK -> orders(id)) | Mã tham chiếu đến orders(id) |
-| 3 | `from_status` | public.order_status | None | Thông tin from_status |
-| 4 | `to_status` | public.order_status | NOT NULL | Thông tin to_status |
-| 5 | `changed_by` | bigint | Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 6 | `changed_by_role` | public.user_role | None | Thông tin changed_by_role |
-| 7 | `reason` | text | None | Thông tin reason |
-| 8 | `metadata` | jsonb | None | Thông tin metadata |
-| 9 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của order_items |
+| 2 | order_id | bigint | NOT NULL, Khóa ngoại (FK -\> orders(id)) | Mã tham chiếu đến orders(id) |
+| 3 | product_variant_id | bigint | NOT NULL, Khóa ngoại (FK -\> product_variants(id)) | Mã tham chiếu đến product_variants(id) |
+| 4 | product_name | character | NOT NULL | Thông tin product_name |
+| 5 | variant_info | character | NOT NULL | Thông tin variant_info |
+| 6 | quantity | integer | NOT NULL | Thông tin quantity |
+| 7 | unit_price | numeric(12,2) | NOT NULL | Thông tin unit_price |
+| 8 | subtotal | numeric(12,2) | NOT NULL | Thông tin subtotal |
+| 9 | CONSTRAINT | order_items_quantity_check | None | Thông tin CONSTRAINT |
+| 10 | CONSTRAINT | order_items_subtotal_check | None | Thông tin CONSTRAINT |
+| 11 | CONSTRAINT | order_items_unit_price_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `orders`
+### *4.2.11. order_status_histories* {#order_status_histories}
 
-**Ý nghĩa**: Đơn hàng (QĐ8). Ship: đơn < 500K → 30K, đơn >= 500K → miễn phí (app logic).
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của orders |
-| 2 | `user_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 3 | `order_code` | character | NOT NULL | Thông tin order_code |
-| 4 | `shipping_name` | character | NOT NULL | Thông tin shipping_name |
-| 5 | `shipping_phone` | character | NOT NULL | Thông tin shipping_phone |
-| 6 | `shipping_province` | character | NOT NULL | Thông tin shipping_province |
-| 7 | `shipping_district` | character | NOT NULL | Thông tin shipping_district |
-| 8 | `shipping_ward` | character | NOT NULL | Thông tin shipping_ward |
-| 9 | `shipping_address` | character | NOT NULL | Thông tin shipping_address |
-| 10 | `subtotal` | numeric(12,2) | NOT NULL | Thông tin subtotal |
-| 11 | `shipping_fee` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin shipping_fee |
-| 12 | `discount_amount` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin discount_amount |
-| 13 | `total_amount` | numeric(12,2) | NOT NULL | Thông tin total_amount |
-| 14 | `voucher_id` | bigint | Khóa ngoại (FK -> vouchers(id)) | Mã tham chiếu đến vouchers(id) |
-| 15 | `status` | public.order_status | NOT NULL, DEFAULT | Thông tin status |
-| 16 | `note` | text | None | Thông tin note |
-| 17 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 18 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 19 | `CONSTRAINT` | orders_discount_amount_check | None | Thông tin CONSTRAINT |
-| 20 | `CONSTRAINT` | orders_shipping_fee_check | None | Thông tin CONSTRAINT |
-| 21 | `CONSTRAINT` | orders_subtotal_check | None | Thông tin CONSTRAINT |
-| 22 | `CONSTRAINT` | orders_total_amount_check | None | Thông tin CONSTRAINT |
-
-### Bảng: `payment_attempts`
-
-**Ý nghĩa**: Lan thu thanh toan online gan voi checkout session truoc khi co order.
+**Ý nghĩa**: Timeline trạng thái đơn hàng phục vụ audit và Staff order detail.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của payment_attempts |
-| 2 | `payment_reference` | character | NOT NULL | Thông tin payment_reference |
-| 3 | `checkout_session_id` | bigint | NOT NULL, Khóa ngoại (FK -> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
-| 4 | `method` | public.payment_method | NOT NULL | Thông tin method |
-| 5 | `amount` | numeric(12,2) | NOT NULL | Thông tin amount |
-| 6 | `status` | public.payment_attempt_status | NOT NULL, DEFAULT | Thông tin status |
-| 7 | `payment_url` | text | None | Thông tin payment_url |
-| 8 | `gateway_transaction_id` | character | None | Thông tin gateway_transaction_id |
-| 9 | `gateway_payload` | jsonb | None | Thông tin gateway_payload |
-| 10 | `failure_reason` | text | None | Thông tin failure_reason |
-| 11 | `requires_refund_reason` | text | None | Thông tin requires_refund_reason |
-| 12 | `expires_at` | timestamp | NOT NULL | Thông tin expires_at |
-| 13 | `completed_at` | timestamp | None | Thông tin completed_at |
-| 14 | `failed_at` | timestamp | None | Thông tin failed_at |
-| 15 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 16 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 17 | `CONSTRAINT` | payment_attempts_amount_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của order_status_histories |
+| 2 | order_id | bigint | NOT NULL, Khóa ngoại (FK -\> orders(id)) | Mã tham chiếu đến orders(id) |
+| 3 | from_status | public.order_status | None | Thông tin from_status |
+| 4 | to_status | public.order_status | NOT NULL | Thông tin to_status |
+| 5 | changed_by | bigint | Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 6 | changed_by_role | public.user_role | None | Thông tin changed_by_role |
+| 7 | reason | text | None | Thông tin reason |
+| 8 | metadata | jsonb | None | Thông tin metadata |
+| 9 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
 
-### Bảng: `payments`
+[]{#_Toc233347754 .anchor}4.2.12. Bảng orders
 
-**Ý nghĩa**: Thanh toán. Không lưu thông tin thẻ — delegate cho VNPay/MoMo.
+**Ý nghĩa**: Đơn hàng (QĐ8). Ship: đơn \< 500K → 30K, đơn \>= 500K → miễn phí (app logic).
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của payments |
-| 2 | `order_id` | bigint | NOT NULL, Khóa ngoại (FK -> orders(id)) | Mã tham chiếu đến orders(id) |
-| 3 | `method` | public.payment_method | NOT NULL | Thông tin method |
-| 4 | `amount` | numeric(12,2) | NOT NULL | Thông tin amount |
-| 5 | `status` | public.payment_status | NOT NULL, DEFAULT | Thông tin status |
-| 6 | `transaction_id` | character | None | Thông tin transaction_id |
-| 7 | `payment_data` | jsonb | None | Thông tin payment_data |
-| 8 | `paid_at` | timestamp | None | Thông tin paid_at |
-| 9 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 10 | `CONSTRAINT` | payments_amount_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của orders |
+| 2 | user_id | bigint | NOT NULL, Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 3 | order_code | character | NOT NULL | Thông tin order_code |
+| 4 | shipping_name | character | NOT NULL | Thông tin shipping_name |
+| 5 | shipping_phone | character | NOT NULL | Thông tin shipping_phone |
+| 6 | shipping_province | character | NOT NULL | Thông tin shipping_province |
+| 7 | shipping_district | character | NOT NULL | Thông tin shipping_district |
+| 8 | shipping_ward | character | NOT NULL | Thông tin shipping_ward |
+| 9 | shipping_address | character | NOT NULL | Thông tin shipping_address |
+| 10 | subtotal | numeric(12,2) | NOT NULL | Thông tin subtotal |
+| 11 | shipping_fee | numeric(12,2) | NOT NULL, DEFAULT | Thông tin shipping_fee |
+| 12 | discount_amount | numeric(12,2) | NOT NULL, DEFAULT | Thông tin discount_amount |
+| 13 | total_amount | numeric(12,2) | NOT NULL | Thông tin total_amount |
+| 14 | voucher_id | bigint | Khóa ngoại (FK -\> vouchers(id)) | Mã tham chiếu đến vouchers(id) |
+| 15 | status | public.order_status | NOT NULL, DEFAULT | Thông tin status |
+| 16 | note | text | None | Thông tin note |
+| 17 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 18 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 19 | CONSTRAINT | orders_discount_amount_check | None | Thông tin CONSTRAINT |
+| 20 | CONSTRAINT | orders_shipping_fee_check | None | Thông tin CONSTRAINT |
+| 21 | CONSTRAINT | orders_subtotal_check | None | Thông tin CONSTRAINT |
+| 22 | CONSTRAINT | orders_total_amount_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `product_images`
+[]{#_Toc233347755 .anchor}4.2.13. Bảng payment_attemps
 
-**Ý nghĩa**: Ảnh sản phẩm lưu trên S3. QĐ1: tối thiểu 1 ảnh main.
-
-| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của product_images |
-| 2 | `product_id` | bigint | NOT NULL, Khóa ngoại (FK -> products(id)) | Mã tham chiếu đến products(id) |
-| 3 | `image_url` | text | NOT NULL | Thông tin image_url |
-| 4 | `image_type` | public.image_type | NOT NULL, DEFAULT | Thông tin image_type |
-| 5 | `display_order` | integer | NOT NULL, DEFAULT | Thông tin display_order |
-| 6 | `alt_text` | character | None | Thông tin alt_text |
-| 7 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-
-### Bảng: `product_variants`
-
-**Ý nghĩa**: Biến thể sản phẩm (QĐ2: SKU duy nhất, tồn kho >= 0). QĐ6: auto giảm khi đặt hàng.
+Ý nghĩa: Thanh toán online gắn với checkout session trước khi có order
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của product_variants |
-| 2 | `product_id` | bigint | NOT NULL, Khóa ngoại (FK -> products(id)) | Mã tham chiếu đến products(id) |
-| 3 | `sku` | character | NOT NULL | Thông tin sku |
-| 4 | `size` | character | NOT NULL | Thông tin size |
-| 5 | `color` | character | NOT NULL | Thông tin color |
-| 6 | `stock_quantity` | integer | NOT NULL, DEFAULT | Thông tin stock_quantity |
-| 7 | `additional_price` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin additional_price |
-| 8 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 9 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 10 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 11 | `CONSTRAINT` | product_variants_stock_quantity_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của payment_attempts |
+| 2 | payment_reference | character | NOT NULL | Thông tin payment_reference |
+| 3 | checkout_session_id | bigint | NOT NULL, Khóa ngoại (FK -\> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
+| 4 | method | public.payment_method | NOT NULL | Thông tin method |
+| 5 | amount | numeric(12,2) | NOT NULL | Thông tin amount |
+| 6 | status | public.payment_attempt_status | NOT NULL, DEFAULT | Thông tin status |
+| 7 | payment_url | text | None | Thông tin payment_url |
+| 8 | gateway_transaction_id | character | None | Thông tin gateway_transaction_id |
+| 9 | gateway_payload | jsonb | None | Thông tin gateway_payload |
+| 10 | failure_reason | text | None | Thông tin failure_reason |
+| 11 | requires_refund_reason | text | None | Thông tin requires_refund_reason |
+| 12 | expires_at | timestamp | NOT NULL | Thông tin expires_at |
+| 13 | completed_at | timestamp | None | Thông tin completed_at |
+| 14 | failed_at | timestamp | None | Thông tin failed_at |
+| 15 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 16 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 17 | CONSTRAINT | payment_attempts_amount_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `products`
+[]{#_Toc233347756 .anchor}4.2.14. Bảng payment
+
+**Ý nghĩa**: Thanh toán. Không lưu thông tin thẻ --- delegate cho VNPay/MoMo.
+
+| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của payments |
+| 2 | order_id | bigint | NOT NULL, Khóa ngoại (FK -\> orders(id)) | Mã tham chiếu đến orders(id) |
+| 3 | method | public.payment_method | NOT NULL | Thông tin method |
+| 4 | amount | numeric(12,2) | NOT NULL | Thông tin amount |
+| 5 | status | public.payment_status | NOT NULL, DEFAULT | Thông tin status |
+| 6 | transaction_id | character | None | Thông tin transaction_id |
+| 7 | payment_data | jsonb | None | Thông tin payment_data |
+| 8 | paid_at | timestamp | None | Thông tin paid_at |
+| 9 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 10 | CONSTRAINT | payments_amount_check | None | Thông tin CONSTRAINT |
+
+[]{#_Toc233347757 .anchor}4.2.15. product_variants
+
+**Ý nghĩa**: Biến thể sản phẩm (QĐ2: SKU duy nhất, tồn kho \>= 0). QĐ6: auto giảm khi đặt hàng.
+
+| STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của product_variants |
+| 2 | product_id | bigint | NOT NULL, Khóa ngoại (FK -\> products(id)) | Mã tham chiếu đến products(id) |
+| 3 | sku | character | NOT NULL | Thông tin sku |
+| 4 | size | character | NOT NULL | Thông tin size |
+| 5 | color | character | NOT NULL | Thông tin color |
+| 6 | stock_quantity | integer | NOT NULL, DEFAULT | Thông tin stock_quantity |
+| 7 | additional_price | numeric(12,2) | NOT NULL, DEFAULT | Thông tin additional_price |
+| 8 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 9 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 10 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 11 | CONSTRAINT | product_variants_stock_quantity_check | None | Thông tin CONSTRAINT |
+
+[]{#_Toc233347758 .anchor}4.2.16. Bảng products
 
 **Ý nghĩa**: Sản phẩm. QĐ1: tên không trùng cùng danh mục. QĐ4: xóa mềm nếu đã có đơn hàng.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của products |
-| 2 | `name` | character | NOT NULL | Thông tin name |
-| 3 | `slug` | character | NOT NULL | Thông tin slug |
-| 4 | `description` | text | None | Thông tin description |
-| 5 | `material` | character | None | Thông tin material |
-| 6 | `care_instructions` | text | None | Thông tin care_instructions |
-| 7 | `category_id` | bigint | NOT NULL, Khóa ngoại (FK -> categories(id)) | Mã tham chiếu đến categories(id) |
-| 8 | `base_price` | numeric(12,2) | NOT NULL | Thông tin base_price |
-| 9 | `sale_price` | numeric(12,2) | None | Thông tin sale_price |
-| 10 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 11 | `is_featured` | boolean | NOT NULL, DEFAULT | Thông tin is_featured |
-| 12 | `total_sold` | integer | NOT NULL, DEFAULT | Thông tin total_sold |
-| 13 | `average_rating` | numeric(3,2) | DEFAULT | Thông tin average_rating |
-| 14 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 15 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 16 | `deleted_at` | timestamp | None | Thông tin deleted_at |
-| 17 | `CONSTRAINT` | products_average_rating_check | None | Thông tin CONSTRAINT |
-| 18 | `CONSTRAINT` | products_base_price_check | None | Thông tin CONSTRAINT |
-| 19 | `CONSTRAINT` | products_sale_price_check | None | Thông tin CONSTRAINT |
-| 20 | `CONSTRAINT` | products_total_sold_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của products |
+| 2 | name | character | NOT NULL | Thông tin name |
+| 3 | slug | character | NOT NULL | Thông tin slug |
+| 4 | description | text | None | Thông tin description |
+| 5 | material | character | None | Thông tin material |
+| 6 | care_instructions | text | None | Thông tin care_instructions |
+| 7 | category_id | bigint | NOT NULL, Khóa ngoại (FK -\> categories(id)) | Mã tham chiếu đến categories(id) |
+| 8 | base_price | numeric(12,2) | NOT NULL | Thông tin base_price |
+| 9 | sale_price | numeric(12,2) | None | Thông tin sale_price |
+| 10 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 11 | is_featured | boolean | NOT NULL, DEFAULT | Thông tin is_featured |
+| 12 | total_sold | integer | NOT NULL, DEFAULT | Thông tin total_sold |
+| 13 | average_rating | numeric(3,2) | DEFAULT | Thông tin average_rating |
+| 14 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 15 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 16 | deleted_at | timestamp | None | Thông tin deleted_at |
+| 17 | CONSTRAINT | products_average_rating_check | None | Thông tin CONSTRAINT |
+| 18 | CONSTRAINT | products_base_price_check | None | Thông tin CONSTRAINT |
+| 19 | CONSTRAINT | products_sale_price_check | None | Thông tin CONSTRAINT |
+| 20 | CONSTRAINT | products_total_sold_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `review_images`
+[]{#_Toc233347759 .anchor}4.2.17. Bảng review_images
 
-**Ý nghĩa**: Ảnh đánh giá (QĐ13: tối đa 5 ảnh — enforce ở app logic).
+**Ý nghĩa**: Ảnh đánh giá (QĐ13: tối đa 5 ảnh --- enforce ở app logic).
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của review_images |
-| 2 | `review_id` | bigint | NOT NULL, Khóa ngoại (FK -> reviews(id)) | Mã tham chiếu đến reviews(id) |
-| 3 | `image_url` | text | NOT NULL | Thông tin image_url |
-| 4 | `display_order` | integer | NOT NULL, DEFAULT | Thông tin display_order |
-| 5 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của review_images |
+| 2 | review_id | bigint | NOT NULL, Khóa ngoại (FK -\> reviews(id)) | Mã tham chiếu đến reviews(id) |
+| 3 | image_url | text | NOT NULL | Thông tin image_url |
+| 4 | display_order | integer | NOT NULL, DEFAULT | Thông tin display_order |
+| 5 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
 
-### Bảng: `reviews`
+[]{#_Toc233347760 .anchor}4.2.18. Bảng reviews
 
 **Ý nghĩa**: Đánh giá sản phẩm (QĐ9, QĐ13). Chỉ KH đã mua + đơn hoàn thành mới được đánh giá.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của reviews |
-| 2 | `user_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 3 | `product_id` | bigint | NOT NULL, Khóa ngoại (FK -> products(id)) | Mã tham chiếu đến products(id) |
-| 4 | `order_id` | bigint | NOT NULL, Khóa ngoại (FK -> orders(id)) | Mã tham chiếu đến orders(id) |
-| 5 | `rating` | smallint | NOT NULL | Thông tin rating |
-| 6 | `content` | text | NOT NULL | Thông tin content |
-| 7 | `is_approved` | boolean | NOT NULL, DEFAULT | Thông tin is_approved |
-| 8 | `admin_reply` | text | None | Thông tin admin_reply |
-| 9 | `replied_at` | timestamp | None | Thông tin replied_at |
-| 10 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 11 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 12 | `delete_reason` | text | None | Thông tin delete_reason |
-| 13 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 14 | `CONSTRAINT` | reviews_content_check | None | Thông tin CONSTRAINT |
-| 15 | `CONSTRAINT` | reviews_rating_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của reviews |
+| 2 | user_id | bigint | NOT NULL, Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 3 | product_id | bigint | NOT NULL, Khóa ngoại (FK -\> products(id)) | Mã tham chiếu đến products(id) |
+| 4 | order_id | bigint | NOT NULL, Khóa ngoại (FK -\> orders(id)) | Mã tham chiếu đến orders(id) |
+| 5 | rating | smallint | NOT NULL | Thông tin rating |
+| 6 | content | text | NOT NULL | Thông tin content |
+| 7 | is_approved | boolean | NOT NULL, DEFAULT | Thông tin is_approved |
+| 8 | admin_reply | text | None | Thông tin admin_reply |
+| 9 | replied_at | timestamp | None | Thông tin replied_at |
+| 10 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 11 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 12 | delete_reason | text | None | Thông tin delete_reason |
+| 13 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 14 | CONSTRAINT | reviews_content_check | None | Thông tin CONSTRAINT |
+| 15 | CONSTRAINT | reviews_rating_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `users`
+[]{#_Toc233347761 .anchor}4.2.19. Bảng users
 
 **Ý nghĩa**: Người dùng hệ thống: admin và khách hàng. QĐ14: không được sửa email. QĐ16: email unique.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của users |
-| 2 | `email` | character | NOT NULL | Thông tin email |
-| 3 | `password_hash` | character | None | Thông tin password_hash |
-| 4 | `full_name` | character | NOT NULL | Thông tin full_name |
-| 5 | `phone` | character | None | Thông tin phone |
-| 6 | `gender` | public.gender_type | None | Thông tin gender |
-| 7 | `date_of_birth` | date | None | Thông tin date_of_birth |
-| 8 | `avatar_url` | text | None | Thông tin avatar_url |
-| 9 | `role` | public.user_role | NOT NULL, DEFAULT | Thông tin role |
-| 10 | `loyalty_points` | integer | NOT NULL, DEFAULT | Thông tin loyalty_points |
-| 11 | `membership_tier_id` | bigint | Khóa ngoại (FK -> membership_tiers(id)) | Mã tham chiếu đến membership_tiers(id) |
-| 12 | `auth_provider` | character | DEFAULT | Thông tin auth_provider |
-| 13 | `email_verified` | boolean | NOT NULL, DEFAULT | Thông tin email_verified |
-| 14 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 15 | `last_login_at` | timestamp | None | Thông tin last_login_at |
-| 16 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 17 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 18 | `deleted_at` | timestamp | None | Thông tin deleted_at |
-| 19 | `CONSTRAINT` | users_loyalty_points_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của users |
+| 2 | email | character | NOT NULL | Thông tin email |
+| 3 | password_hash | character | None | Thông tin password_hash |
+| 4 | full_name | character | NOT NULL | Thông tin full_name |
+| 5 | phone | character | None | Thông tin phone |
+| 6 | gender | public.gender_type | None | Thông tin gender |
+| 7 | date_of_birth | date | None | Thông tin date_of_birth |
+| 8 | avatar_url | text | None | Thông tin avatar_url |
+| 9 | role | public.user_role | NOT NULL, DEFAULT | Thông tin role |
+| 10 | loyalty_points | integer | NOT NULL, DEFAULT | Thông tin loyalty_points |
+| 11 | membership_tier_id | bigint | Khóa ngoại (FK -\> membership_tiers(id)) | Mã tham chiếu đến membership_tiers(id) |
+| 12 | auth_provider | character | DEFAULT | Thông tin auth_provider |
+| 13 | email_verified | boolean | NOT NULL, DEFAULT | Thông tin email_verified |
+| 14 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 15 | last_login_at | timestamp | None | Thông tin last_login_at |
+| 16 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 17 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 18 | deleted_at | timestamp | None | Thông tin deleted_at |
+| 19 | CONSTRAINT | users_loyalty_points_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `voucher_reservations`
+[]{#_Toc233347762 .anchor}4.2.20. Bảng voucher_reservations
 
 **Ý nghĩa**: Giu luot su dung voucher tam thoi cho checkout, chua tang times_used khi reserve.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của voucher_reservations |
-| 2 | `checkout_session_id` | bigint | NOT NULL, Khóa ngoại (FK -> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
-| 3 | `voucher_id` | bigint | NOT NULL, Khóa ngoại (FK -> vouchers(id)) | Mã tham chiếu đến vouchers(id) |
-| 4 | `discount_amount` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin discount_amount |
-| 5 | `status` | public.reservation_status | NOT NULL, DEFAULT | Thông tin status |
-| 6 | `expires_at` | timestamp | NOT NULL | Thông tin expires_at |
-| 7 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 8 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 9 | `CONSTRAINT` | voucher_reservations_discount_amount_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của voucher_reservations |
+| 2 | checkout_session_id | bigint | NOT NULL, Khóa ngoại (FK -\> checkout_sessions(id)) | Mã tham chiếu đến checkout_sessions(id) |
+| 3 | voucher_id | bigint | NOT NULL, Khóa ngoại (FK -\> vouchers(id)) | Mã tham chiếu đến vouchers(id) |
+| 4 | discount_amount | numeric(12,2) | NOT NULL, DEFAULT | Thông tin discount_amount |
+| 5 | status | public.reservation_status | NOT NULL, DEFAULT | Thông tin status |
+| 6 | expires_at | timestamp | NOT NULL | Thông tin expires_at |
+| 7 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 8 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 9 | CONSTRAINT | voucher_reservations_discount_amount_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `vouchers`
+[]{#_Toc233347763 .anchor}4.2.21. Bảng vouchers
 
-**Ý nghĩa**: Mã giảm giá (QĐ7). QĐ11: mỗi đơn chỉ 1 voucher, kiểm tra điều kiện.
+**Ý nghĩa**: Mã giảm giá (QĐ7). QĐ11: mỗi đơn chỉ 1 voucher, kiểm tra điều kiện
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của vouchers |
-| 2 | `code` | character | NOT NULL | Thông tin code |
-| 3 | `discount_type` | public.discount_type | NOT NULL | Thông tin discount_type |
-| 4 | `discount_value` | numeric(12,2) | NOT NULL | Thông tin discount_value |
-| 5 | `max_discount_amount` | numeric(12,2) | None | Thông tin max_discount_amount |
-| 6 | `min_order_amount` | numeric(12,2) | NOT NULL, DEFAULT | Thông tin min_order_amount |
-| 7 | `start_date` | timestamp | NOT NULL | Thông tin start_date |
-| 8 | `end_date` | timestamp | NOT NULL | Thông tin end_date |
-| 9 | `usage_limit` | integer | NOT NULL, DEFAULT | Thông tin usage_limit |
-| 10 | `times_used` | integer | NOT NULL, DEFAULT | Thông tin times_used |
-| 11 | `is_active` | boolean | NOT NULL, DEFAULT | Thông tin is_active |
-| 12 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
-| 13 | `updated_at` | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
-| 14 | `CONSTRAINT` | vouchers_check | None | Thông tin CONSTRAINT |
-| 15 | `CONSTRAINT` | vouchers_discount_value_check | None | Thông tin CONSTRAINT |
-| 16 | `CONSTRAINT` | vouchers_times_used_check | None | Thông tin CONSTRAINT |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của vouchers |
+| 2 | code | character | NOT NULL | Thông tin code |
+| 3 | discount_type | public.discount_type | NOT NULL | Thông tin discount_type |
+| 4 | discount_value | numeric(12,2) | NOT NULL | Thông tin discount_value |
+| 5 | max_discount_amount | numeric(12,2) | None | Thông tin max_discount_amount |
+| 6 | min_order_amount | numeric(12,2) | NOT NULL, DEFAULT | Thông tin min_order_amount |
+| 7 | start_date | timestamp | NOT NULL | Thông tin start_date |
+| 8 | end_date | timestamp | NOT NULL | Thông tin end_date |
+| 9 | usage_limit | integer | NOT NULL, DEFAULT | Thông tin usage_limit |
+| 10 | times_used | integer | NOT NULL, DEFAULT | Thông tin times_used |
+| 11 | is_active | boolean | NOT NULL, DEFAULT | Thông tin is_active |
+| 12 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+| 13 | updated_at | timestamp | NOT NULL, DEFAULT | Thông tin updated_at |
+| 14 | CONSTRAINT | vouchers_check | None | Thông tin CONSTRAINT |
+| 15 | CONSTRAINT | vouchers_discount_value_check | None | Thông tin CONSTRAINT |
+| 16 | CONSTRAINT | vouchers_times_used_check | None | Thông tin CONSTRAINT |
 
-### Bảng: `wishlists`
+[]{#_Toc233347764 .anchor}4.2.22. Bảng wishlist
 
 **Ý nghĩa**: Danh sách sản phẩm yêu thích.
 
 | STT | Tên Field | Kiểu dữ liệu | Ràng buộc | Ý nghĩa |
-|---|---|---|---|---|
-| 1 | `id` | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của wishlists |
-| 2 | `user_id` | bigint | NOT NULL, Khóa ngoại (FK -> users(id)) | Mã tham chiếu đến users(id) |
-| 3 | `product_id` | bigint | NOT NULL, Khóa ngoại (FK -> products(id)) | Mã tham chiếu đến products(id) |
-| 4 | `created_at` | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
+|----|----|----|----|----|
+| 1 | id | bigint | NOT NULL, Khóa chính (PK) | Mã định danh của wishlists |
+| 2 | user_id | bigint | NOT NULL, Khóa ngoại (FK -\> users(id)) | Mã tham chiếu đến users(id) |
+| 3 | product_id | bigint | NOT NULL, Khóa ngoại (FK -\> products(id)) | Mã tham chiếu đến products(id) |
+| 4 | created_at | timestamp | NOT NULL, DEFAULT | Thông tin created_at |
 
+# 4.3. Thiết kế giao diện {#thiết-kế-giao-diện .P2}
 
+[]{#_Toc233347766 .anchor}4.3.1. Trang đăng nhập
 
-4.3. Thiết kế giao diện\
- {#thiết-kế-giao-diện .P2}
-========================
+![A screenshot of a login form
+Description automatically generated](media/image34.png){width="3.7708333333333335in" height="5.552083333333333in"}
+
+**Ý nghĩa:** Cho phép người dùng nhập đăng nhập vào hệ thống bằng email và mật khẩu hoặc đăng nhập bằng google.
+
+Các đối tượng trong ảnh:
+
+| Số  | Object    | Mục đích                                        |
+|-----|-----------|-------------------------------------------------|
+| 1   | Textbox   | Nhập địa chỉ email để đăng nhập                 |
+| 2   | Textbox   | Nhập mật khẩu của tài khoản                     |
+| 3   | Checkbox  | Ghi nhớ đăng nhập cho lần truy cập sau          |
+| 4   | Hyperlink | Nhấn vào sẽ chuyển sang giao diện quên mật khẩu |
+| 5   | Button    | Nhấn vào thì sẽ gửi request đăng nhập           |
+| 6   | Button    | Hiển thị modal đăng nhập bằng google            |
+| 7   | Hyperlink | Dẫn đến trang đăng ký để tạo tài khoản mới      |
+
+[]{#_Toc233347767 .anchor}4.3.2. Trang đăng ký
+
+![A screenshot of a phone
+Description automatically generated](media/image35.png){width="3.4891469816272966in" height="5.822188320209974in"}
+
+**Ý nghĩa:** Cho phép người dùng nhập họ tên, email và mật khẩu để tạo tài khoản (customer) vào hệ thống.
+
+Các đối tượng trong ảnh:
+
+| Số  | Object    | Mục đích                                                    |
+|-----|-----------|-------------------------------------------------------------|
+| 1   | Textbox   | Nhập họ tên của người dùng                                  |
+| 2   | Textbox   | Nhập email của người dùng                                   |
+| 3   | Textbox   | Nhập mật khẩu cho tài khoản                                 |
+| 4   | Textbox   | Nhập xác nhận mật khẩu cho tài khoản                        |
+| 5   | Checkbox  | Xác nhận người dùng đã đọc và đồng ý với điều khoản sử dụng |
+| 6   | Button    | Gửi thông tin đăng ký để tạo tài khoản mới                  |
+| 7   | Button    | Hiển thị modal chọn tài khoản google để đăng ký             |
+| 8   | Hyperlink | Dẫn đến trang đăng nhập cho người đã có tài khoản           |
+
+[]{#_Toc233347768 .anchor}4.3.3. Trang quên mật khẩu
+
+![A screenshot of a web page
+Description automatically generated](media/image36.png){width="3.4162390638670166in" height="3.5620548993875767in"}
+
+**Ý nghĩa:** Cho phép người dùng khôi phục mật khẩu khi quên bằng cách nhập Email để nhận đường link xác thực.
+
+Các đối tượng trong ảnh:
+
+| Số  | Object    | Mục đích                                                |
+|-----|-----------|---------------------------------------------------------|
+| 1   | Textbox   | Nhập địa chỉ Email đã đăng ký tài khoản                 |
+| 2   | Button    | Gửi yêu cầu lấy đường link xác thực để đặt lại mật khẩu |
+| 3   | Hyperlink | Quay lại trang đăng nhập                                |
 
 # CHƯƠNG 5: ÁP DỤNG MẪU THIẾT KẾ {#chương-5-áp-dụng-mẫu-thiết-kế .P1}
 
@@ -2416,7 +2502,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 # 5.1. Nhóm mẫu thiết kế khởi tạo (Creational Patterns) {#nhóm-mẫu-thiết-kế-khởi-tạo-creational-patterns .P2}
 
-[]{#_Toc233321832 .anchor}5.1.1. Singleton Pattern
+[]{#_Toc233347771 .anchor}5.1.1. Singleton Pattern
 
 **Công dụng chung:** Đảm bảo một lớp chỉ có duy nhất một thể hiện (instance) và cung cấp điểm truy cập toàn cục đến nó.
 
@@ -2426,7 +2512,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Tiết kiệm tối đa tài nguyên bộ nhớ, dễ quản lý luồng dữ liệu và chia sẻ trạng thái tập trung.
 
-[]{#_Toc233321833 .anchor}5.1.2. Builder Pattern
+[]{#_Toc233347772 .anchor}5.1.2. Builder Pattern
 
 **Công dụng chung:** Tách rời việc xây dựng đối tượng phức tạp khỏi biểu diễn của nó để cùng một tiến trình có thể tạo ra các biểu diễn khác nhau.
 
@@ -2436,7 +2522,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Việc khởi tạo cực kỳ an toàn, cấu trúc rõ ràng theo từng bước chuỗi (method chaining), mã nguồn dễ đọc hơn.
 
-[]{#_Toc233321834 .anchor}5.1.3. Factory Method Pattern
+[]{#_Toc233347773 .anchor}5.1.3. Factory Method Pattern
 
 **Công dụng chung:** Cung cấp một giao diện để tạo đối tượng trong lớp cha, nhưng cho phép các lớp con thay đổi kiểu đối tượng sẽ được tạo.
 
@@ -2448,7 +2534,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 # 5.2. Nhóm mẫu thiết kế cấu trúc (Structural Patterns) {#nhóm-mẫu-thiết-kế-cấu-trúc-structural-patterns .P2}
 
-[]{#_Toc233321836 .anchor}5.2.1. Adapter Pattern
+[]{#_Toc233347775 .anchor}5.2.1. Adapter Pattern
 
 **Công dụng chung:** Bao bọc đối tượng bằng một interface tương thích, cho phép các interface không tương thích làm việc cùng nhau.
 
@@ -2458,7 +2544,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Giúp hệ thống không phụ thuộc chặt vào mã của bên thứ ba, dễ dàng đổi sang nhà cung cấp thanh toán mới mà không sửa logic cốt lõi.
 
-[]{#_Toc233321837 .anchor}5.2.2. Facade Pattern
+[]{#_Toc233347776 .anchor}5.2.2. Facade Pattern
 
 **Công dụng chung:** Cung cấp một giao diện thống nhất, cấp cao cho một tập hợp các giao diện trong hệ thống con để che giấu sự phức tạp.
 
@@ -2468,7 +2554,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Cung cấp một interface gọn gàng cho client, giảm sự phụ thuộc chéo giữa Controller và nhiều hệ thống con bên dưới.
 
-[]{#_Toc233321838 .anchor}5.2.3. Composite Pattern
+[]{#_Toc233347777 .anchor}5.2.3. Composite Pattern
 
 **Công dụng chung:** Tổ chức các đối tượng theo cấu trúc cây để biểu diễn hệ thống phân cấp toàn phần hay bán phần.
 
@@ -2478,7 +2564,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Cho phép hệ thống tương tác và xử lý đồng nhất đối với danh mục gốc và các danh mục con.
 
-[]{#_Toc233321839 .anchor}5.2.4. Proxy Pattern
+[]{#_Toc233347778 .anchor}5.2.4. Proxy Pattern
 
 **Công dụng chung:** Cung cấp một đối tượng đóng thế (surrogate) để kiểm soát quyền truy cập tới đối tượng gốc.
 
@@ -2490,7 +2576,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 # 5.3. Nhóm mẫu thiết kế hành vi (Behavioral Patterns) {#nhóm-mẫu-thiết-kế-hành-vi-behavioral-patterns .P2}
 
-[]{#_Toc233321841 .anchor}5.3.1. State Pattern
+[]{#_Toc233347780 .anchor}5.3.1. State Pattern
 
 **Công dụng chung:** Cho phép đối tượng thay đổi hành vi của nó khi trạng thái nội bộ thay đổi.
 
@@ -2500,7 +2586,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Kiểm soát chặt chẽ hành vi hợp lệ của Voucher tại từng thời điểm, xóa bỏ triệt để các khối if-else lồng nhau.
 
-[]{#_Toc233321842 .anchor}5.3.2. Strategy Pattern
+[]{#_Toc233347781 .anchor}5.3.2. Strategy Pattern
 
 **Công dụng chung:** Định nghĩa một tập hợp thuật toán, đóng gói từng thuật toán và làm cho chúng có thể thay thế lẫn nhau.
 
@@ -2510,7 +2596,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Đóng gói các thuật toán tính toán độc lập, xóa bỏ if-else dài dòng, dễ dàng thêm mới các loại ưu đãi sau này.
 
-[]{#_Toc233321843 .anchor}5.3.3. Observer Pattern
+[]{#_Toc233347782 .anchor}5.3.3. Observer Pattern
 
 **Công dụng chung:** Định nghĩa mối phụ thuộc một - nhiều, khi một đối tượng đổi trạng thái, tất cả đối tượng phụ thuộc được tự động thông báo.
 
@@ -2520,7 +2606,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Giảm độ kết dính (Loose Coupling), xử lý bất đồng bộ các tác vụ hậu kỳ giúp phản hồi người dùng nhanh hơn.
 
-[]{#_Toc233321844 .anchor}5.3.4. Template Method Pattern
+[]{#_Toc233347783 .anchor}5.3.4. Template Method Pattern
 
 **Công dụng chung:** Định nghĩa bộ khung của thuật toán trong lớp cha, giao việc cài đặt chi tiết cho các lớp con.
 
@@ -2530,7 +2616,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Tái sử dụng bộ khung chuẩn, giảm mã lặp (code duplication), thống nhất luồng thuật toán cốt lõi.
 
-[]{#_Toc233321845 .anchor}5.3.5. Command Pattern
+[]{#_Toc233347784 .anchor}5.3.5. Command Pattern
 
 **Công dụng chung:** Đóng gói một yêu cầu thành một đối tượng độc lập, cho phép trì hoãn thực thi, đưa vào hàng đợi hoặc lưu log.
 
@@ -2540,7 +2626,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Tách biệt đối tượng ra lệnh khỏi đối tượng thực thi, dễ dàng quản lý luồng gọi hàm phức tạp.
 
-[]{#_Toc233321846 .anchor}5.3.6. Chain of Responsibility
+[]{#_Toc233347785 .anchor}5.3.6. Chain of Responsibility
 
 **Công dụng chung:** Cho phép chuyển yêu cầu dọc theo một chuỗi các đối tượng xử lý nối tiếp nhau đến khi có một đối tượng xử lý nó.
 
@@ -2550,7 +2636,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Nếu bộ lọc đầu phát hiện vi phạm, chuỗi lập tức dừng lại, tối ưu hiệu suất và cấu trúc kiểm duyệt rất linh hoạt.
 
-[]{#_Toc233321847 .anchor}5.3.7. Visitor Pattern
+[]{#_Toc233347786 .anchor}5.3.7. Visitor Pattern
 
 **Công dụng chung:** Định nghĩa một hoạt động mới mà không làm thay đổi các lớp của các đối tượng mà nó thao tác.
 
@@ -2562,7 +2648,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 # 5.4. Các mẫu thiết kế kiến trúc & dữ liệu (Architecture & Data Patterns) {#các-mẫu-thiết-kế-kiến-trúc-dữ-liệu-architecture-data-patterns .P2}
 
-[]{#_Toc233321849 .anchor}5.4.1. Reservation Pattern
+[]{#_Toc233347788 .anchor}5.4.1. Reservation Pattern
 
 **Công dụng chung:** Khóa (Lock) tạm thời một nguồn tài nguyên có giới hạn để đảm bảo nó thuộc về người dùng đang thực hiện giao dịch.
 
@@ -2572,7 +2658,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Bảo đảm tính nhất quán dữ liệu tồn kho trong môi trường có lưu lượng người mua hàng song song rất lớn.
 
-[]{#_Toc233321850 .anchor}5.4.2. Repository Pattern
+[]{#_Toc233347789 .anchor}5.4.2. Repository Pattern
 
 **Công dụng chung:** Đóng vai trò lớp trung gian (Collection-like) giữa tầng xử lý nghiệp vụ và truy xuất cơ sở dữ liệu.
 
@@ -2582,7 +2668,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Trừu tượng hóa hoàn toàn việc kết nối Database. Tận dụng khả năng tự động sinh câu truy vấn an toàn của Spring Data.
 
-[]{#_Toc233321851 .anchor}5.4.3. Unit of Work Pattern
+[]{#_Toc233347790 .anchor}5.4.3. Unit of Work Pattern
 
 **Công dụng chung:** Theo dõi mọi thay đổi trong một tác vụ và cập nhật đồng loạt xuống cơ sở dữ liệu như một giao dịch duy nhất.
 
@@ -2592,7 +2678,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Đảm bảo tính nguyên tử (ACID). Nếu một thao tác lỗi, toàn bộ lệnh DB trước đó tự động bị Rollback (hủy bỏ).
 
-[]{#_Toc233321852 .anchor}5.4.4. Specification Pattern
+[]{#_Toc233347791 .anchor}5.4.4. Specification Pattern
 
 **Công dụng chung:** Kết hợp nhiều tiêu chí để kiểm tra sự thỏa mãn của đối tượng, hoặc tạo ra bộ lọc dữ liệu đa năng.
 
@@ -2602,7 +2688,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Cho phép nối ghép các điều kiện lọc động qua phép logic AND/OR tại thời gian thực một cách uyển chuyển.
 
-[]{#_Toc233321853 .anchor}5.4.5. DTO Pattern
+[]{#_Toc233347792 .anchor}5.4.5. DTO Pattern
 
 **Công dụng chung:** Đóng gói và vận chuyển dữ liệu giữa các tiến trình hoặc các tầng (Layer) của ứng dụng.
 
@@ -2612,7 +2698,7 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 
 **Lợi ích:** Tăng cường bảo mật, tạo định dạng JSON thống nhất cho Frontend sử dụng độc lập với thiết kế Database.
 
-[]{#_Toc233321854 .anchor}5.4.6. Policy Pattern
+[]{#_Toc233347793 .anchor}5.4.6. Policy Pattern
 
 **Công dụng chung:** Tách rời tập hợp các nguyên tắc, luật lệ kinh doanh ra khỏi đối tượng để dễ dàng tái cấu hình.
 
@@ -2621,8 +2707,6 @@ Nhằm đảm bảo tính linh hoạt, khả năng mở rộng, dễ dàng bảo
 **Hiện thực hóa:** Thể hiện ở lớp OrderStatusTransitionPolicy trong gói policy.
 
 **Lợi ích:** Gom mọi quy tắc kiểm tra ràng buộc tập trung tại một nơi, ranh giới nghiệp vụ rõ ràng và sạch sẽ hơn.
-
-# CHƯƠNG 6: CÀI ĐẶT VÀ KẾT QUẢ THỰC NGHIỆM {#chương-6-cài-đặt-và-kết-quả-thực-nghiệm .P1}
 
 # C. PHẦN KẾT LUẬN {#c.-phần-kết-luận .P1}
 
@@ -2695,3 +2779,34 @@ Nâng cấp hạ tầng triển khai (DevOps): Áp dụng tự động hóa hoà
 \[10\] VNPAY. (không ngày tháng). *Kết nối Cổng thanh toán VNPAY*. Được truy lục từ https://sandbox.vnpayment.vn/apis/
 
 \[11\] Walls, C. (2022). *Spring in Action, Sixth Edition.* Manning Publications.
+
+# BẢNG LIỆT KÊ KHỐI LƯỢNG CÔNG VIỆC {#bảng-liệt-kê-khối-lượng-công-việc .P1}
+
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th><h1 id="mssv" class="P1">MSSV</h1></th>
+<th><h1 id="thành-viên" class="P1">Thành viên </h1></th>
+<th><h1 id="công-việc-đã-thực-hiện" class="P1">Công việc đã thực hiện</h1></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><h1 id="section-1" class="P1"></h1></td>
+<td><h1 id="section-2" class="P1"></h1></td>
+<td><h1 id="section-3" class="P1"></h1></td>
+</tr>
+<tr>
+<td><h1 id="section-4" class="P1"></h1></td>
+<td><h1 id="section-5" class="P1"></h1></td>
+<td><h1 id="section-6" class="P1"></h1></td>
+</tr>
+</tbody>
+</table>
+
+#  {#section-7 .P1}

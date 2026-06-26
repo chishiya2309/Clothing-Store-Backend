@@ -251,6 +251,22 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException e, WebRequest request) {
+        ErrorResponse errorResponse = baseErrorResponse(HttpStatus.BAD_REQUEST, request);
+        errorResponse.setMessage("Dữ liệu không hợp lệ hoặc đã tồn tại. Vui lòng kiểm tra lại.");
+        return errorResponse;
+    }
+
+    @ExceptionHandler(Exception.class)
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleGenericException(Exception e, WebRequest request) {
+        ErrorResponse errorResponse = baseErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, request);
+        errorResponse.setMessage("Có lỗi hệ thống xảy ra. Vui lòng thử lại sau.");
+        return errorResponse;
+    }
+
     private ErrorResponse baseErrorResponse(HttpStatus status, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());

@@ -471,7 +471,7 @@ public class StaffProductServiceImpl implements StaffProductService {
     }
 
     private void evictProductCaches() {
-        List.of("newArrivals", "bestSellers").stream()
+        List.of("newArrivals", "bestSellers", "categories", "collections").stream()
                 .map(cacheManager::getCache)
                 .filter(Objects::nonNull)
                 .forEach(Cache::clear);
