@@ -19,7 +19,7 @@ import java.time.OffsetDateTime;
 @RestController
 @RequestMapping("/api/staff/reviews")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
 @Slf4j(topic = "STAFF-REVIEW-CONTROLLER")
 public class StaffReviewController {
 

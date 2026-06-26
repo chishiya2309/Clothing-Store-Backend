@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/staff/vouchers")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
 public class StaffVoucherController {
 
     private final VoucherService voucherService;

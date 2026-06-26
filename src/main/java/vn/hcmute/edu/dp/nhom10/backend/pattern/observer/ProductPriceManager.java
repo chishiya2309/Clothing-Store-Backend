@@ -42,6 +42,8 @@ public class ProductPriceManager implements ProductPriceSubject {
         }
     }
 
+    @org.springframework.cache.annotation.CacheEvict(value = { "newArrivals", "bestSellers", "categories",
+            "collections" }, allEntries = true)
     @Transactional
     public Product setSalePrice(Long productId, BigDecimal newSalePrice) {
         Product product = productRepository.findById(productId)
@@ -49,7 +51,7 @@ public class ProductPriceManager implements ProductPriceSubject {
 
         BigDecimal oldPrice = product.getSalePrice();
         product.setSalePrice(newSalePrice);
-        
+
         Product savedProduct = productRepository.save(product);
 
         // Kích hoạt notification pattern

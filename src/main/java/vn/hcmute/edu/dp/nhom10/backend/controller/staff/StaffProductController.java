@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import vn.hcmute.edu.dp.nhom10.backend.service.S3Service;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCreateProductRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffProductSearchCriteria;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffUpdateProductRequest;
@@ -28,10 +31,11 @@ import java.time.OffsetDateTime;
 @RestController
 @RequestMapping("/api/staff/products")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STAFF')")
+@PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
 public class StaffProductController {
 
     private final StaffProductService staffProductService;
+    private final S3Service s3Service;
 
     @GetMapping
     public ApiResponse getProducts(
@@ -110,6 +114,12 @@ public class StaffProductController {
                 "Cập nhật tồn kho thành công",
                 staffProductService.updateStock(productId, variantId, request)
         );
+    }
+
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse uploadImage(@RequestParam("file") MultipartFile file) {
+        String url = s3Service.uploadFile("products", file);
+        return buildResponse(HttpStatus.OK, "Upload hình ảnh thành công", url);
     }
 
     private ApiResponse buildResponse(HttpStatus status, String message, Object data) {

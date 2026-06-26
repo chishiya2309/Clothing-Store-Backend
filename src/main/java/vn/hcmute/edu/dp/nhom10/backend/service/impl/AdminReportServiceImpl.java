@@ -74,7 +74,8 @@ public class AdminReportServiceImpl implements AdminReportService {
                         p.getProductName(),
                         p.getCategoryName(),
                         p.getTotalQuantitySold(),
-                        p.getTotalRevenue()
+                        p.getTotalRevenue(),
+                        p.getThumbnailUrl()
                 ))
                 .toList();
     }

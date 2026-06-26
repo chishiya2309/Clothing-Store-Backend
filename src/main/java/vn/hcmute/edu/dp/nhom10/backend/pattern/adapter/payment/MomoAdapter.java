@@ -50,8 +50,7 @@ public class MomoAdapter implements PaymentGatewayAdapter {
     public GatewayPaymentCreationResult createPayment(GatewayPaymentCreationCommand command) {
         if (!isAvailable()) {
             throw new PaymentInitializationException(
-                    "MoMo adapter is not configured: " + properties.unavailableReason()
-            );
+                    "MoMo adapter is not configured: " + properties.unavailableReason());
         }
 
         MomoCreatePaymentRequest request = requestFactory.create(properties, command);
@@ -64,14 +63,12 @@ public class MomoAdapter implements PaymentGatewayAdapter {
         return new GatewayPaymentCreationResult(
                 response.payUrl(),
                 null,
-                sanitizedPayload(request, response)
-        );
+                sanitizedPayload(request, response));
     }
 
     private MomoCreatePaymentResponse sendCreatePaymentRequest(
             MomoCreatePaymentRequest request,
-            String paymentReference
-    ) {
+            String paymentReference) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(properties.getConnectTimeoutSeconds()))
                 .build();
@@ -129,8 +126,7 @@ public class MomoAdapter implements PaymentGatewayAdapter {
 
     private Map<String, Object> sanitizedPayload(
             MomoCreatePaymentRequest request,
-            MomoCreatePaymentResponse response
-    ) {
+            MomoCreatePaymentResponse response) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("gateway", supportMethod().name());
         payload.put("partnerCode", request.partnerCode());

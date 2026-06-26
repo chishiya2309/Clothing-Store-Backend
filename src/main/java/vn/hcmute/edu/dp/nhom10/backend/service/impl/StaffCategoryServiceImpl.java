@@ -43,7 +43,7 @@ public class StaffCategoryServiceImpl implements StaffCategoryService {
     }
 
     @Override
-    @CacheEvict(value = "categories", allEntries = true)
+    @CacheEvict(value = {"categories", "newArrivals", "bestSellers"}, allEntries = true)
     public StaffCategoryResponse createCategory(StaffCategoryRequest request, String username) {
         return commandExecutor.execute(new CatalogCommand<StaffCategoryResponse>() {
             @Override
@@ -85,7 +85,7 @@ public class StaffCategoryServiceImpl implements StaffCategoryService {
     }
 
     @Override
-    @CacheEvict(value = "categories", allEntries = true)
+    @CacheEvict(value = {"categories", "newArrivals", "bestSellers"}, allEntries = true)
     public StaffCategoryResponse updateCategory(Long id, StaffCategoryRequest request, String username) {
         return commandExecutor.execute(new CatalogCommand<StaffCategoryResponse>() {
             @Override
@@ -142,7 +142,7 @@ public class StaffCategoryServiceImpl implements StaffCategoryService {
     }
 
     @Override
-    @CacheEvict(value = "categories", allEntries = true)
+    @CacheEvict(value = {"categories", "newArrivals", "bestSellers"}, allEntries = true)
     public void deleteCategory(Long id, String username) {
         commandExecutor.execute(new CatalogCommand<Void>() {
             @Override

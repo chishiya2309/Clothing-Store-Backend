@@ -12,7 +12,8 @@ public record BestsellerReportResponse(
         String productName,
         String categoryName,
         Long totalQuantitySold,
-        BigDecimal totalRevenue
+        BigDecimal totalRevenue,
+        String thumbnailUrl
 ) {
     public BestsellerReportResponse {
         if (categoryName == null) categoryName = "Không rõ";
