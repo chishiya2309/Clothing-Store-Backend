@@ -47,7 +47,7 @@ class CsvExporterTest {
         BestsellerCsvExporter exporter = new BestsellerCsvExporter();
         
         List<BestsellerReportResponse> data = List.of(
-                new BestsellerReportResponse(1L, "Áo Polo, Cotton", "Nam > Áo Polo", 320L, BigDecimal.valueOf(159680000))
+                new BestsellerReportResponse(1L, "Áo Polo, Cotton", "Nam > Áo Polo", 320L, BigDecimal.valueOf(159680000), "http://example.com/image.jpg")
         );
 
         StringWriter writer = new StringWriter();
