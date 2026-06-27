@@ -49,15 +49,19 @@ public class Product {
     private BigDecimal salePrice;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @Column(name = "is_featured", nullable = false)
+    @Builder.Default
     private Boolean isFeatured = false;
 
     @Column(name = "total_sold", nullable = false)
+    @Builder.Default
     private Integer totalSold = 0;
 
     @Column(name = "average_rating", precision = 3, scale = 2)
+    @Builder.Default
     private BigDecimal averageRating = BigDecimal.ZERO;
 
     @CreationTimestamp

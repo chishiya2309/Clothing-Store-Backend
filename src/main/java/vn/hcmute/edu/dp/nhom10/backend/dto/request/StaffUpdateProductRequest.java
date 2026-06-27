@@ -11,13 +11,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record StaffUpdateProductRequest(
-        @NotBlank
-        @Size(max = 255)
+        @NotBlank(message = "Tên sản phẩm không được để trống")
+        @Size(max = 255, message = "Tên sản phẩm không được vượt quá 255 ký tự")
         String name,
 
         String description,
 
-        @Size(max = 255)
+        @Size(max = 255, message = "Chất liệu không được vượt quá 255 ký tự")
         String material,
 
         String careInstructions,
