@@ -50,17 +50,17 @@ class AdminReportControllerTest {
     void getRevenueReport_success() throws Exception {
         OffsetDateTime start = OffsetDateTime.parse("2026-06-01T00:00:00Z");
         OffsetDateTime end = OffsetDateTime.parse("2026-06-30T23:59:59Z");
-        
+
         List<RevenueReportResponse> mockData = List.of(
-                new RevenueReportResponse(LocalDate.now(), 100L, 90L, 10L, BigDecimal.valueOf(300000), BigDecimal.valueOf(20000), BigDecimal.valueOf(280000))
-        );
+                new RevenueReportResponse(LocalDate.now(), 100L, 90L, 10L, BigDecimal.valueOf(300000),
+                        BigDecimal.valueOf(20000), BigDecimal.valueOf(280000)));
 
         when(reportService.getRevenueReport(eq(start), eq(end))).thenReturn(mockData);
 
         mockMvc.perform(get("/api/admin/reports/revenue")
-                        .param("startDate", "2026-06-01T00:00:00Z")
-                        .param("endDate", "2026-06-30T23:59:59Z")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .param("startDate", "2026-06-01T00:00:00Z")
+                .param("endDate", "2026-06-30T23:59:59Z")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("Lấy dữ liệu thống kê doanh thu thành công"))
@@ -83,8 +83,8 @@ class AdminReportControllerTest {
         }).when(reportService).exportRevenueReport(any(Writer.class), eq(start), eq(end));
 
         mockMvc.perform(get("/api/admin/reports/revenue/export")
-                        .param("startDate", "2026-06-01T00:00:00Z")
-                        .param("endDate", "2026-06-30T23:59:59Z"))
+                .param("startDate", "2026-06-01T00:00:00Z")
+                .param("endDate", "2026-06-30T23:59:59Z"))
                 .andExpect(status().isOk())
                 .andExpect(status().is(200));
 
@@ -97,15 +97,15 @@ class AdminReportControllerTest {
         OffsetDateTime end = OffsetDateTime.parse("2026-06-30T23:59:59Z");
 
         List<BestsellerReportResponse> mockData = List.of(
-                new BestsellerReportResponse(1L, "Áo Polo Nam", "Nam > Polo", 50L, BigDecimal.valueOf(50000))
-        );
+                new BestsellerReportResponse(1L, "Áo Polo Nam", "Nam > Polo", 50L, BigDecimal.valueOf(50000),
+                        "http://example.com/image.jpg"));
 
         when(reportService.getBestsellerReport(eq(start), eq(end))).thenReturn(mockData);
 
         mockMvc.perform(get("/api/admin/reports/bestsellers")
-                        .param("startDate", "2026-06-01T00:00:00Z")
-                        .param("endDate", "2026-06-30T23:59:59Z")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .param("startDate", "2026-06-01T00:00:00Z")
+                .param("endDate", "2026-06-30T23:59:59Z")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("Lấy dữ liệu thống kê sản phẩm bán chạy thành công"))
@@ -128,8 +128,8 @@ class AdminReportControllerTest {
         }).when(reportService).exportBestsellerReport(any(Writer.class), eq(start), eq(end));
 
         mockMvc.perform(get("/api/admin/reports/bestsellers/export")
-                        .param("startDate", "2026-06-01T00:00:00Z")
-                        .param("endDate", "2026-06-30T23:59:59Z"))
+                .param("startDate", "2026-06-01T00:00:00Z")
+                .param("endDate", "2026-06-30T23:59:59Z"))
                 .andExpect(status().isOk());
 
         verify(reportService, times(1)).exportBestsellerReport(any(Writer.class), eq(start), eq(end));
@@ -141,15 +141,15 @@ class AdminReportControllerTest {
         OffsetDateTime end = OffsetDateTime.parse("2026-06-30T23:59:59Z");
 
         List<LoyaltyCustomerReportResponse> mockData = List.of(
-                new LoyaltyCustomerReportResponse(10L, "Nguyễn Văn A", "a@gmail.com", "Vàng", 5L, BigDecimal.valueOf(50000), 500)
-        );
+                new LoyaltyCustomerReportResponse(10L, "Nguyễn Văn A", "a@gmail.com", "Vàng", 5L,
+                        BigDecimal.valueOf(50000), 500));
 
         when(reportService.getLoyaltyCustomerReport(eq(start), eq(end))).thenReturn(mockData);
 
         mockMvc.perform(get("/api/admin/reports/loyalty")
-                        .param("startDate", "2026-06-01T00:00:00Z")
-                        .param("endDate", "2026-06-30T23:59:59Z")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .param("startDate", "2026-06-01T00:00:00Z")
+                .param("endDate", "2026-06-30T23:59:59Z")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("Lấy báo cáo khách hàng thân thiết thành công"))
@@ -172,8 +172,8 @@ class AdminReportControllerTest {
         }).when(reportService).exportLoyaltyCustomerReport(any(Writer.class), eq(start), eq(end));
 
         mockMvc.perform(get("/api/admin/reports/loyalty/export")
-                        .param("startDate", "2026-06-01T00:00:00Z")
-                        .param("endDate", "2026-06-30T23:59:59Z"))
+                .param("startDate", "2026-06-01T00:00:00Z")
+                .param("endDate", "2026-06-30T23:59:59Z"))
                 .andExpect(status().isOk());
 
         verify(reportService, times(1)).exportLoyaltyCustomerReport(any(Writer.class), eq(start), eq(end));

@@ -32,7 +32,7 @@ class ReportDtoTest {
     void testBestsellerReportResponse_compactConstructor_defaultsNulls() {
         // Construct with nulls
         BestsellerReportResponse response = new BestsellerReportResponse(
-                1L, "Test Product", null, null, null
+                1L, "Test Product", null, null, null, null
         );
 
         // Assert defaults

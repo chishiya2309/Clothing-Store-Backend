@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Date;
 
@@ -57,7 +63,8 @@ public class GlobalExceptionHandling {
     }
 
     @ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class,
-            MethodArgumentNotValidException.class, IllegalArgumentException.class })
+            MethodArgumentNotValidException.class, IllegalArgumentException.class,
+            HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "Handle exception when the data invalid. (@RequestBody, @RequestParam)", summary = "Handle Bad Request", value = """
@@ -98,7 +105,7 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler({ResourceNotFoundException.class, NoResourceFoundException.class, NoHandlerFoundException.class})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "404", description = "Not Found", content = {
                     @Content(mediaType = APPLICATION_JSON_VALUE, examples = @ExampleObject(name = "404 Response", summary = "Handle exception when resource not found", value = """
@@ -113,7 +120,7 @@ public class GlobalExceptionHandling {
     })
 
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NOT_FOUND)
-    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
+    public ErrorResponse handleResourceNotFoundException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setPath(request.getDescription(false).replace("uri=", ""));
