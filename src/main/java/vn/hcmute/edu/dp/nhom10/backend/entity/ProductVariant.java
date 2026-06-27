@@ -34,12 +34,15 @@ public class ProductVariant {
     private String color;
 
     @Column(name = "stock_quantity", nullable = false)
+    @Builder.Default
     private Integer stockQuantity = 0;
 
     @Column(name = "additional_price", nullable = false, precision = 12, scale = 2)
+    @Builder.Default
     private BigDecimal additionalPrice = BigDecimal.ZERO;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @CreationTimestamp

@@ -11,12 +11,12 @@ import java.math.BigDecimal;
 public record StaffProductVariantRequest(
         Long id,
 
-        @NotBlank
-        @Size(max = 10)
+        @NotBlank(message = "Kích thước không được để trống")
+        @Size(max = 10, message = "Kích thước không được vượt quá 10 ký tự")
         String size,
 
-        @NotBlank
-        @Size(max = 50)
+        @NotBlank(message = "Màu sắc không được để trống")
+        @Size(max = 50, message = "Màu sắc không được vượt quá 50 ký tự")
         String color,
 
         @NotNull
