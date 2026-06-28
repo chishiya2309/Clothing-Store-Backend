@@ -204,9 +204,11 @@ public class StaffProductServiceImpl implements StaffProductService {
     @Override
     @Transactional
     public StaffProductDetailResponse updateVisibility(Long productId, StaffUpdateProductVisibilityRequest request) {
-        Product product = findProduct(productId);
+        Product product = productRepository.findByIdIgnoringSoftDelete(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm với id: " + productId));
         product.setIsActive(request.isActive());
-        product.setDeletedAt(Boolean.TRUE.equals(request.isActive()) ? null : OffsetDateTime.now());
+        // DO NOT set deletedAt - visibility toggle only changes isActive flag
+        // Soft delete (deletedAt) is only set when user clicks Delete button
 
         Product saved = productRepository.save(product);
         evictProductCaches();
