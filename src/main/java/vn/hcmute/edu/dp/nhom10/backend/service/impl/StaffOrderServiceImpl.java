@@ -531,10 +531,19 @@ public class StaffOrderServiceImpl implements StaffOrderService {
 
     private StaffOrderItemResponse toOrderItemResponse(OrderItem item) {
         ProductVariant variant = item.getProductVariant();
+        String productImage = null;
+        if (variant != null && variant.getProduct() != null && variant.getProduct().getImages() != null) {
+            productImage = variant.getProduct().getImages().stream()
+                    .filter(img -> "main".equals(img.getImageType()))
+                    .findFirst()
+                    .map(vn.hcmute.edu.dp.nhom10.backend.entity.ProductImage::getImageUrl)
+                    .orElse(variant.getProduct().getImages().isEmpty() ? null : variant.getProduct().getImages().get(0).getImageUrl());
+        }
         return StaffOrderItemResponse.builder()
                 .productVariantId(variant == null ? null : variant.getId())
                 .sku(variant == null ? null : variant.getSku())
                 .productName(item.getProductName())
+                .productImage(productImage)
                 .variantInfo(item.getVariantInfo())
                 .unitPrice(item.getUnitPrice())
                 .quantity(item.getQuantity())
