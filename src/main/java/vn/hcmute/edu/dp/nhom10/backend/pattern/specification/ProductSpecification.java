@@ -5,6 +5,8 @@ import org.springframework.data.jpa.domain.Specification;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ProductSearchCriteria;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
+import vn.hcmute.edu.dp.nhom10.backend.entity.CollectionProduct;
+import vn.hcmute.edu.dp.nhom10.backend.entity.Collection;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -42,6 +44,10 @@ public final class ProductSpecification {
             spec = spec.and(nameContains(criteria.getKeyword().trim()));
         }
 
+        if (criteria.getCollectionSlug() != null && !criteria.getCollectionSlug().isBlank()) {
+            spec = spec.and(inCollection(criteria.getCollectionSlug().trim()));
+        }
+
         if (criteria.getColors() != null && !criteria.getColors().isEmpty()) {
             spec = spec.and(hasColors(criteria.getColors()));
         }
@@ -59,6 +65,21 @@ public final class ProductSpecification {
         }
 
         return spec;
+    }
+
+    /** Lọc theo Collection Slug */
+    public static Specification<Product> inCollection(String collectionSlug) {
+        return (root, query, cb) -> {
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<CollectionProduct> cpRoot = subquery.from(CollectionProduct.class);
+            Join<CollectionProduct, Collection> collectionJoin = cpRoot.join("collection");
+            subquery.select(cpRoot.get("product").get("id"))
+                    .where(
+                            cb.equal(collectionJoin.get("slug"), collectionSlug),
+                            cb.isTrue(collectionJoin.get("isActive"))
+                    );
+            return cb.in(root.get("id")).value(subquery);
+        };
     }
 
     /** Chỉ lấy sản phẩm đang hoạt động */

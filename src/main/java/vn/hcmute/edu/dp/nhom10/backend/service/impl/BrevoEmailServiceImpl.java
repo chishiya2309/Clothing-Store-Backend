@@ -130,8 +130,7 @@ public class BrevoEmailServiceImpl implements EmailService {
             String toEmail,
             String orderCode,
             String reason,
-            boolean requiresManualRefundReview
-    ) {
+            boolean requiresManualRefundReview) {
         String htmlContent = """
                 <html>
                 <body>
@@ -147,8 +146,7 @@ public class BrevoEmailServiceImpl implements EmailService {
                 HtmlUtils.htmlEscape(reason),
                 requiresManualRefundReview
                         ? "<p>Cửa hàng sẽ xem xét riêng giao dịch thanh toán trực tuyến đã hoàn tất.</p>"
-                        : ""
-        );
+                        : "");
 
         sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Đơn hàng đã bị hủy", htmlContent);
     }
@@ -165,8 +163,7 @@ public class BrevoEmailServiceImpl implements EmailService {
             String paymentMethod,
             String paymentStatus,
             BigDecimal paidAmount,
-            boolean requiresManualRefundReview
-    ) {
+            boolean requiresManualRefundReview) {
         String htmlContent = """
                 <html>
                 <body>
@@ -194,8 +191,7 @@ public class BrevoEmailServiceImpl implements EmailService {
                 paidAmount == null ? "" : paidAmount.toPlainString(),
                 requiresManualRefundReview
                         ? "<p>Cần xem xét hoàn tiền thủ công đối với khoản thanh toán trực tuyến đã hoàn thành tất này.</p>"
-                        : "<p>Việc xem xét hoàn tiền thủ công không bắt buộc với đơn hàng này.</p>"
-        );
+                        : "<p>Việc xem xét hoàn tiền thủ công không bắt buộc với đơn hàng này.</p>");
 
         sendTransactionalEmail(toEmail, toEmail, "Clothing Store - Staff cancelled order", htmlContent);
     }
@@ -221,7 +217,6 @@ public class BrevoEmailServiceImpl implements EmailService {
             log.error("Failed to send transactional email to {}", toEmail, e);
         }
     }
-
 
     @Async
     @Override
@@ -259,40 +254,55 @@ public class BrevoEmailServiceImpl implements EmailService {
         }
     }
 
-
-
     @Async
     @Override
-    public void sendProductSaleEmail(String toEmail, String fullName, vn.hcmute.edu.dp.nhom10.backend.entity.Product product) {
+    public void sendProductSaleEmail(String toEmail, String fullName,
+            vn.hcmute.edu.dp.nhom10.backend.entity.Product product) {
         String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
         String productUrl = baseUrl + "/product/" + product.getSlug();
         String priceDisplay = product.getSalePrice() != null ? product.getSalePrice().toString() : "";
-        
+
         String imageUrl = "";
         if (product.getImages() != null && !product.getImages().isEmpty()) {
-            imageUrl = product.getImages().get(0).getImageUrl();
-        }
-        
-        String imageHtml = !imageUrl.isEmpty() 
-            ? String.format("<div style='text-align: center; margin: 20px 0;'><a href='%s'><img src='%s' alt='%s' style='max-width: 100%%; max-height: 300px; border-radius: 8px;'/></a></div>", productUrl, imageUrl, product.getName())
-            : "";
+            vn.hcmute.edu.dp.nhom10.backend.entity.ProductImage mainImage = product.getImages().stream()
+                    .filter(img -> vn.hcmute.edu.dp.nhom10.backend.enums.ImageType.main.equals(img.getImageType()))
+                    .findFirst()
+                    .orElse(product.getImages().get(0));
 
-        String htmlContent = String.format("""
-                <html>
-                <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                        <h2 style="color: #ba1a1a; text-align: center;">Sản phẩm bạn yêu thích đang giảm giá!</h2>
-                        <p>Chào <strong>%s</strong>,</p>
-                        <p>Sản phẩm <strong>%s</strong> mà bạn đã lưu vào danh sách yêu thích hiện đang có giá ưu đãi là <strong style="color: #ba1a1a; font-size: 1.2em;">%s đ</strong>.</p>
-                        %s
-                        <div style="text-align: center; margin-top: 30px;">
-                            <a href="%s" style="background-color: #111827; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Xem chi tiết và Mua ngay</a>
-                        </div>
-                        <p style="margin-top: 30px; font-size: 0.9em; color: #666; text-align: center;">Cảm ơn bạn đã luôn đồng hành cùng CLOTHY!</p>
-                    </div>
-                </body>
-                </html>
-                """, fullName, product.getName(), priceDisplay, imageHtml, productUrl);
+            imageUrl = mainImage.getImageUrl();
+            if (imageUrl != null && !imageUrl.startsWith("http")) {
+                if (imageUrl.startsWith("/")) {
+                    imageUrl = backendUrl + imageUrl;
+                } else {
+                    imageUrl = backendUrl + "/" + imageUrl;
+                }
+            }
+        }
+
+        String imageHtml = !imageUrl.isEmpty()
+                ? String.format(
+                        "<div style='text-align: center; margin: 20px 0;'><a href='%s'><img src='%s' alt='%s' style='max-width: 100%%; max-height: 300px; border-radius: 8px;'/></a></div>",
+                        productUrl, imageUrl, product.getName())
+                : "";
+
+        String htmlContent = String.format(
+                """
+                        <html>
+                        <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+                            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                <h2 style="color: #ba1a1a; text-align: center;">Sản phẩm bạn yêu thích đang giảm giá!</h2>
+                                <p>Chào <strong>%s</strong>,</p>
+                                <p>Sản phẩm <strong>%s</strong> mà bạn đã lưu vào danh sách yêu thích hiện đang có giá ưu đãi là <strong style="color: #ba1a1a; font-size: 1.2em;">%s đ</strong>.</p>
+                                %s
+                                <div style="text-align: center; margin-top: 30px;">
+                                    <a href="%s" style="background-color: #111827; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Xem chi tiết và Mua ngay</a>
+                                </div>
+                                <p style="margin-top: 30px; font-size: 0.9em; color: #666; text-align: center;">Cảm ơn bạn đã luôn đồng hành cùng CLOTHY!</p>
+                            </div>
+                        </body>
+                        </html>
+                        """,
+                fullName, product.getName(), priceDisplay, imageHtml, productUrl);
 
         Map<String, Object> requestBody = Map.of(
                 "sender", Map.of("name", senderName, "email", senderEmail),

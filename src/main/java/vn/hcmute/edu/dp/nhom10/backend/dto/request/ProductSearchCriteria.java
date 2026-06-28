@@ -22,6 +22,9 @@ public class ProductSearchCriteria {
     /** Slug danh mục để lọc theo category tree (UC-10 + UC-12) */
     private String categorySlug;
 
+    /** Slug bộ sưu tập để lọc theo bộ sưu tập */
+    private String collectionSlug;
+
     /** Lọc theo danh sách màu sắc (UC-12) */
     private List<String> colors;
 

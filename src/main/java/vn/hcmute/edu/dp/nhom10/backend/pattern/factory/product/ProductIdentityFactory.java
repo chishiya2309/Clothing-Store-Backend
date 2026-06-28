@@ -19,6 +19,14 @@ public class ProductIdentityFactory {
                 + normalizeToken(size, "-") + "-"
                 + normalizeToken(color, "-"))
                 .toUpperCase(Locale.ROOT);
+        
+        if (baseSku.length() > 40) {
+            baseSku = baseSku.substring(0, 40);
+            if (baseSku.endsWith("-")) {
+                baseSku = baseSku.substring(0, 39);
+            }
+        }
+        
         return uniqueValue(baseSku, skuExists);
     }
 
