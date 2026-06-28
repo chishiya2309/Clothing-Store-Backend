@@ -47,4 +47,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     boolean existsByCategoryIdAndNameIgnoreCase(Long categoryId, String name);
 
     boolean existsByCategoryIdAndNameIgnoreCaseAndIdNot(Long categoryId, String name, Long id);
+
+    @Query(value = "SELECT * FROM products WHERE id = :id", nativeQuery = true)
+    Optional<Product> findByIdIgnoringSoftDelete(@Param("id") Long id);
 }
