@@ -6,11 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCategoryOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCategoryRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffCategoryService;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/staff/categories")
@@ -60,6 +62,16 @@ public class StaffCategoryController {
         String username = authentication != null ? authentication.getName() : null;
         staffCategoryService.deleteCategory(id, username);
         return buildResponse(HttpStatus.OK, "Xóa danh mục thành công", null);
+    }
+
+    @PutMapping("/bulk-order")
+    public ApiResponse updateCategoryOrders(
+            @Valid @RequestBody List<StaffCategoryOrderRequest> requests,
+            Authentication authentication
+    ) {
+        String username = authentication != null ? authentication.getName() : null;
+        staffCategoryService.updateCategoryOrders(requests, username);
+        return buildResponse(HttpStatus.OK, "Cập nhật thứ tự hiển thị thành công", null);
     }
 
     private ApiResponse buildResponse(HttpStatus status, String message, Object data) {

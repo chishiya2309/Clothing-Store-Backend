@@ -20,7 +20,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "categories", key = "'hierarchy'")
+    @Cacheable(value = "categories", key = "'hierarchy_v2'")
     public List<CategoryResponse> getCategoryHierarchy() {
         return categoryRepository.findByIsActiveTrueAndParentIsNullOrderByDisplayOrderAsc()
                 .stream()
@@ -34,6 +34,8 @@ public class CategoryServiceImpl implements CategoryService {
                 .name(category.getName())
                 .slug(category.getSlug())
                 .description(category.getDescription())
+                .displayOrder(category.getDisplayOrder())
+                .isActive(category.getIsActive())
                 .children(category.getChildren().stream()
                         .filter(Category::getIsActive)
                         .map(this::mapToResponse)

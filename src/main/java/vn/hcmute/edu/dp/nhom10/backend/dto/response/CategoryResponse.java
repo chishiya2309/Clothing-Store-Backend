@@ -15,5 +15,7 @@ public class CategoryResponse implements Serializable {
     private String name;
     private String slug;
     private String description;
+    private Integer displayOrder;
+    private Boolean isActive;
     private List<CategoryResponse> children;
 }

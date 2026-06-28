@@ -31,6 +31,7 @@ public class Category {
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
+    @OrderBy("displayOrder ASC")
     @Builder.Default
     private List<Category> children = new ArrayList<>();
 

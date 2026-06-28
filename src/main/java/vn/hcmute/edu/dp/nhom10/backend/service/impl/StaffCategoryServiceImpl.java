@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCategoryOrderRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.StaffCategoryRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffCategoryResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Category;
@@ -158,6 +159,28 @@ public class StaffCategoryServiceImpl implements StaffCategoryService {
             @Override
             public String getDescription() {
                 return "Xóa danh mục ID: " + id;
+            }
+        }, username);
+    }
+
+    @Override
+    @CacheEvict(value = {"categories", "newArrivals", "bestSellers"}, allEntries = true)
+    public void updateCategoryOrders(List<StaffCategoryOrderRequest> requests, String username) {
+        commandExecutor.execute(new CatalogCommand<Void>() {
+            @Override
+            public Void execute() {
+                for (StaffCategoryOrderRequest request : requests) {
+                    Category category = categoryRepository.findById(request.getId())
+                            .orElseThrow(() -> new ResourceNotFoundException("Danh mục không tồn tại: " + request.getId()));
+                    category.setDisplayOrder(request.getDisplayOrder());
+                    categoryRepository.save(category);
+                }
+                return null;
+            }
+
+            @Override
+            public String getDescription() {
+                return "Cập nhật thứ tự cho " + requests.size() + " danh mục";
             }
         }, username);
     }
