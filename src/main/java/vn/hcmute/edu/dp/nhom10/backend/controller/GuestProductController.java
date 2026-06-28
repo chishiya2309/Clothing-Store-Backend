@@ -27,6 +27,7 @@ public class GuestProductController {
     public ApiResponse searchProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) String collectionSlug,
             @RequestParam(required = false) List<String> colors,
             @RequestParam(required = false) List<String> sizes,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -38,6 +39,7 @@ public class GuestProductController {
         ProductSearchCriteria criteria = ProductSearchCriteria.builder()
                 .keyword(keyword)
                 .categorySlug(categorySlug)
+                .collectionSlug(collectionSlug)
                 .colors(colors)
                 .sizes(sizes)
                 .minPrice(minPrice)

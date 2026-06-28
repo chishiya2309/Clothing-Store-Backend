@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     Optional<Collection> findBySlugAndIsActiveTrue(String slug);
+    java.util.List<Collection> findAllByIsActiveTrue();
 }

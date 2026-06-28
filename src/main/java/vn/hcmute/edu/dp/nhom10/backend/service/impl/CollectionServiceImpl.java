@@ -30,4 +30,19 @@ public class CollectionServiceImpl implements CollectionService {
                 .bannerUrl(collection.getBannerUrl())
                 .build();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "collections", key = "'all_active'")
+    public java.util.List<CollectionResponse> getActiveCollections() {
+        return collectionRepository.findAllByIsActiveTrue().stream()
+                .map(collection -> CollectionResponse.builder()
+                        .id(collection.getId())
+                        .name(collection.getName())
+                        .slug(collection.getSlug())
+                        .description(collection.getDescription())
+                        .bannerUrl(collection.getBannerUrl())
+                        .build())
+                .toList();
+    }
 }

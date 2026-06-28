@@ -19,4 +19,6 @@ public class ProductGridResponse implements Serializable {
     private BigDecimal basePrice;
     private BigDecimal salePrice;
     private List<String> colors;
+    private Boolean isActive;
+    private String categoryName;
 }

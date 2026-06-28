@@ -259,6 +259,8 @@ public class StaffCollectionServiceImpl implements StaffCollectionService {
                 .salePrice(product.getSalePrice())
                 .thumbnailUrl(thumbnail)
                 .colors(colors)
+                .isActive(product.getIsActive())
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
                 .build();
     }
 }

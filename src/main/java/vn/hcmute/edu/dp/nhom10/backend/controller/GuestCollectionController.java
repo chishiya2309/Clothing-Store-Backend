@@ -18,6 +18,17 @@ public class GuestCollectionController {
 
     private final CollectionService collectionService;
 
+    @GetMapping
+    @Operation(summary = "Lấy danh sách các bộ sưu tập đang hoạt động")
+    public ApiResponse getActiveCollections() {
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Success")
+                .data(collectionService.getActiveCollections())
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
     @GetMapping("/{slug}")
     @Operation(summary = "Lấy thông tin bộ sưu tập bằng slug")
     public ApiResponse getCollectionBySlug(@PathVariable String slug) {
