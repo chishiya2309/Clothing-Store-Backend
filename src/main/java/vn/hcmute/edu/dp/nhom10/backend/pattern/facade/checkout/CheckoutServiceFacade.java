@@ -81,14 +81,25 @@ public class CheckoutServiceFacade implements CheckoutService {
 
         inventoryReservationService.reserveStock(savedCheckoutSession.getId(), checkoutData.items(), expiresAt);
 
-        String voucherCode = normalizeVoucherCode(requestDTO.voucherCode());
         BigDecimal discountAmount = BigDecimal.ZERO;
+        
+        // Add membership discount first
+        if (user.getMembershipTier() != null && user.getMembershipTier().getDiscountPercent() != null) {
+            BigDecimal percent = user.getMembershipTier().getDiscountPercent();
+            if (percent.compareTo(BigDecimal.ZERO) > 0) {
+                discountAmount = discountAmount.add(subtotal.multiply(percent).divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP));
+            }
+        }
+
+        String voucherCode = normalizeVoucherCode(requestDTO.voucherCode());
         if (voucherCode != null) {
-            discountAmount = requireAmount(
+            discountAmount = discountAmount.add(requireAmount(
                     voucherService.reserveVoucher(savedCheckoutSession.getId(), voucherCode, subtotal, expiresAt),
-                    "Discount amount"
-            );
+                    "Voucher discount amount"
+            ));
             savedCheckoutSession.setVoucher(findReservedVoucher(savedCheckoutSession.getId()));
+        } else {
+            savedCheckoutSession.setVoucher(null);
         }
 
         BigDecimal totalAmount = calculateTotalAmount(subtotal, shippingFee, discountAmount);

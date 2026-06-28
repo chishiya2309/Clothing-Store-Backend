@@ -18,6 +18,7 @@ public class StaffOrderItemResponse implements Serializable {
     private Long productVariantId;
     private String sku;
     private String productName;
+    private String productImage;
     private String variantInfo;
     private BigDecimal unitPrice;
     private Integer quantity;
