@@ -198,7 +198,7 @@ class StaffProductServiceImplTest {
                 .variants(new ArrayList<>())
                 .build();
 
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdIgnoringSoftDelete(1L)).thenReturn(Optional.of(product));
         when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Cache cache = mock(Cache.class);
