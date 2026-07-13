@@ -33,13 +33,13 @@ public class ProductController {
             @RequestParam(required = false) java.math.BigDecimal maxPrice,
             @RequestParam(required = false) List<String> colors,
             @RequestParam(required = false) List<String> sizes,
-            @RequestParam(required = false) String brand) {
+            @RequestParam(required = false) List<String> brands) {
 
         log.info("Full-text search query: '{}', sortBy: {}, page: {}, size: {}", q, sortBy, page, size);
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Search products successfully")
-                .data(productService.searchProductsFullText(q, sortBy, page, size, categorySlug, minPrice, maxPrice, colors, sizes, brand))
+                .data(productService.searchProductsFullText(q, sortBy, page, size, categorySlug, minPrice, maxPrice, colors, sizes, brands))
                 .timestamp(OffsetDateTime.now())
                 .build();
     }

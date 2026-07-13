@@ -176,22 +176,24 @@ public final class ProductSpecification {
         };
     }
 
-    /** Lọc theo thương hiệu */
-    public static Specification<Product> hasBrand(String brand) {
+    /** Lọc theo danh sách thương hiệu */
+    public static Specification<Product> hasBrands(List<String> brands) {
         return (root, query, cb) -> {
-            if (brand == null || brand.isBlank()) {
+            if (brands == null || brands.isEmpty()) {
                 return cb.conjunction();
             }
-            Expression<String> unaccentBrand = cb.function("unaccent", String.class, root.get("brand"));
-            String normalizedBrand = removeAccents(brand.toLowerCase().trim());
-            return cb.equal(cb.lower(unaccentBrand), normalizedBrand);
+            Expression<String> unaccentBrand = cb.function("unaccent", String.class, cb.coalesce(root.get("brand"), ""));
+            List<String> normalizedBrands = brands.stream()
+                    .map(b -> removeAccents(b.toLowerCase().trim()))
+                    .toList();
+            return cb.lower(unaccentBrand).in(normalizedBrands);
         };
     }
 
     /** Tạo Specification tổng hợp cho tìm kiếm và lọc */
     public static Specification<Product> fromFullTextCriteria(
             String q, List<Long> categoryIds, BigDecimal minPrice, BigDecimal maxPrice,
-            List<String> colors, List<String> sizes, String brand) {
+            List<String> colors, List<String> sizes, List<String> brands) {
         
         Specification<Product> spec = Specification.where(isActive());
 
@@ -203,8 +205,8 @@ public final class ProductSpecification {
             spec = spec.and(inCategories(categoryIds));
         }
 
-        if (brand != null && !brand.isBlank()) {
-            spec = spec.and(hasBrand(brand));
+        if (brands != null && !brands.isEmpty()) {
+            spec = spec.and(hasBrands(brands));
         }
 
         if (colors != null && !colors.isEmpty()) {

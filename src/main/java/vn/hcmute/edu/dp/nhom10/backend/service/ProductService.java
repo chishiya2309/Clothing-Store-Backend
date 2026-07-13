@@ -38,7 +38,7 @@ public interface ProductService {
     PageResponse<ProductSearchDto> searchProductsFullText(
             String q, String sortBy, int page, int size,
             String categorySlug, BigDecimal minPrice, BigDecimal maxPrice,
-            List<String> colors, List<String> sizes, String brand);
+            List<String> colors, List<String> sizes, List<String> brands);
 
     /** Autocomplete trả về danh sách gợi ý sản phẩm rút gọn */
     List<ProductSuggestionDto> getAutocompleteSuggestionsList(String q);
