@@ -6,6 +6,12 @@ spring:
     name: clothing-store-backend
   profiles:
     active: @spring.profiles.active@
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:./.env[.properties]
+      - optional:file:../.env[.properties]
+      - optional:file:Clothing-Store-Backend/.env[.properties]
 
 management:
   endpoints:

@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/guest/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET,
+                                "/sitemap.xml",
+                                "/robots.txt",
                                 "/api/products/**",
                                 "/api/payments/vnpay/return",
                                 "/api/payments/vnpay/ipn",

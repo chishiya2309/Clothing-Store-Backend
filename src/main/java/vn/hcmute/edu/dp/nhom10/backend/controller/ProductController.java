@@ -10,6 +10,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.service.ProductService;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -19,6 +20,41 @@ import java.time.OffsetDateTime;
 public class ProductController {
 
     private final ProductService productService;
+
+    @GetMapping("/search")
+    @Operation(summary = "Tìm kiếm sản phẩm full-text + Lọc + Sắp xếp")
+    public ApiResponse searchProducts(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "relevance") String sortBy,
+            @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
+            @RequestParam(required = false) List<String> colors,
+            @RequestParam(required = false) List<String> sizes,
+            @RequestParam(required = false) String brand) {
+
+        log.info("Full-text search query: '{}', sortBy: {}, page: {}, size: {}", q, sortBy, page, size);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Search products successfully")
+                .data(productService.searchProductsFullText(q, sortBy, page, size, categorySlug, minPrice, maxPrice, colors, sizes, brand))
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
+
+    @GetMapping("/suggestions")
+    @Operation(summary = "Gợi ý tìm kiếm autocomplete")
+    public ApiResponse getSuggestions(@RequestParam String q) {
+        log.info("Autocomplete query: '{}'", q);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Fetch suggestions successfully")
+                .data(productService.getAutocompleteSuggestionsList(q))
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
 
     @GetMapping("/{slug}")
     @Operation(summary = "Xem chi tiết sản phẩm theo slug")

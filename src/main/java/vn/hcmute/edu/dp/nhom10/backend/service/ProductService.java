@@ -4,8 +4,12 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ProductSearchCriteria;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductGridResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductSearchDto;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductSuggestionDto;
 
+import java.math.BigDecimal;
 import java.util.List;
+
 public interface ProductService {
 
     /**
@@ -29,4 +33,13 @@ public interface ProductService {
 
     /** Lấy danh sách Sản phẩm bán chạy nhất */
     List<ProductGridResponse> getBestSellers(int limit);
+
+    /** Tìm kiếm sản phẩm nâng cao / full-text search */
+    PageResponse<ProductSearchDto> searchProductsFullText(
+            String q, String sortBy, int page, int size,
+            String categorySlug, BigDecimal minPrice, BigDecimal maxPrice,
+            List<String> colors, List<String> sizes, String brand);
+
+    /** Autocomplete trả về danh sách gợi ý sản phẩm rút gọn */
+    List<ProductSuggestionDto> getAutocompleteSuggestionsList(String q);
 }

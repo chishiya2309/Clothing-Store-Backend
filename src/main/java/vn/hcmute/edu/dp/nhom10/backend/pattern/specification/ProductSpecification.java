@@ -139,4 +139,90 @@ public final class ProductSpecification {
                 maxPrice
         );
     }
+
+    /** Chuẩn hóa bỏ dấu tiếng Việt */
+    public static String removeAccents(String src) {
+        if (src == null) return null;
+        String nfdNormalizedString = java.text.Normalizer.normalize(src, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(nfdNormalizedString).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
+    }
+
+    /** Tìm kiếm full-text không dấu, không phân biệt hoa thường trên: name, description, brand, category name */
+    public static Specification<Product> fullTextSearch(String query) {
+        return (root, criteriaQuery, cb) -> {
+            if (query == null || query.isBlank()) {
+                return cb.conjunction();
+            }
+
+            String normalized = removeAccents(query.toLowerCase().trim());
+            String pattern = "%" + normalized + "%";
+
+            // Join Category
+            Join<Object, Object> categoryJoin = root.join("category", JoinType.LEFT);
+
+            // Gọi unaccent trong PostgreSQL
+            Expression<String> unaccentName = cb.function("unaccent", String.class, root.get("name"));
+            Expression<String> unaccentDesc = cb.function("unaccent", String.class, cb.coalesce(root.get("description"), ""));
+            Expression<String> unaccentBrand = cb.function("unaccent", String.class, cb.coalesce(root.get("brand"), ""));
+            Expression<String> unaccentCatName = cb.function("unaccent", String.class, categoryJoin.get("name"));
+
+            return cb.or(
+                cb.like(cb.lower(unaccentName), pattern),
+                cb.like(cb.lower(unaccentDesc), pattern),
+                cb.like(cb.lower(unaccentBrand), pattern),
+                cb.like(cb.lower(unaccentCatName), pattern)
+            );
+        };
+    }
+
+    /** Lọc theo thương hiệu */
+    public static Specification<Product> hasBrand(String brand) {
+        return (root, query, cb) -> {
+            if (brand == null || brand.isBlank()) {
+                return cb.conjunction();
+            }
+            Expression<String> unaccentBrand = cb.function("unaccent", String.class, root.get("brand"));
+            String normalizedBrand = removeAccents(brand.toLowerCase().trim());
+            return cb.equal(cb.lower(unaccentBrand), normalizedBrand);
+        };
+    }
+
+    /** Tạo Specification tổng hợp cho tìm kiếm và lọc */
+    public static Specification<Product> fromFullTextCriteria(
+            String q, List<Long> categoryIds, BigDecimal minPrice, BigDecimal maxPrice,
+            List<String> colors, List<String> sizes, String brand) {
+        
+        Specification<Product> spec = Specification.where(isActive());
+
+        if (q != null && !q.isBlank()) {
+            spec = spec.and(fullTextSearch(q));
+        }
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            spec = spec.and(inCategories(categoryIds));
+        }
+
+        if (brand != null && !brand.isBlank()) {
+            spec = spec.and(hasBrand(brand));
+        }
+
+        if (colors != null && !colors.isEmpty()) {
+            spec = spec.and(hasColors(colors));
+        }
+
+        if (sizes != null && !sizes.isEmpty()) {
+            spec = spec.and(hasSizes(sizes));
+        }
+
+        if (minPrice != null) {
+            spec = spec.and(priceGreaterThanOrEqual(minPrice));
+        }
+
+        if (maxPrice != null) {
+            spec = spec.and(priceLessThanOrEqual(maxPrice));
+        }
+
+        return spec;
+    }
 }

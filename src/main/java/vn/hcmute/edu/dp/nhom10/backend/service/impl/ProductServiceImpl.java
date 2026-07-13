@@ -13,6 +13,8 @@ import org.springframework.data.jpa.domain.Specification;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ProductSearchCriteria;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductGridResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductSearchDto;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.ProductSuggestionDto;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Category;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductImage;
@@ -21,6 +23,10 @@ import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.ProductService;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +42,9 @@ public class ProductServiceImpl implements ProductService {
 
         private final ProductRepository productRepository;
         private final CategoryRepository categoryRepository;
+
+        @PersistenceContext
+        private EntityManager entityManager;
 
         @Override
         @Transactional(readOnly = true)
@@ -246,5 +255,154 @@ public class ProductServiceImpl implements ProductService {
                                 .thumbnailUrl(thumbnail)
                                 .colors(colors)
                                 .build();
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public PageResponse<ProductSearchDto> searchProductsFullText(
+                String q, String sortBy, int page, int size,
+                String categorySlug, BigDecimal minPrice, BigDecimal maxPrice,
+                List<String> colors, List<String> sizes, String brand) {
+
+                List<Long> categoryIds = resolveCategoryIds(categorySlug);
+
+                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+                CriteriaQuery<Product> query = cb.createQuery(Product.class);
+                Root<Product> root = query.from(Product.class);
+
+                // Fetch Join category to avoid N+1 query
+                root.fetch("category", JoinType.LEFT);
+
+                Specification<Product> spec = ProductSpecification.fromFullTextCriteria(
+                        q, categoryIds, minPrice, maxPrice, colors, sizes, brand);
+
+                Predicate predicate = spec.toPredicate(root, query, cb);
+                if (predicate != null) {
+                        query.where(predicate);
+                }
+
+                // Sorting
+                if ("relevance".equalsIgnoreCase(sortBy) && q != null && !q.isBlank()) {
+                        String normalizedQ = ProductSpecification.removeAccents(q.toLowerCase().trim());
+                        Expression<Double> sim = cb.function("similarity", Double.class,
+                                cb.function("unaccent", String.class, root.get("name")),
+                                cb.literal(normalizedQ)
+                        );
+                        query.orderBy(cb.desc(sim));
+                } else if ("price_asc".equalsIgnoreCase(sortBy)) {
+                        query.orderBy(cb.asc(cb.coalesce(root.get("salePrice"), root.get("basePrice"))));
+                } else if ("price_desc".equalsIgnoreCase(sortBy)) {
+                        query.orderBy(cb.desc(cb.coalesce(root.get("salePrice"), root.get("basePrice"))));
+                } else if ("newest".equalsIgnoreCase(sortBy)) {
+                        query.orderBy(cb.desc(root.get("createdAt")));
+                } else {
+                        // Default sorting (newest/latest)
+                        query.orderBy(cb.desc(root.get("createdAt")));
+                }
+
+                TypedQuery<Product> typedQuery = entityManager.createQuery(query);
+                typedQuery.setFirstResult(page * size);
+                typedQuery.setMaxResults(size);
+                List<Product> products = typedQuery.getResultList();
+
+                // Count Query
+                CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+                Root<Product> countRoot = countQuery.from(Product.class);
+                Predicate countPredicate = spec.toPredicate(countRoot, countQuery, cb);
+                if (countPredicate != null) {
+                        countQuery.where(countPredicate);
+                }
+                countQuery.select(cb.count(countRoot));
+                Long totalElements = entityManager.createQuery(countQuery).getSingleResult();
+
+                List<ProductSearchDto> content = products.stream()
+                        .map(this::mapToSearchDto)
+                        .collect(Collectors.toList());
+
+                int totalPages = (int) Math.ceil((double) totalElements / size);
+
+                return PageResponse.<ProductSearchDto>builder()
+                        .pageNumber(page)
+                        .pageSize(size)
+                        .totalElements(totalElements)
+                        .totalPages(totalPages)
+                        .content(content)
+                        .build();
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        @org.springframework.cache.annotation.Cacheable(value = "autocompleteSuggestions", key = "#q.trim().toLowerCase()")
+        public List<ProductSuggestionDto> getAutocompleteSuggestionsList(String q) {
+                if (q == null || q.trim().length() < 2) {
+                        return Collections.emptyList();
+                }
+
+                String normalizedQ = ProductSpecification.removeAccents(q.toLowerCase().trim());
+
+                CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+                CriteriaQuery<Product> query = cb.createQuery(Product.class);
+                Root<Product> root = query.from(Product.class);
+
+                Join<Product, Category> categoryJoin = root.join("category", JoinType.LEFT);
+
+                Expression<String> unaccentName = cb.function("unaccent", String.class, root.get("name"));
+                Expression<String> unaccentBrand = cb.function("unaccent", String.class, cb.coalesce(root.get("brand"), ""));
+                Expression<String> unaccentCatName = cb.function("unaccent", String.class, categoryJoin.get("name"));
+
+                String pattern = "%" + normalizedQ + "%";
+                Predicate specPredicate = cb.and(
+                        cb.isTrue(root.get("isActive")),
+                        cb.or(
+                                cb.like(cb.lower(unaccentName), pattern),
+                                cb.like(cb.lower(unaccentBrand), pattern),
+                                cb.like(cb.lower(unaccentCatName), pattern)
+                        )
+                );
+
+                query.where(specPredicate);
+
+                Expression<Double> sim = cb.function("similarity", Double.class,
+                        cb.function("unaccent", String.class, root.get("name")),
+                        cb.literal(normalizedQ)
+                );
+                query.orderBy(cb.desc(sim));
+
+                TypedQuery<Product> typedQuery = entityManager.createQuery(query);
+                typedQuery.setMaxResults(8);
+                List<Product> products = typedQuery.getResultList();
+
+                return products.stream()
+                        .map(p -> new ProductSuggestionDto(p.getName(), p.getSlug()))
+                        .collect(Collectors.toList());
+        }
+
+        private ProductSearchDto mapToSearchDto(Product product) {
+                String thumbnail = null;
+                if (product.getImages() != null && !product.getImages().isEmpty()) {
+                        thumbnail = product.getImages().stream()
+                                .filter(img -> img.getImageType() == vn.hcmute.edu.dp.nhom10.backend.enums.ImageType.thumbnail)
+                                .findFirst()
+                                .map(ProductImage::getImageUrl)
+                                .orElseGet(() -> product.getImages().stream()
+                                        .filter(img -> img.getImageType() == vn.hcmute.edu.dp.nhom10.backend.enums.ImageType.main)
+                                        .findFirst()
+                                        .map(ProductImage::getImageUrl)
+                                        .orElse(product.getImages().get(0).getImageUrl())
+                                );
+                }
+
+                return ProductSearchDto.builder()
+                        .id(product.getId())
+                        .name(product.getName())
+                        .slug(product.getSlug())
+                        .image(thumbnail)
+                        .category(product.getCategory() != null ? product.getCategory().getName() : null)
+                        .basePrice(product.getBasePrice())
+                        .salePrice(product.getSalePrice())
+                        .rating(product.getAverageRating())
+                        .soldQuantity(product.getTotalSold())
+                        .brand(product.getBrand())
+                        .build();
         }
 }
