@@ -22,6 +22,7 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.ProductService;
+import vn.hcmute.edu.dp.nhom10.backend.service.TrendingSearchService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -42,6 +43,7 @@ public class ProductServiceImpl implements ProductService {
 
         private final ProductRepository productRepository;
         private final CategoryRepository categoryRepository;
+        private final TrendingSearchService trendingSearchService;
 
         @PersistenceContext
         private EntityManager entityManager;
@@ -151,6 +153,10 @@ public class ProductServiceImpl implements ProductService {
                 List<ProductGridResponse> content = productPage.getContent().stream()
                                 .map(this::mapToGridResponse)
                                 .collect(Collectors.toList());
+
+                if (criteria != null && criteria.getKeyword() != null && !criteria.getKeyword().isBlank()) {
+                        trendingSearchService.recordSearch(criteria.getKeyword());
+                }
 
                 return PageResponse.<ProductGridResponse>builder()
                                 .pageNumber(productPage.getNumber())
@@ -318,6 +324,10 @@ public class ProductServiceImpl implements ProductService {
                 List<ProductSearchDto> content = products.stream()
                         .map(this::mapToSearchDto)
                         .collect(Collectors.toList());
+
+                if (q != null && !q.isBlank()) {
+                        trendingSearchService.recordSearch(q);
+                }
 
                 int totalPages = (int) Math.ceil((double) totalElements / size);
 
