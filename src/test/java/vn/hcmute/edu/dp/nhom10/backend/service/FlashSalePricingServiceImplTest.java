@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -78,6 +79,27 @@ class FlashSalePricingServiceImplTest {
         assertEquals(new BigDecimal("80000"), result.price());
         assertEquals(PriceSource.PRODUCT_SALE, result.priceSource());
         assertEquals(null, result.flashSaleItemId());
+    }
+
+    @Test
+    void resolve_soldOutFlashSale_withoutProductSale_fallsBackToBasePrice() {
+        Product product = product("100000", null);
+        FlashSaleItem item = FlashSaleItem.builder()
+                .id(9L)
+                .flashSalePrice(new BigDecimal("60000"))
+                .quota(5)
+                .reservedQuantity(2)
+                .soldQuantity(3)
+                .build();
+        when(repository.findActiveForProductAt(eq(1L), any(), any(Pageable.class)))
+                .thenReturn(List.of(item));
+
+        ResolvedProductPrice result = new FlashSalePricingServiceImpl(repository)
+                .resolve(product, OffsetDateTime.now());
+
+        assertEquals(new BigDecimal("100000"), result.price());
+        assertEquals(PriceSource.REGULAR, result.priceSource());
+        assertNull(result.flashSaleItemId());
     }
 
     @Test

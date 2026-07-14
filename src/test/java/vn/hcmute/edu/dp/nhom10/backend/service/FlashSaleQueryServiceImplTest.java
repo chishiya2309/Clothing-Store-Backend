@@ -119,6 +119,21 @@ class FlashSaleQueryServiceImplTest {
         assertTrue(response.items().get(0).soldOut());
     }
 
+    @Test
+    void getCampaign_endedCampaign_returnsEndedStatusForHistory() {
+        FlashSaleCampaign campaign = campaign(
+                OffsetDateTime.now().minusHours(2),
+                OffsetDateTime.now().minusHours(1),
+                true
+        );
+        when(campaignRepository.findById(1L)).thenReturn(Optional.of(campaign));
+        when(itemRepository.findPublicItemsByCampaignId(1L)).thenReturn(List.of());
+
+        PublicFlashSaleResponse response = service.getCampaign(1L);
+
+        assertEquals(FlashSaleStatus.ENDED, response.status());
+    }
+
     private FlashSaleCampaign campaign(OffsetDateTime startAt, OffsetDateTime endAt, boolean active) {
         return FlashSaleCampaign.builder()
                 .id(1L)

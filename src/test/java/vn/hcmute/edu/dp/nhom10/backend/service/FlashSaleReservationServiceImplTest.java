@@ -100,6 +100,36 @@ class FlashSaleReservationServiceImplTest {
         assertEquals(ReservationStatus.released, reservation.getStatus());
     }
 
+    @Test
+    void expireQuota_activeReservation_restoresAvailabilityAndMarksExpired() {
+        FlashSaleItem item = FlashSaleItem.builder().id(5L).quota(10).reservedQuantity(2).soldQuantity(3).build();
+        FlashSaleReservation reservation = FlashSaleReservation.builder().flashSaleItem(item).quantity(2)
+                .status(ReservationStatus.active).build();
+        when(reservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of(reservation));
+        when(itemRepository.findAllByIdInForUpdate(List.of(5L))).thenReturn(List.of(item));
+
+        service().expireQuota(1L);
+
+        assertEquals(0, item.getReservedQuantity());
+        assertEquals(3, item.getSoldQuantity());
+        assertEquals(ReservationStatus.expired, reservation.getStatus());
+    }
+
+    @Test
+    void expireQuota_consumedReservation_isIdempotent() {
+        FlashSaleItem item = FlashSaleItem.builder().id(5L).quota(10).reservedQuantity(0).soldQuantity(3).build();
+        FlashSaleReservation reservation = FlashSaleReservation.builder().flashSaleItem(item).quantity(2)
+                .status(ReservationStatus.consumed).build();
+        when(reservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of(reservation));
+
+        service().expireQuota(1L);
+
+        assertEquals(0, item.getReservedQuantity());
+        assertEquals(3, item.getSoldQuantity());
+        assertEquals(ReservationStatus.consumed, reservation.getStatus());
+        verify(itemRepository, never()).findAllByIdInForUpdate(anyList());
+    }
+
     private FlashSaleReservationServiceImpl service() {
         return new FlashSaleReservationServiceImpl(checkoutRepository, itemRepository, reservationRepository);
     }

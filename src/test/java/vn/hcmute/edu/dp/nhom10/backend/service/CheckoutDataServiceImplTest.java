@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -237,6 +238,24 @@ class CheckoutDataServiceImplTest {
 
         assertEquals(new BigDecimal("85000.00"), result.items().get(0).unitPrice());
         verify(cartItemRepository).findCheckoutItemsByUserId(10L);
+    }
+
+    @Test
+    void getCheckoutData_flashSale_snapshotsPriceSourceItemAndVariantPrice() {
+        Product product = product(1L, "T-Shirt", "100000.00", "80000.00", true);
+        ProductVariant variant = variant(2L, "5000.00", true);
+        CartItem cartItem = cartItem(3L, product, variant, 2);
+        mockCheckoutCart(List.of(cartItem));
+        when(flashSalePricingService.resolve(eq(product), any()))
+                .thenReturn(new ResolvedProductPrice(new BigDecimal("60000.00"), PriceSource.FLASH_SALE, 9L));
+
+        CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
+
+        assertEquals(new BigDecimal("65000.00"), result.items().get(0).unitPrice());
+        assertEquals(new BigDecimal("130000.00"), result.items().get(0).subtotal());
+        assertEquals(PriceSource.FLASH_SALE, result.items().get(0).priceSource());
+        assertEquals(9L, result.items().get(0).flashSaleItemId());
+        assertEquals(new BigDecimal("130000.00"), result.subtotal());
     }
 
     private void mockCheckoutCart(List<CartItem> cartItems) {
