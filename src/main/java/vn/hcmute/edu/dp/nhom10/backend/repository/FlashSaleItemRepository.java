@@ -18,6 +18,17 @@ public interface FlashSaleItemRepository extends JpaRepository<FlashSaleItem, Lo
     boolean existsByCampaignIdAndProductId(Long campaignId, Long productId);
 
     @Query("""
+            select item
+            from FlashSaleItem item
+            join fetch item.product product
+            where item.campaign.id = :campaignId
+              and product.isActive = true
+              and product.deletedAt is null
+            order by item.id asc
+            """)
+    List<FlashSaleItem> findPublicItemsByCampaignId(@Param("campaignId") Long campaignId);
+
+    @Query("""
             select count(item) > 0
             from FlashSaleItem item
             join item.campaign campaign
