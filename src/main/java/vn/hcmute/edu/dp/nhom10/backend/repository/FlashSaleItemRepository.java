@@ -1,6 +1,7 @@
 package vn.hcmute.edu.dp.nhom10.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -43,5 +44,21 @@ public interface FlashSaleItemRepository extends JpaRepository<FlashSaleItem, Lo
             @Param("campaignId") Long campaignId,
             @Param("startAt") OffsetDateTime startAt,
             @Param("endAt") OffsetDateTime endAt
+    );
+
+    @Query("""
+            select item
+            from FlashSaleItem item
+            join item.campaign campaign
+            where item.product.id = :productId
+              and campaign.isActive = true
+              and campaign.startAt <= :now
+              and campaign.endAt > :now
+            order by campaign.startAt desc, item.id asc
+            """)
+    List<FlashSaleItem> findActiveForProductAt(
+            @Param("productId") Long productId,
+            @Param("now") OffsetDateTime now,
+            Pageable pageable
     );
 }

@@ -12,12 +12,14 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.FlashSaleItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PriceSource;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionItemRepository;
@@ -195,6 +197,9 @@ public class CheckoutServiceFacade implements CheckoutService {
             throw new InvalidDataException("Product variant ID is required in checkout item snapshot");
         }
         ProductVariant productVariant = entityManager.getReference(ProductVariant.class, item.productVariantId());
+        FlashSaleItem flashSaleItem = item.flashSaleItemId() == null
+                ? null
+                : entityManager.getReference(FlashSaleItem.class, item.flashSaleItemId());
         return CheckoutSessionItem.builder()
                 .checkoutSession(checkoutSession)
                 .productVariant(productVariant)
@@ -203,6 +208,8 @@ public class CheckoutServiceFacade implements CheckoutService {
                 .quantity(item.quantity())
                 .unitPrice(requireAmount(item.unitPrice(), "Checkout item unit price"))
                 .subtotal(requireAmount(item.subtotal(), "Checkout item subtotal"))
+                .flashSaleItem(flashSaleItem)
+                .priceSource(item.priceSource() == null ? PriceSource.REGULAR : item.priceSource())
                 .build();
     }
 

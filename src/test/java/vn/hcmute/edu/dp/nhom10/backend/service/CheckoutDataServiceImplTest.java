@@ -4,14 +4,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.junit.jupiter.MockitoExtension;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ResolvedProductPrice;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Address;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CartItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PriceSource;
 import vn.hcmute.edu.dp.nhom10.backend.repository.AddressRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.CheckoutDataServiceImpl;
@@ -19,6 +22,8 @@ import vn.hcmute.edu.dp.nhom10.backend.service.impl.CheckoutDataServiceImpl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,8 +40,23 @@ class CheckoutDataServiceImplTest {
     @Mock
     private CartItemRepository cartItemRepository;
 
+    @Mock
+    private FlashSalePricingService flashSalePricingService;
+
     @InjectMocks
     private CheckoutDataServiceImpl checkoutDataService;
+
+    @BeforeEach
+    void setUpPricing() {
+        lenient().when(flashSalePricingService.resolve(any(Product.class), any()))
+                .thenAnswer(invocation -> {
+                    Product product = invocation.getArgument(0);
+                    if (product.getSalePrice() != null) {
+                        return new ResolvedProductPrice(product.getSalePrice(), PriceSource.PRODUCT_SALE, null);
+                    }
+                    return new ResolvedProductPrice(product.getBasePrice(), PriceSource.REGULAR, null);
+                });
+    }
 
     @Test
     void getCheckoutData_addressNotFound_throwsException() {

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.AddressSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ResolvedProductPrice;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Address;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CartItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
@@ -14,9 +15,11 @@ import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.AddressRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutDataService;
+import vn.hcmute.edu.dp.nhom10.backend.service.FlashSalePricingService;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
 
     private final AddressRepository addressRepository;
     private final CartItemRepository cartItemRepository;
+    private final FlashSalePricingService flashSalePricingService;
 
     @Override
     @Transactional(readOnly = true)
@@ -39,8 +43,9 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
             throw new IllegalArgumentException("Cart is empty");
         }
 
+        OffsetDateTime pricingTime = OffsetDateTime.now();
         List<CheckoutItemSnapshot> items = cartItems.stream()
-                .map(this::toItemSnapshot)
+                .map(item -> toItemSnapshot(item, pricingTime))
                 .toList();
 
         BigDecimal subtotal = items.stream()
@@ -61,7 +66,7 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
         return subtotal.compareTo(FREE_SHIPPING_THRESHOLD) > 0 ? BigDecimal.ZERO : STANDARD_SHIPPING_FEE;
     }
 
-    private CheckoutItemSnapshot toItemSnapshot(CartItem cartItem) {
+    private CheckoutItemSnapshot toItemSnapshot(CartItem cartItem, OffsetDateTime pricingTime) {
         Integer quantity = cartItem.getQuantity();
         if (quantity == null || quantity <= 0) {
             throw new IllegalArgumentException("Cart item quantity is invalid");
@@ -85,10 +90,8 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
             throw new IllegalArgumentException("Product variant is inactive: " + variant.getId());
         }
 
-        BigDecimal productPrice = product.getSalePrice() != null ? product.getSalePrice() : product.getBasePrice();
-        if (productPrice == null) {
-            throw new IllegalArgumentException("Product price is missing: " + product.getId());
-        }
+        ResolvedProductPrice resolvedPrice = flashSalePricingService.resolve(product, pricingTime);
+        BigDecimal productPrice = resolvedPrice.price();
 
         BigDecimal additionalPrice = variant.getAdditionalPrice() != null ? variant.getAdditionalPrice() : BigDecimal.ZERO;
         BigDecimal unitPrice = productPrice.add(additionalPrice);
@@ -105,7 +108,9 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
                 buildVariantInfo(variant),
                 quantity,
                 unitPrice,
-                subtotal
+                subtotal,
+                resolvedPrice.flashSaleItemId(),
+                resolvedPrice.priceSource()
         );
     }
 
