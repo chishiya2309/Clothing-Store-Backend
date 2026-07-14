@@ -35,6 +35,9 @@ public class Product {
     @Column
     private String material;
 
+    @Column
+    private String brand;
+
     @Column(name = "care_instructions", columnDefinition = "TEXT")
     private String careInstructions;
 
