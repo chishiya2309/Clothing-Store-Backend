@@ -15,6 +15,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.InventoryReservationRepository
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentAttemptRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutExpirationService;
+import vn.hcmute.edu.dp.nhom10.backend.service.FlashSaleReservationService;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -32,6 +33,7 @@ public class CheckoutExpirationServiceImpl implements CheckoutExpirationService 
     private final InventoryReservationRepository inventoryReservationRepository;
     private final VoucherReservationRepository voucherReservationRepository;
     private final PaymentAttemptRepository paymentAttemptRepository;
+    private final FlashSaleReservationService flashSaleReservationService;
 
     @Override
     @Transactional
@@ -51,6 +53,7 @@ public class CheckoutExpirationServiceImpl implements CheckoutExpirationService 
                 continue;
             }
             expireInventoryReservations(checkoutSession.getId());
+            flashSaleReservationService.expireQuota(checkoutSession.getId());
             expireVoucherReservation(checkoutSession.getId());
             expirePaymentAttempts(checkoutSession.getId());
 

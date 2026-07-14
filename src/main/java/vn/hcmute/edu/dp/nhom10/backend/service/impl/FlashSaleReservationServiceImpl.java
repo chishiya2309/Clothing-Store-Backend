@@ -84,4 +84,53 @@ public class FlashSaleReservationServiceImpl implements FlashSaleReservationServ
     }
 
     private int value(Integer number) { return number == null ? 0 : number; }
+
+    @Override
+    @Transactional
+    public void consumeQuota(String checkoutCode) {
+        changeStatus(checkoutCode, ReservationStatus.consumed);
+    }
+
+    @Override
+    @Transactional
+    public void releaseQuota(String checkoutCode) {
+        changeStatus(checkoutCode, ReservationStatus.released);
+    }
+
+    @Override
+    @Transactional
+    public void expireQuota(Long checkoutSessionId) {
+        changeReservations(checkoutSessionId, ReservationStatus.expired);
+    }
+
+    private void changeStatus(String checkoutCode, ReservationStatus target) {
+        if (checkoutCode == null || checkoutCode.isBlank()) throw new IllegalArgumentException("Checkout code is required");
+        CheckoutSession checkout = checkoutSessionRepository.findByCheckoutCodeForUpdate(checkoutCode.trim())
+                .orElseThrow(() -> new ResourceNotFoundException("Checkout session not found with code: " + checkoutCode));
+        changeReservations(checkout.getId(), target);
+    }
+
+    private void changeReservations(Long checkoutSessionId, ReservationStatus target) {
+        List<FlashSaleReservation> reservations = reservationRepository.findAllByCheckoutSessionIdForUpdate(checkoutSessionId);
+        List<FlashSaleReservation> active = reservations.stream()
+                .filter(r -> r.getStatus() == ReservationStatus.active).toList();
+        if (active.isEmpty()) return;
+        List<Long> ids = active.stream().map(r -> r.getFlashSaleItem().getId()).distinct().sorted().toList();
+        Map<Long, FlashSaleItem> locked = new LinkedHashMap<>();
+        flashSaleItemRepository.findAllByIdInForUpdate(ids).forEach(item -> locked.put(item.getId(), item));
+        for (FlashSaleReservation reservation : active) {
+            FlashSaleItem item = locked.get(reservation.getFlashSaleItem().getId());
+            int quantity = reservation.getQuantity();
+            if (item == null || quantity <= 0 || value(item.getReservedQuantity()) < quantity) {
+                throw new InvalidDataException("Flash sale reservation state is inconsistent");
+            }
+            item.setReservedQuantity(value(item.getReservedQuantity()) - quantity);
+            if (target == ReservationStatus.consumed) {
+                item.setSoldQuantity(value(item.getSoldQuantity()) + quantity);
+            }
+            reservation.setStatus(target);
+        }
+        flashSaleItemRepository.saveAll(locked.values());
+        reservationRepository.saveAll(active);
+    }
 }

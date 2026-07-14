@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.FlashSaleItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.FlashSaleReservation;
+import vn.hcmute.edu.dp.nhom10.backend.enums.ReservationStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PriceSource;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InsufficientStockException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
@@ -62,6 +64,40 @@ class FlashSaleReservationServiceImplTest {
                 BigDecimal.TEN, BigDecimal.TEN, null, PriceSource.REGULAR);
         service().reserveQuota(1L, List.of(regular), OffsetDateTime.now().plusMinutes(10));
         verify(checkoutRepository, never()).findByIdForUpdate(1L);
+    }
+
+    @Test
+    void consumeQuota_activeReservation_movesReservedToSold() {
+        FlashSaleItem item = FlashSaleItem.builder().id(5L).quota(10).reservedQuantity(2).soldQuantity(3).build();
+        FlashSaleReservation reservation = FlashSaleReservation.builder().flashSaleItem(item).quantity(2)
+                .status(ReservationStatus.active).build();
+        when(checkoutRepository.findByCheckoutCodeForUpdate("CHK-1"))
+                .thenReturn(Optional.of(CheckoutSession.builder().id(1L).checkoutCode("CHK-1").build()));
+        when(reservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of(reservation));
+        when(itemRepository.findAllByIdInForUpdate(List.of(5L))).thenReturn(List.of(item));
+
+        service().consumeQuota("CHK-1");
+
+        assertEquals(0, item.getReservedQuantity());
+        assertEquals(5, item.getSoldQuantity());
+        assertEquals(ReservationStatus.consumed, reservation.getStatus());
+    }
+
+    @Test
+    void releaseQuota_activeReservation_restoresAvailability() {
+        FlashSaleItem item = FlashSaleItem.builder().id(5L).quota(10).reservedQuantity(2).soldQuantity(3).build();
+        FlashSaleReservation reservation = FlashSaleReservation.builder().flashSaleItem(item).quantity(2)
+                .status(ReservationStatus.active).build();
+        when(checkoutRepository.findByCheckoutCodeForUpdate("CHK-1"))
+                .thenReturn(Optional.of(CheckoutSession.builder().id(1L).checkoutCode("CHK-1").build()));
+        when(reservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of(reservation));
+        when(itemRepository.findAllByIdInForUpdate(List.of(5L))).thenReturn(List.of(item));
+
+        service().releaseQuota("CHK-1");
+
+        assertEquals(0, item.getReservedQuantity());
+        assertEquals(3, item.getSoldQuantity());
+        assertEquals(ReservationStatus.released, reservation.getStatus());
     }
 
     private FlashSaleReservationServiceImpl service() {
