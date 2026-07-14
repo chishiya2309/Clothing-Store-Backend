@@ -29,7 +29,13 @@ class FlashSalePricingServiceImplTest {
     @Test
     void resolve_activeFlashSale_hasHighestPriority() {
         Product product = product("100000", "80000");
-        FlashSaleItem item = FlashSaleItem.builder().id(9L).flashSalePrice(new BigDecimal("60000")).build();
+        FlashSaleItem item = FlashSaleItem.builder()
+                .id(9L)
+                .flashSalePrice(new BigDecimal("60000"))
+                .quota(10)
+                .reservedQuantity(2)
+                .soldQuantity(3)
+                .build();
         OffsetDateTime now = OffsetDateTime.parse("2026-07-14T20:00:00+07:00");
         when(repository.findActiveForProductAt(eq(1L), eq(now), any(Pageable.class)))
                 .thenReturn(List.of(item));
@@ -51,6 +57,27 @@ class FlashSalePricingServiceImplTest {
 
         assertEquals(new BigDecimal("80000"), result.price());
         assertEquals(PriceSource.PRODUCT_SALE, result.priceSource());
+    }
+
+    @Test
+    void resolve_soldOutFlashSale_fallsBackToProductSalePrice() {
+        Product product = product("100000", "80000");
+        FlashSaleItem item = FlashSaleItem.builder()
+                .id(9L)
+                .flashSalePrice(new BigDecimal("60000"))
+                .quota(5)
+                .reservedQuantity(1)
+                .soldQuantity(4)
+                .build();
+        when(repository.findActiveForProductAt(eq(1L), any(), any(Pageable.class)))
+                .thenReturn(List.of(item));
+
+        ResolvedProductPrice result = new FlashSalePricingServiceImpl(repository)
+                .resolve(product, OffsetDateTime.now());
+
+        assertEquals(new BigDecimal("80000"), result.price());
+        assertEquals(PriceSource.PRODUCT_SALE, result.priceSource());
+        assertEquals(null, result.flashSaleItemId());
     }
 
     @Test

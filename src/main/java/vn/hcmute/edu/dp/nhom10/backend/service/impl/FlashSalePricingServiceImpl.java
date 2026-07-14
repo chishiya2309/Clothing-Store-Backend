@@ -33,12 +33,21 @@ public class FlashSalePricingServiceImpl implements FlashSalePricingService {
                 product.getId(), now, PageRequest.of(0, 1));
         if (!activeItems.isEmpty()) {
             FlashSaleItem item = activeItems.get(0);
-            return result(item.getFlashSalePrice(), PriceSource.FLASH_SALE, item.getId(), product.getId());
+            int quota = value(item.getQuota());
+            int reserved = value(item.getReservedQuantity());
+            int sold = value(item.getSoldQuantity());
+            if (quota - reserved - sold > 0) {
+                return result(item.getFlashSalePrice(), PriceSource.FLASH_SALE, item.getId(), product.getId());
+            }
         }
         if (product.getSalePrice() != null) {
             return result(product.getSalePrice(), PriceSource.PRODUCT_SALE, null, product.getId());
         }
         return result(product.getBasePrice(), PriceSource.REGULAR, null, product.getId());
+    }
+
+    private int value(Integer quantity) {
+        return quantity == null ? 0 : quantity;
     }
 
     private ResolvedProductPrice result(BigDecimal price, PriceSource source, Long itemId, Long productId) {
