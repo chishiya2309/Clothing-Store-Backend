@@ -29,6 +29,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutDataService;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutService;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
+import vn.hcmute.edu.dp.nhom10.backend.service.FlashSaleReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 
 import java.math.BigDecimal;
@@ -44,6 +45,7 @@ public class CheckoutServiceFacade implements CheckoutService {
 
     private final CheckoutDataService checkoutDataService;
     private final InventoryReservationService inventoryReservationService;
+    private final FlashSaleReservationService flashSaleReservationService;
     private final VoucherReservationService voucherService;
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final CheckoutSessionItemRepository checkoutSessionItemRepository;
@@ -82,6 +84,7 @@ public class CheckoutServiceFacade implements CheckoutService {
         final CheckoutSession savedCheckoutSession = checkoutSessionRepository.save(checkoutSession);
 
         inventoryReservationService.reserveStock(savedCheckoutSession.getId(), checkoutData.items(), expiresAt);
+        flashSaleReservationService.reserveQuota(savedCheckoutSession.getId(), checkoutData.items(), expiresAt);
 
         BigDecimal discountAmount = BigDecimal.ZERO;
         

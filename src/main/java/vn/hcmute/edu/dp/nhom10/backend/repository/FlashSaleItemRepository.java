@@ -2,6 +2,8 @@ package vn.hcmute.edu.dp.nhom10.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -61,4 +63,12 @@ public interface FlashSaleItemRepository extends JpaRepository<FlashSaleItem, Lo
             @Param("now") OffsetDateTime now,
             Pageable pageable
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select item from FlashSaleItem item
+            where item.id in :ids
+            order by item.id
+            """)
+    List<FlashSaleItem> findAllByIdInForUpdate(@Param("ids") List<Long> ids);
 }
