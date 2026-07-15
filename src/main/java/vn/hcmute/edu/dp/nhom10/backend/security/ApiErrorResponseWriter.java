@@ -2,7 +2,7 @@ package vn.hcmute.edu.dp.nhom10.backend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class ApiErrorResponseWriter {
 
     private final ObjectMapper objectMapper;
+
+    public ApiErrorResponseWriter(@Lazy ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public void write(HttpServletResponse response, HttpStatus status, String message, String path) throws IOException {
         if (response.isCommitted()) {
