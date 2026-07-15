@@ -1,5 +1,6 @@
 package vn.hcmute.edu.dp.nhom10.backend;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,6 +10,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+@Disabled("Manual script for migrating data, requires .env file")
 public class DatabaseMigrationTest {
 
     @Test
