@@ -13,9 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class ApiErrorResponseWriter {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     public void write(HttpServletResponse response, HttpStatus status, String message, String path) throws IOException {
         if (response.isCommitted()) {
