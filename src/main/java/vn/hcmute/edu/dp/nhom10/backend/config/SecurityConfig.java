@@ -3,6 +3,7 @@ package vn.hcmute.edu.dp.nhom10.backend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,14 +17,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import vn.hcmute.edu.dp.nhom10.backend.security.JwtAuthenticationFilter;
+import vn.hcmute.edu.dp.nhom10.backend.security.JwtAuthenticationEntryPoint;
+import vn.hcmute.edu.dp.nhom10.backend.security.RateLimitingFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableConfigurationProperties(RateLimitProperties.class)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final RateLimitingFilter rateLimitingFilter;
     private final CorsConfig corsConfig;
 
     @Bean
@@ -41,7 +47,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(new vn.hcmute.edu.dp.nhom10.backend.security.JwtAuthenticationEntryPoint()))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/guest/**", "/error").permitAll()
@@ -57,7 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter, RateLimitingFilter.class);
 
         return http.build();
     }
