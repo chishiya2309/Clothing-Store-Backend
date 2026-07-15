@@ -22,7 +22,9 @@ jobs:
           cache: 'maven'
 
       - name: Build & Test
-        run: ./mvnw clean verify -B
+        run: |
+          chmod +x mvnw
+          ./mvnw clean verify -B
 
   deploy:
     name: 🚀 Deploy to Render
