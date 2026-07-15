@@ -23,7 +23,7 @@ import vn.hcmute.edu.dp.nhom10.backend.security.RateLimitingFilter;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@EnableConfigurationProperties(RateLimitProperties.class)
+@EnableConfigurationProperties({RateLimitProperties.class, CorsProperties.class})
 @RequiredArgsConstructor
 public class SecurityConfig {
 
