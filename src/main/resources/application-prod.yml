@@ -34,7 +34,7 @@ spring:
       password: ${REDIS_PASSWORD}
       timeout: 2000ms
       ssl:
-        enabled: true
+        enabled: false
 
 springdoc:
   api-docs:
