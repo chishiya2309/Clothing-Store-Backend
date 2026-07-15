@@ -55,11 +55,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/sitemap.xml",
                                 "/robots.txt",
+                                "/api/experiments/**",
                                 "/api/products/**",
                                 "/api/payments/vnpay/return",
                                 "/api/payments/vnpay/ipn",
                                 "/api/payments/momo/return").permitAll()
                         .requestMatchers(HttpMethod.POST,
+                                "/api/analytics/events",
                                 "/api/payments/momo/ipn").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
