@@ -19,6 +19,16 @@ class ClientIpResolverTest {
     }
 
     @Test
+    void resolve_ignoresSpoofedProxyHeadersWhenRemoteAddressIsPublic() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("X-Forwarded-For", "203.0.113.10");
+        request.addHeader("X-Real-IP", "198.51.100.20");
+        request.setRemoteAddr("198.51.100.7");
+
+        assertEquals("198.51.100.7", resolver.resolve(request));
+    }
+
+    @Test
     void resolve_usesRealIpWhenForwardedForBlank() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("X-Forwarded-For", " ");
