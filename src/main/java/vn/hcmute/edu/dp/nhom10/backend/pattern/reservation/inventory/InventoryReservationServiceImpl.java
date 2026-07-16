@@ -15,6 +15,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.InventoryReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
+import vn.hcmute.edu.dp.nhom10.backend.service.FlashSaleReservationService;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class InventoryReservationServiceImpl implements InventoryReservationServ
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final InventoryReservationRepository inventoryReservationRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final FlashSaleReservationService flashSaleReservationService;
 
     @Override
     @Transactional
@@ -158,6 +160,7 @@ public class InventoryReservationServiceImpl implements InventoryReservationServ
 
         productVariantRepository.saveAll(variantsToSave);
         inventoryReservationRepository.saveAll(activeReservations);
+        flashSaleReservationService.consumeQuota(normalizedCheckoutCode);
     }
 
     @Override
@@ -178,6 +181,7 @@ public class InventoryReservationServiceImpl implements InventoryReservationServ
         if (!changedReservations.isEmpty()) {
             inventoryReservationRepository.saveAll(changedReservations);
         }
+        flashSaleReservationService.releaseQuota(normalizedCheckoutCode);
     }
 
     private Map<Long, Integer> collectRequestedQuantities(List<CheckoutItemSnapshot> items) {

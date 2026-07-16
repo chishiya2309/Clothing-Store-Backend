@@ -60,6 +60,9 @@ class CheckoutServiceFacadeTest {
     private InventoryReservationService inventoryReservationService;
 
     @Mock
+    private FlashSaleReservationService flashSaleReservationService;
+
+    @Mock
     private VoucherReservationService voucherService;
 
     @Mock
