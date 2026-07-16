@@ -30,6 +30,9 @@ public class BrevoEmailServiceImpl implements EmailService {
     @Value("${app.backend-url:http://localhost:8080}")
     private String backendUrl;
 
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
+
     private final RestClient restClient;
 
     public BrevoEmailServiceImpl() {
@@ -258,8 +261,7 @@ public class BrevoEmailServiceImpl implements EmailService {
     @Override
     public void sendProductSaleEmail(String toEmail, String fullName,
             vn.hcmute.edu.dp.nhom10.backend.entity.Product product) {
-        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
-        String productUrl = baseUrl + "/product/" + product.getSlug();
+        String productUrl = frontendUrl + "/product/" + product.getSlug();
         String priceDisplay = product.getSalePrice() != null ? product.getSalePrice().toString() : "";
 
         String imageUrl = "";
@@ -327,9 +329,8 @@ public class BrevoEmailServiceImpl implements EmailService {
 
     private @NonNull String buildVerificationEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
-        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
         String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
-        String verificationLink = baseUrl + "/verify-email?token=" + encodedToken;
+        String verificationLink = frontendUrl + "/verify-email?token=" + encodedToken;
 
         return """
                 <html>
@@ -395,9 +396,8 @@ public class BrevoEmailServiceImpl implements EmailService {
 
     private @NonNull String buildPasswordResetEmailHtml(String fullName, String token) {
         String escapedName = HtmlUtils.htmlEscape(fullName == null ? "" : fullName);
-        String baseUrl = backendUrl.contains(":8080") ? backendUrl.replace(":8080", ":3000") : backendUrl;
         String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
-        String resetLink = baseUrl + "/reset-password?token=" + encodedToken;
+        String resetLink = frontendUrl + "/reset-password?token=" + encodedToken;
         return """
                 <html>
                                 <body style="margin:0;padding:0;background:#FAFAF8;">
