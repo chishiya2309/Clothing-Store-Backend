@@ -12,12 +12,14 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.FlashSaleItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PriceSource;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionItemRepository;
@@ -27,6 +29,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutDataService;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutService;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
+import vn.hcmute.edu.dp.nhom10.backend.service.FlashSaleReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 
 import java.math.BigDecimal;
@@ -42,6 +45,7 @@ public class CheckoutServiceFacade implements CheckoutService {
 
     private final CheckoutDataService checkoutDataService;
     private final InventoryReservationService inventoryReservationService;
+    private final FlashSaleReservationService flashSaleReservationService;
     private final VoucherReservationService voucherService;
     private final CheckoutSessionRepository checkoutSessionRepository;
     private final CheckoutSessionItemRepository checkoutSessionItemRepository;
@@ -80,6 +84,7 @@ public class CheckoutServiceFacade implements CheckoutService {
         final CheckoutSession savedCheckoutSession = checkoutSessionRepository.save(checkoutSession);
 
         inventoryReservationService.reserveStock(savedCheckoutSession.getId(), checkoutData.items(), expiresAt);
+        flashSaleReservationService.reserveQuota(savedCheckoutSession.getId(), checkoutData.items(), expiresAt);
 
         BigDecimal discountAmount = BigDecimal.ZERO;
         
@@ -195,6 +200,9 @@ public class CheckoutServiceFacade implements CheckoutService {
             throw new InvalidDataException("Product variant ID is required in checkout item snapshot");
         }
         ProductVariant productVariant = entityManager.getReference(ProductVariant.class, item.productVariantId());
+        FlashSaleItem flashSaleItem = item.flashSaleItemId() == null
+                ? null
+                : entityManager.getReference(FlashSaleItem.class, item.flashSaleItemId());
         return CheckoutSessionItem.builder()
                 .checkoutSession(checkoutSession)
                 .productVariant(productVariant)
@@ -203,6 +211,8 @@ public class CheckoutServiceFacade implements CheckoutService {
                 .quantity(item.quantity())
                 .unitPrice(requireAmount(item.unitPrice(), "Checkout item unit price"))
                 .subtotal(requireAmount(item.subtotal(), "Checkout item subtotal"))
+                .flashSaleItem(flashSaleItem)
+                .priceSource(item.priceSource() == null ? PriceSource.REGULAR : item.priceSource())
                 .build();
     }
 

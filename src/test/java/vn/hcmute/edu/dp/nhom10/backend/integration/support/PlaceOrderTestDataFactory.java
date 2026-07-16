@@ -11,6 +11,8 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.Category;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
+import vn.hcmute.edu.dp.nhom10.backend.entity.FlashSaleCampaign;
+import vn.hcmute.edu.dp.nhom10.backend.entity.FlashSaleItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
@@ -154,6 +156,25 @@ public class PlaceOrderTestDataFactory {
         entityManager.flush();
 
         return new CheckoutActor(user.getId(), address.getId(), productVariantId, cartQuantity);
+    }
+
+    @Transactional
+    public Long createActiveFlashSaleForVariant(Long productVariantId, int quota, BigDecimal flashPrice) {
+        ProductVariant variant = entityManager.find(ProductVariant.class, productVariantId);
+        FlashSaleCampaign campaign = FlashSaleCampaign.builder()
+                .name("IT Flash Sale " + suffix())
+                .description("Concurrency test")
+                .startAt(OffsetDateTime.now().minusMinutes(5))
+                .endAt(OffsetDateTime.now().plusHours(1))
+                .isActive(true)
+                .build();
+        entityManager.persist(campaign);
+        FlashSaleItem item = FlashSaleItem.builder()
+                .campaign(campaign).product(variant.getProduct()).flashSalePrice(flashPrice)
+                .quota(quota).reservedQuantity(0).soldQuantity(0).build();
+        entityManager.persist(item);
+        entityManager.flush();
+        return item.getId();
     }
 
     @Transactional

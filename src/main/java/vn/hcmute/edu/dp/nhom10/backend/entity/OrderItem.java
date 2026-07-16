@@ -2,6 +2,7 @@ package vn.hcmute.edu.dp.nhom10.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import vn.hcmute.edu.dp.nhom10.backend.enums.PriceSource;
 
 import java.math.BigDecimal;
 
@@ -39,4 +40,13 @@ public class OrderItem {
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flash_sale_item_id")
+    private FlashSaleItem flashSaleItem;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "price_source", nullable = false, length = 20)
+    @Builder.Default
+    private PriceSource priceSource = PriceSource.REGULAR;
 }

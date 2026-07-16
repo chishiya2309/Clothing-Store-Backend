@@ -166,6 +166,8 @@ public class OrderServiceImpl implements OrderService {
                 .quantity(checkoutSessionItem.getQuantity())
                 .unitPrice(checkoutSessionItem.getUnitPrice())
                 .subtotal(checkoutSessionItem.getSubtotal())
+                .flashSaleItem(checkoutSessionItem.getFlashSaleItem())
+                .priceSource(checkoutSessionItem.getPriceSource())
                 .build();
     }
 

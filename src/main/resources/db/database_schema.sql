@@ -152,6 +152,48 @@ CREATE TABLE product_variants (
 COMMENT ON TABLE product_variants IS 'Biến thể sản phẩm (QĐ2: SKU duy nhất, tồn kho >= 0). QĐ6: auto giảm khi đặt hàng.';
 
 -- ============================================================
+-- 6A. FLASH SALE CAMPAIGNS
+-- ============================================================
+
+CREATE TABLE flash_sale_campaigns (
+    id              BIGSERIAL       PRIMARY KEY,
+    name            VARCHAR(150)    NOT NULL,
+    description     TEXT,
+    start_at        TIMESTAMPTZ     NOT NULL,
+    end_at          TIMESTAMPTZ     NOT NULL,
+    is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_flash_sale_campaign_time CHECK (end_at > start_at)
+);
+
+COMMENT ON TABLE flash_sale_campaigns IS 'Flash sale campaigns with server-side start and end times.';
+
+-- ============================================================
+-- 6B. FLASH SALE ITEMS
+-- ============================================================
+
+CREATE TABLE flash_sale_items (
+    id                  BIGSERIAL       PRIMARY KEY,
+    campaign_id         BIGINT          NOT NULL REFERENCES flash_sale_campaigns(id) ON DELETE CASCADE,
+    product_id          BIGINT          NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+    flash_sale_price    NUMERIC(12,2)   NOT NULL,
+    quota               INTEGER         NOT NULL,
+    reserved_quantity   INTEGER         NOT NULL DEFAULT 0,
+    sold_quantity       INTEGER         NOT NULL DEFAULT 0,
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_flash_sale_item_campaign_product UNIQUE (campaign_id, product_id),
+    CONSTRAINT chk_flash_sale_item_price CHECK (flash_sale_price >= 0),
+    CONSTRAINT chk_flash_sale_item_quota CHECK (quota > 0),
+    CONSTRAINT chk_flash_sale_item_reserved CHECK (reserved_quantity >= 0),
+    CONSTRAINT chk_flash_sale_item_sold CHECK (sold_quantity >= 0),
+    CONSTRAINT chk_flash_sale_item_capacity CHECK (reserved_quantity + sold_quantity <= quota)
+);
+
+COMMENT ON TABLE flash_sale_items IS 'Products, prices, quotas, reservations, and sold counts for flash sale campaigns.';
+
+-- ============================================================
 -- 7. PRODUCT IMAGES
 -- ============================================================
 
@@ -287,7 +329,10 @@ CREATE TABLE order_items (
     variant_info        VARCHAR(100)    NOT NULL,                 -- VD: "L / Trắng"
     quantity            INTEGER         NOT NULL CHECK (quantity > 0),
     unit_price          NUMERIC(12,2)   NOT NULL CHECK (unit_price >= 0),
-    subtotal            NUMERIC(12,2)   NOT NULL CHECK (subtotal >= 0)
+    subtotal            NUMERIC(12,2)   NOT NULL CHECK (subtotal >= 0),
+    flash_sale_item_id  BIGINT          REFERENCES flash_sale_items(id) ON DELETE RESTRICT,
+    price_source        VARCHAR(20)     NOT NULL DEFAULT 'REGULAR'
+        CHECK (price_source IN ('REGULAR', 'PRODUCT_SALE', 'FLASH_SALE'))
 );
 
 COMMENT ON TABLE order_items IS 'Chi tiết đơn hàng. Snapshot giá/tên SP tại thời điểm mua (QĐ3).';
@@ -356,6 +401,9 @@ CREATE TABLE checkout_session_items (
     quantity            INTEGER         NOT NULL CHECK (quantity > 0),
     unit_price          NUMERIC(12,2)   NOT NULL CHECK (unit_price >= 0),
     subtotal            NUMERIC(12,2)   NOT NULL CHECK (subtotal >= 0),
+    flash_sale_item_id  BIGINT          REFERENCES flash_sale_items(id) ON DELETE RESTRICT,
+    price_source        VARCHAR(20)     NOT NULL DEFAULT 'REGULAR'
+        CHECK (price_source IN ('REGULAR', 'PRODUCT_SALE', 'FLASH_SALE')),
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
 
@@ -379,6 +427,24 @@ CREATE TABLE inventory_reservations (
 );
 
 COMMENT ON TABLE inventory_reservations IS 'Giu ton kho tam thoi cho checkout, chua tru stock_quantity khi reserve.';
+
+-- ============================================================
+-- 13C.1 FLASH SALE RESERVATIONS
+-- ============================================================
+
+CREATE TABLE flash_sale_reservations (
+    id                  BIGSERIAL           PRIMARY KEY,
+    checkout_session_id BIGINT              NOT NULL REFERENCES checkout_sessions(id) ON DELETE CASCADE,
+    flash_sale_item_id  BIGINT              NOT NULL REFERENCES flash_sale_items(id) ON DELETE RESTRICT,
+    quantity            INTEGER             NOT NULL CHECK (quantity > 0),
+    status              reservation_status  NOT NULL DEFAULT 'active',
+    expires_at          TIMESTAMPTZ          NOT NULL,
+    created_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_flash_sale_reservation_checkout_item UNIQUE (checkout_session_id, flash_sale_item_id)
+);
+
+COMMENT ON TABLE flash_sale_reservations IS 'Temporary flash sale quota reservations linked to checkout sessions.';
 
 -- ============================================================
 -- 13D. VOUCHER RESERVATIONS
@@ -621,6 +687,11 @@ CREATE INDEX idx_products_slug ON products(slug);
 -- Product Variants
 CREATE INDEX idx_variants_product ON product_variants(product_id);
 CREATE INDEX idx_variants_sku ON product_variants(sku);
+
+-- Flash Sales
+CREATE INDEX idx_flash_sale_campaigns_active_time ON flash_sale_campaigns(is_active, start_at, end_at);
+CREATE INDEX idx_flash_sale_items_campaign ON flash_sale_items(campaign_id);
+CREATE INDEX idx_flash_sale_items_product ON flash_sale_items(product_id);
 CREATE INDEX idx_variants_stock_low ON product_variants(stock_quantity) WHERE stock_quantity < 10; -- QĐ6: cảnh báo
 
 -- Product Images
@@ -638,6 +709,7 @@ CREATE INDEX idx_order_status_history_order_time_id ON order_status_histories(or
 
 -- Order Items
 CREATE INDEX idx_order_items_order ON order_items(order_id);
+CREATE INDEX idx_order_items_flash_sale ON order_items(flash_sale_item_id) WHERE flash_sale_item_id IS NOT NULL;
 
 -- Payments
 CREATE INDEX idx_payments_order ON payments(order_id);
@@ -652,11 +724,17 @@ CREATE INDEX idx_checkout_sessions_code ON checkout_sessions(checkout_code);
 -- Checkout Session Items
 CREATE INDEX idx_checkout_session_items_checkout ON checkout_session_items(checkout_session_id);
 CREATE INDEX idx_checkout_session_items_variant ON checkout_session_items(product_variant_id);
+CREATE INDEX idx_checkout_session_items_flash_sale ON checkout_session_items(flash_sale_item_id) WHERE flash_sale_item_id IS NOT NULL;
 
 -- Inventory Reservations
 CREATE INDEX idx_inventory_reservations_variant_status_expires ON inventory_reservations(product_variant_id, status, expires_at);
 CREATE INDEX idx_inventory_reservations_checkout ON inventory_reservations(checkout_session_id);
 CREATE INDEX idx_inventory_reservations_status_expires ON inventory_reservations(status, expires_at);
+
+-- Flash Sale Reservations
+CREATE INDEX idx_flash_sale_reservations_checkout ON flash_sale_reservations(checkout_session_id);
+CREATE INDEX idx_flash_sale_reservations_item_status_expires ON flash_sale_reservations(flash_sale_item_id, status, expires_at);
+CREATE INDEX idx_flash_sale_reservations_status_expires ON flash_sale_reservations(status, expires_at);
 
 -- Voucher Reservations
 CREATE INDEX idx_voucher_reservations_voucher_status_expires ON voucher_reservations(voucher_id, status, expires_at);
