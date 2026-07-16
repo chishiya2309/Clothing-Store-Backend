@@ -42,6 +42,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Page<Product> findByIsActiveTrue(Pageable pageable);
 
+    List<Product> findByIsActiveTrue();
+
     boolean existsBySlug(String slug);
 
     boolean existsByCategoryIdAndNameIgnoreCase(Long categoryId, String name);

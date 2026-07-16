@@ -6,6 +6,12 @@ spring:
     name: clothing-store-backend
   profiles:
     active: @spring.profiles.active@
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:./.env[.properties]
+      - optional:file:../.env[.properties]
+      - optional:file:Clothing-Store-Backend/.env[.properties]
 
 management:
   endpoints:
@@ -17,3 +23,54 @@ logging:
   level:
     root: INFO
     web: INFO
+
+app:
+  rate-limit:
+    enabled: true
+    rules:
+      - key: auth-login
+        path-patterns:
+          - /api/auth/login
+        methods:
+          - POST
+        limit: 5
+        window-seconds: 60
+        message: Too many login attempts. Please try again in a minute.
+      - key: auth-register
+        path-patterns:
+          - /api/auth/register
+          - /api/auth/resend-verification
+          - /api/auth/forgot-password
+          - /api/auth/reset-password
+        methods:
+          - POST
+        limit: 5
+        window-seconds: 600
+        message: Too many auth requests. Please wait a few minutes and try again.
+      - key: auth-google
+        path-patterns:
+          - /api/auth/google
+        methods:
+          - POST
+        limit: 10
+        window-seconds: 60
+        message: Too many Google sign-in attempts. Please try again shortly.
+      - key: auth-refresh
+        path-patterns:
+          - /api/auth/refresh
+        methods:
+          - POST
+        limit: 30
+        window-seconds: 60
+        message: Too many token refresh requests. Please slow down and try again.
+      - key: public-catalog
+        path-patterns:
+          - /api/products/**
+          - /api/guest/**
+          - /sitemap.xml
+          - /robots.txt
+        methods:
+          - GET
+        limit: 180
+        window-seconds: 60
+        message: Too many catalog requests. Please retry in a moment.

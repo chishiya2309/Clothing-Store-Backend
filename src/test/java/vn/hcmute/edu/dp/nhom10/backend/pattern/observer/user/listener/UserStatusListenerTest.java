@@ -109,10 +109,12 @@ class UserStatusListenerTest {
     void handleAuditLog_exceptionHandledGracefully() {
         UserStatusChangedEvent event = new UserStatusChangedEvent(this, 1L, "user@test.com", true, false);
 
-        // This will trigger exception because SecurityContextHolder throws a NullPointerException
-        // since we are not mocking it. We expect it to be caught and logged (meaning no exception thrown to caller).
-        
-        userStatusListener.handleAuditLog(event);
+        // Explicitly mock to throw exception to test the catch block
+        try (MockedStatic<SecurityContextHolder> mockedSecurity = mockStatic(SecurityContextHolder.class)) {
+            mockedSecurity.when(SecurityContextHolder::getContext).thenThrow(new RuntimeException("Security error"));
+            
+            userStatusListener.handleAuditLog(event);
+        }
         
         verify(activityLogRepository, never()).save(any(ActivityLog.class));
     }
