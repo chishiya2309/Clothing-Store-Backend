@@ -252,16 +252,7 @@ Sau khi chạy đủ seed data:
 
 | Email              | Password    |
 | ------------------ | ----------- |
-| `admin@nhom10.com` | `Admin@123` |
-
-### Khách hàng (cùng password `Admin@123`)
-
-| Email                  |
-| ---------------------- |
-| `nguyenvana@gmail.com` |
-| `tranthib@gmail.com`   |
-| `phamthid@gmail.com`   |
-| `lythik@gmail.com`     |
+| `admin@nhom10.com` | `Admin123` |
 
 ---
 
