@@ -76,3 +76,12 @@ Rule mặc định:
 ## Gợi Ý Frontend
 
 Frontend có thể dùng `Retry-After` hoặc `X-RateLimit-Reset` để hiển thị thông báo chờ khi gặp `429`, ví dụ ở login/search/autocomplete.
+
+## Security Hardening Notes
+
+Ngoài rate limiting, phần backend của Quân hiện đã bổ sung thêm vài lớp hardening nhỏ để giảm rủi ro demo bị bắt lỗi:
+
+- Chỉ tin `X-Forwarded-For` và `X-Real-IP` khi request đi qua proxy nội bộ/loopback, tránh client ngoài tự spoof IP để né rate limit.
+- CORS chuyển sang cấu hình origin allowlist và expose sẵn các header rate limit để frontend đọc được `Retry-After`, `X-RateLimit-*`.
+- JWT token sai chữ ký được reject gọn trong provider thay vì làm log auth nhiễu.
+- JWT filter bỏ qua xử lý nếu security context đã có authentication, đồng thời parse `Bearer` header theo kiểu trim + không phân biệt hoa thường để tránh lỗi vặt từ client.
