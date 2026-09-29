@@ -26,7 +26,7 @@ logging:
 
 app:
   rate-limit:
-    enabled: true
+    enabled: false
     rules:
       - key: auth-login
         path-patterns:
