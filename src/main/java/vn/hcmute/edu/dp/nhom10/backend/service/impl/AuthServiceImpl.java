@@ -223,7 +223,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
-        userRepository.findByEmail(request.email()).ifPresent(user -> {
+        userRepository.findByEmailIgnoreCase(request.email()).ifPresent(user -> {
             String token = UUID.randomUUID().toString();
             String key = PASSWORD_RESET_PREFIX + token;
             redisTemplate.opsForValue().set(key, user.getId().toString(), passwordResetTokenTtl, TimeUnit.SECONDS);

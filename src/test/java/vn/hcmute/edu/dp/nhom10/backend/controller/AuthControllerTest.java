@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +27,8 @@ import vn.hcmute.edu.dp.nhom10.backend.service.AuthService;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -173,9 +178,10 @@ class AuthControllerTest {
                                 .andExpect(jsonPath("$.data.accessToken").value("google_access_token"));
         }
 
-        @Test
-        void forgotPassword_success() throws Exception {
-                ForgotPasswordRequest request = new ForgotPasswordRequest("test@test.com");
+        @ParameterizedTest
+        @ValueSource(strings = {"test@test.com", "aKi23092005@gMaIL.CoM", "notfound@test.com"})
+        void forgotPassword_validEmail_returnsGenericConfirmation(String email) throws Exception {
+                ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
                 doNothing().when(authService).forgotPassword(any(ForgotPasswordRequest.class));
 
@@ -186,6 +192,22 @@ class AuthControllerTest {
                                 .andExpect(jsonPath("$.status").value(200))
                                 .andExpect(jsonPath("$.message").value(
                                                 "If your email is registered, a password reset link has been sent."));
+
+                verify(authService).forgotPassword(request);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "not-an-email", "aki23092005@"})
+        void forgotPassword_invalidEmail_returnsBadRequest(String email) throws Exception {
+                ForgotPasswordRequest request = new ForgotPasswordRequest(email);
+
+                mockMvc.perform(post("/api/auth/forgot-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest());
+
+                verifyNoInteractions(authService);
         }
 
         @Test
