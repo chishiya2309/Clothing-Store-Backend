@@ -246,6 +246,26 @@ Sau khi chạy đủ seed data:
 
 ---
 
+## Migration thu hồi phiên sau reset mật khẩu
+
+Với database hiện có, chạy `src/main/resources/db/password_reset_session_version_patch.sql`
+trước khi triển khai backend mới. Patch có thể chạy lặp và không đặt lại phiên bản đã lưu.
+Schema khởi tạo đã có hai cột `session_version` và `row_version`.
+
+Tạm ngừng nhận yêu cầu reset trong lúc cập nhật, thay toàn bộ backend instance rồi mới
+mở lại chức năng. Instance cũ không kiểm tra phiên bản và không được chạy cùng instance mới.
+JWT cũ thiếu claim và refresh token Redis cũ chỉ chứa user ID thuộc phiên bản 0;
+chúng tiếp tục hoạt động khi tài khoản chưa reset. Sau reset, mọi token của phiên bản cũ
+bị từ chối, kể cả khi vẫn còn trong Redis. Không rollback về backend bỏ kiểm tra phiên bản.
+
+Kiểm thử xác thực dùng JDK 17; PostgreSQL integration test cần Docker:
+
+```powershell
+$env:JAVA_HOME = 'D:\Java\jdk-17'
+mvn '-Dtest=AuthServiceImplTest,AuthControllerTest,SessionSecurityTest,JwtTokenProviderTest,RefreshTokenSessionTest,UserStatusListenerTest' test
+mvn '-Dtest=PasswordResetSessionIT' test
+```
+
 ## 👤 Tài Khoản Demo
 
 ### Admin
