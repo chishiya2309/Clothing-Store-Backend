@@ -266,15 +266,6 @@ public class GlobalExceptionHandling {
         return errorResponse;
     }
 
-    @ExceptionHandler(org.springframework.dao.OptimisticLockingFailureException.class)
-    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.CONFLICT)
-    public ErrorResponse handleOptimisticLockingException(
-            org.springframework.dao.OptimisticLockingFailureException e, WebRequest request) {
-        ErrorResponse response = baseErrorResponse(HttpStatus.CONFLICT, request);
-        response.setMessage("Dữ liệu đã thay đổi. Vui lòng thử lại.");
-        return response;
-    }
-
     @ExceptionHandler(Exception.class)
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGenericException(Exception e, WebRequest request) {

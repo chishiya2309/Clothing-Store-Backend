@@ -24,7 +24,6 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.ActivityLogRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.MembershipTierRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.security.JwtTokenProvider;
-import vn.hcmute.edu.dp.nhom10.backend.security.RefreshTokenSession;
 import vn.hcmute.edu.dp.nhom10.backend.service.AuthService;
 import org.springframework.context.ApplicationEventPublisher;
 import vn.hcmute.edu.dp.nhom10.backend.event.UserRegisteredEvent;
@@ -167,13 +166,12 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Email or password is incorrect");
         }
 
-        String accessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getSessionVersion());
+        String accessToken = jwtTokenProvider.generateToken(user.getEmail());
         String refreshToken = UUID.randomUUID().toString();
 
         long ttl = Boolean.TRUE.equals(request.rememberMe()) ? rememberMeTokenTtl : refreshTokenTtl;
         String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        redisTemplate.opsForValue().set(key,
-                new RefreshTokenSession(user.getId(), user.getSessionVersion()).encode(), ttl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, user.getId().toString(), ttl, TimeUnit.SECONDS);
 
         user.setLastLoginAt(OffsetDateTime.now());
         userRepository.save(user);
@@ -193,19 +191,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse refreshToken(String refreshToken) {
         String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        RefreshTokenSession session = RefreshTokenSession.decode(redisTemplate.opsForValue().get(key));
-        User user = userRepository.findById(session.userId())
-                .orElseThrow(() -> new BadCredentialsException("Refresh token expired or invalid"));
+        Object userIdObj = redisTemplate.opsForValue().get(key);
 
-        if (session.sessionVersion() != user.getSessionVersion()) {
-            throw new BadCredentialsException("Session has been revoked");
+        if (userIdObj == null) {
+            throw new InvalidDataException("Refresh token expired or invalid");
         }
+
+        Long userId = Long.valueOf(userIdObj.toString());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!Boolean.TRUE.equals(user.getIsActive()) || !Boolean.TRUE.equals(user.getEmailVerified())) {
             throw new AccessDeniedException("Account is inactive or email not verified");
         }
 
-        String newAccessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getSessionVersion());
+        String newAccessToken = jwtTokenProvider.generateToken(user.getEmail());
 
         return TokenResponse.builder()
                 .accessToken(newAccessToken)
@@ -246,19 +246,28 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Long userId = Long.valueOf(userIdObj.toString());
-        User user = userRepository.findByIdForUpdate(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // A second request may have consumed this token while we waited for the row lock.
-        Object lockedUserId = redisTemplate.opsForValue().get(key);
-        if (lockedUserId == null || !userId.toString().equals(lockedUserId.toString())) {
-            throw new InvalidDataException("Token expired or invalid");
-        }
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
-        user.setSessionVersion(Math.incrementExact(user.getSessionVersion()));
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
 
         redisTemplate.delete(key);
+
+        // Revoke all existing sessions
+        try {
+            java.util.Set<String> keys = redisTemplate.keys(REFRESH_TOKEN_PREFIX + "*");
+            if (keys != null && !keys.isEmpty()) {
+                for (String tokenKey : keys) {
+                    Object cachedUserId = redisTemplate.opsForValue().get(tokenKey);
+                    if (cachedUserId != null && Long.valueOf(cachedUserId.toString()).equals(userId)) {
+                        redisTemplate.delete(tokenKey);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to revoke refresh tokens for user: " + userId, e);
+        }
     }
 
     @Transactional
@@ -296,12 +305,11 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        String accessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getSessionVersion());
+        String accessToken = jwtTokenProvider.generateToken(user.getEmail());
         String refreshToken = UUID.randomUUID().toString();
 
         String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        redisTemplate.opsForValue().set(key,
-                new RefreshTokenSession(user.getId(), user.getSessionVersion()).encode(), refreshTokenTtl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, user.getId().toString(), refreshTokenTtl, TimeUnit.SECONDS);
 
         user.setLastLoginAt(OffsetDateTime.now());
         userRepository.save(user);

@@ -35,14 +35,6 @@ public class User {
     @Column(name = "password_hash")
     private String passwordHash;
 
-    @Column(name = "session_version", nullable = false)
-    @Builder.Default
-    private long sessionVersion = 0;
-
-    @Version
-    @Column(name = "row_version", nullable = false)
-    private Long rowVersion;
-
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 

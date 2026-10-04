@@ -12,7 +12,6 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.observer.user.event.UserStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ActivityLogRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
-import vn.hcmute.edu.dp.nhom10.backend.security.RefreshTokenSession;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,16 +75,7 @@ public class UserStatusListener {
                 if (keys != null && !keys.isEmpty()) {
                     for (String tokenKey : keys) {
                         Object cachedUserId = redisTemplate.opsForValue().get(tokenKey);
-                        if (cachedUserId == null) {
-                            continue;
-                        }
-                        RefreshTokenSession session;
-                        try {
-                            session = RefreshTokenSession.decode(cachedUserId);
-                        } catch (org.springframework.security.authentication.BadCredentialsException ex) {
-                            continue;
-                        }
-                        if (session.userId() == event.getUserId()) {
+                        if (cachedUserId != null && Long.valueOf(cachedUserId.toString()).equals(event.getUserId())) {
                             redisTemplate.delete(tokenKey);
                             log.info("Revoked session token key: {}", tokenKey);
                         }

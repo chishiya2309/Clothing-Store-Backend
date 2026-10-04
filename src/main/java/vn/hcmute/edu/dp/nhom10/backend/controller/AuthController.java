@@ -16,9 +16,6 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.request.ResetPasswordRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.TokenResponse;
 import vn.hcmute.edu.dp.nhom10.backend.service.AuthService;
-import vn.hcmute.edu.dp.nhom10.backend.dto.response.SessionResponse;
-import vn.hcmute.edu.dp.nhom10.backend.security.SessionUserDetails;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.OffsetDateTime;
@@ -33,16 +30,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AuthController {
 
     private final AuthService authService;
-
-    @GetMapping("/session")
-    public ApiResponse session(@AuthenticationPrincipal SessionUserDetails principal) {
-        return ApiResponse.builder()
-                .status(HttpStatus.OK.value())
-                .message("Session is valid")
-                .data(new SessionResponse(principal.getId(), principal.getFullName(), principal.getRole()))
-                .timestamp(OffsetDateTime.now())
-                .build();
-    }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)

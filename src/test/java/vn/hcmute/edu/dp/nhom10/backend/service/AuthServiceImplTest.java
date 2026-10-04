@@ -205,7 +205,7 @@ class AuthServiceImplTest {
 
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(request.password(), user.getPasswordHash())).thenReturn(true);
-        when(jwtTokenProvider.generateToken(user.getEmail(), user.getSessionVersion())).thenReturn("access_token");
+        when(jwtTokenProvider.generateToken(user.getEmail())).thenReturn("access_token");
         when(jwtTokenProvider.getJwtExpirationInMs()).thenReturn(900000L);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -219,7 +219,7 @@ class AuthServiceImplTest {
         verify(userRepository).save(user);
         assertNotNull(user.getLastLoginAt());
         verify(activityLogRepository).save(any(ActivityLog.class));
-        verify(valueOperations).set(anyString(), eq("1:0"), eq(604800L), eq(TimeUnit.SECONDS));
+        verify(valueOperations).set(anyString(), eq("1"), eq(604800L), eq(TimeUnit.SECONDS));
     }
 
     @Test
@@ -280,7 +280,7 @@ class AuthServiceImplTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(key)).thenReturn("1");
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(jwtTokenProvider.generateToken(user.getEmail(), user.getSessionVersion())).thenReturn("new_access_token");
+        when(jwtTokenProvider.generateToken(user.getEmail())).thenReturn("new_access_token");
         when(jwtTokenProvider.getJwtExpirationInMs()).thenReturn(900000L);
 
         TokenResponse response = authService.refreshToken(token);
@@ -298,7 +298,7 @@ class AuthServiceImplTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(key)).thenReturn(null);
 
-        assertThrows(BadCredentialsException.class, () -> authService.refreshToken(token));
+        assertThrows(InvalidDataException.class, () -> authService.refreshToken(token));
     }
 
     @Test
@@ -320,7 +320,7 @@ class AuthServiceImplTest {
 
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(request.password(), user.getPasswordHash())).thenReturn(true);
-        when(jwtTokenProvider.generateToken(user.getEmail(), user.getSessionVersion())).thenReturn("access_token");
+        when(jwtTokenProvider.generateToken(user.getEmail())).thenReturn("access_token");
         when(jwtTokenProvider.getJwtExpirationInMs()).thenReturn(900000L);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
@@ -329,7 +329,7 @@ class AuthServiceImplTest {
         assertNotNull(response);
         // Verify that remember-me TTL (30 days = 2592000s) is used instead of default 7
         // days
-        verify(valueOperations).set(anyString(), eq("1:0"), eq(2592000L), eq(TimeUnit.SECONDS));
+        verify(valueOperations).set(anyString(), eq("1"), eq(2592000L), eq(TimeUnit.SECONDS));
     }
 
     @ParameterizedTest
@@ -385,62 +385,18 @@ class AuthServiceImplTest {
         User user = new User();
         user.setId(1L);
         user.setPasswordHash("old_hash");
-        user.setSessionVersion(3L);
 
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.get(key)).thenReturn("1");
-        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(request.newPassword())).thenReturn("new_hash");
 
         authService.resetPassword(request);
 
         assertEquals("new_hash", user.getPasswordHash());
-        assertEquals(4L, user.getSessionVersion());
-        verify(userRepository).saveAndFlush(user);
+        verify(userRepository).save(user);
         verify(redisTemplate).delete(key);
-        verify(redisTemplate, never()).keys(anyString());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"1", "1:0", "1:2", "garbage", "1:-1", "1:3:4"})
-    void refreshToken_revokedOrMalformed_cannotIssueAccessToken(String value) {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.get("refresh_token:old")).thenReturn(value);
-        if (value.matches("1(?::[0-9]+)?")) {
-            User user = new User();
-            user.setSessionVersion(3L);
-            when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        }
-        assertThrows(BadCredentialsException.class, () -> authService.refreshToken("old"));
-        verifyNoInteractions(jwtTokenProvider);
-    }
-
-    @Test
-    void refreshToken_currentVersion_issuesVersionedToken() {
-        User user = new User();
-        user.setEmail("test@test.com");
-        user.setSessionVersion(3L);
-        user.setIsActive(true);
-        user.setEmailVerified(true);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.get("refresh_token:current")).thenReturn("1:3");
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(jwtTokenProvider.generateToken(user.getEmail(), 3L)).thenReturn("new");
-        assertEquals("new", authService.refreshToken("current").getAccessToken());
-    }
-
-    @Test
-    void resetPassword_tokenConsumedWhileWaiting_doesNotChangePassword() {
-        User user = new User();
-        user.setPasswordHash("old_hash");
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.get("password_reset:used")).thenReturn("1", null);
-        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
-        assertThrows(InvalidDataException.class, () -> authService.resetPassword(
-                new ResetPasswordRequest("used", "NewPass123", "NewPass123")));
-        assertEquals("old_hash", user.getPasswordHash());
-        assertEquals(0L, user.getSessionVersion());
-        verify(userRepository, never()).saveAndFlush(any());
+        verify(redisTemplate).keys("refresh_token:*");
     }
 
     @Test
@@ -449,37 +405,6 @@ class AuthServiceImplTest {
 
         assertThrows(InvalidDataException.class, () -> authService.resetPassword(request));
         verify(redisTemplate, never()).opsForValue();
-    }
-
-    @Test
-    void googleLogin_bindsBothTokensToCurrentSessionVersion() throws Exception {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("google@test.com");
-        user.setFullName("Google User");
-        user.setRole(vn.hcmute.edu.dp.nhom10.backend.enums.UserRole.customer);
-        user.setSessionVersion(3L);
-        user.setIsActive(true);
-        user.setEmailVerified(true);
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(jwtTokenProvider.generateToken(user.getEmail(), 3L)).thenReturn("google_token");
-        var payload = new com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload();
-        payload.setEmail(user.getEmail());
-        var token = mock(com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.class);
-        when(token.getPayload()).thenReturn(payload);
-        var verifier = mock(com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier.class);
-        when(verifier.verify("google-id-token")).thenReturn(token);
-        try (var builders = mockConstruction(com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier.Builder.class,
-                (builder, context) -> {
-                    when(builder.setAudience(anyCollection())).thenReturn(builder);
-                    when(builder.build()).thenReturn(verifier);
-                })) {
-            TokenResponse response = authService.loginWithGoogle(
-                    new vn.hcmute.edu.dp.nhom10.backend.dto.request.GoogleAuthRequest("google-id-token"), null, null);
-            assertEquals("google_token", response.getAccessToken());
-            verify(valueOperations).set(startsWith("refresh_token:"), eq("1:3"), eq(604800L), eq(TimeUnit.SECONDS));
-        }
     }
 
     @Test
