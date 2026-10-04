@@ -6,10 +6,13 @@ import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -27,16 +30,30 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, long sessionVersion) {
-        if (sessionVersion < 0) {
-            throw new IllegalArgumentException("Session version cannot be negative");
-        }
+    public String generateToken(Authentication authentication) {
+        Objects.requireNonNull(authentication, "Authentication cannot be null");
+
+        UserDetails userPrincipal = (UserDetails) Objects.requireNonNull(
+                authentication.getPrincipal(),
+                "Principal cannot be null");
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        return Jwts.builder()
+                .subject(userPrincipal.getUsername())
+                .issuedAt(new Date())
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
                 .subject(username)
-                .claim("session_version", sessionVersion)
                 .issuedAt(new Date())
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -57,20 +74,15 @@ public class JwtTokenProvider {
         try {
             Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(authToken);
             return true;
-        } catch (JwtException | IllegalArgumentException ex) {
-            log.debug("Invalid or expired JWT token");
+        } catch (MalformedJwtException ex) {
+            log.error("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            log.error("Expired JWT token");
+        } catch (UnsupportedJwtException ex) {
+            log.error("Unsupported JWT token");
+        } catch (IllegalArgumentException ex) {
+            log.error("JWT claims string is empty.");
         }
         return false;
-    }
-
-    public long getSessionVersionFromJWT(String token) {
-        Claims claims = Jwts.parser().verifyWith(getSigningKey()).build()
-                .parseSignedClaims(token).getPayload();
-        // Tokens issued before session versioning belong to version zero only.
-        Long version = claims.get("session_version", Long.class);
-        if (version != null && version < 0) {
-            throw new IllegalArgumentException("Invalid session version");
-        }
-        return version == null ? 0 : version;
     }
 }

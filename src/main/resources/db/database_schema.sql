@@ -48,8 +48,6 @@ CREATE TABLE users (
     id                  BIGSERIAL       PRIMARY KEY,
     email               VARCHAR(255)    NOT NULL UNIQUE,
     password_hash       VARCHAR(255),                           -- NULL nếu đăng ký qua OAuth
-    session_version     BIGINT          NOT NULL DEFAULT 0,
-    row_version         BIGINT          NOT NULL DEFAULT 0,
     full_name           VARCHAR(100)    NOT NULL,
     phone               VARCHAR(15),
     gender              gender_type,

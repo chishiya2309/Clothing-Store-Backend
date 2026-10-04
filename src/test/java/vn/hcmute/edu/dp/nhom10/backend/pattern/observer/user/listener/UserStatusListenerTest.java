@@ -119,16 +119,15 @@ class UserStatusListenerTest {
         verify(activityLogRepository, never()).save(any(ActivityLog.class));
     }
 
-    @org.junit.jupiter.params.ParameterizedTest
-    @org.junit.jupiter.params.provider.CsvSource({"1, 2", "1:4, 2:4"})
-    void handleSessionRevocation_lockUser_revokesSessions(String ownSession, String otherSession) {
+    @Test
+    void handleSessionRevocation_lockUser_revokesSessions() {
         UserStatusChangedEvent event = new UserStatusChangedEvent(this, 1L, "user@test.com", true, false);
         Set<String> keys = Set.of("refresh_token:token123", "refresh_token:token456");
 
         when(redisTemplate.keys("refresh_token:*")).thenReturn(keys);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        when(valueOperations.get("refresh_token:token123")).thenReturn(ownSession);
-        when(valueOperations.get("refresh_token:token456")).thenReturn(otherSession);
+        when(valueOperations.get("refresh_token:token123")).thenReturn("1"); // locked user ID
+        when(valueOperations.get("refresh_token:token456")).thenReturn("2"); // other user ID
 
         userStatusListener.handleSessionRevocation(event);
 
