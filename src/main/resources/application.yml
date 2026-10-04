@@ -24,18 +24,6 @@ logging:
     root: INFO
     web: INFO
 
-openrouteservice:
-  api-key: ${OPENROUTESERVICE_API_KEY:}
-  base-url: ${OPENROUTESERVICE_BASE_URL:https://api.heigit.org}
-
-shipping:
-  shop-latitude: ${SHOP_LATITUDE:10.762622}
-  shop-longitude: ${SHOP_LONGITUDE:106.660172}
-  base-fee: ${SHIPPING_BASE_FEE:25000}
-  base-distance-km: ${SHIPPING_BASE_DISTANCE_KM:10}
-  extra-fee-per-km: ${SHIPPING_EXTRA_FEE_PER_KM:3000}
-  max-fee: ${SHIPPING_MAX_FEE:50000}
-
 app:
   rate-limit:
     enabled: false

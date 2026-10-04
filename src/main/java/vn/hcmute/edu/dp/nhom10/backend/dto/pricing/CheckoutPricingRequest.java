@@ -8,6 +8,7 @@ public record CheckoutPricingRequest(
         User user,
         BigDecimal subtotal,
         BigDecimal shippingFee,
-        BigDecimal voucherDiscountAmount
+        BigDecimal voucherDiscountAmount,
+        BigDecimal shippingDiscountAmount
 ) {
 }

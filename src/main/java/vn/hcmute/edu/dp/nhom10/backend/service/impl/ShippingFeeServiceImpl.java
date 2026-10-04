@@ -40,7 +40,10 @@ public class ShippingFeeServiceImpl implements ShippingFeeService {
             return money(shippingProperties.getMaxFee());
         }
 
-        return calculateFee(distanceKm.get());
+        BigDecimal shippingFee = calculateFee(distanceKm.get());
+        log.info("Calculated shipping fee for address '{}' with driving distance {} km: {}",
+                fullAddress, distanceKm.get(), shippingFee);
+        return shippingFee;
     }
 
     BigDecimal calculateFee(BigDecimal distanceKm) {
@@ -54,10 +57,15 @@ public class ShippingFeeServiceImpl implements ShippingFeeService {
             return money(baseFee);
         }
 
+        BigDecimal maxDistanceKm = shippingProperties.getMaxDistanceKm();
+        if (distanceKm.compareTo(maxDistanceKm) >= 0) {
+            return money(shippingProperties.getMaxFee());
+        }
+
         BigDecimal extraKm = distanceKm.subtract(baseDistanceKm)
                 .setScale(0, RoundingMode.CEILING);
         BigDecimal calculatedFee = baseFee.add(extraKm.multiply(shippingProperties.getExtraFeePerKm()));
-        return money(calculatedFee.min(shippingProperties.getMaxFee()));
+        return money(calculatedFee);
     }
 
     private String buildFullAddress(Address address) {

@@ -36,8 +36,18 @@ class ShippingFeeServiceImplTest {
     }
 
     @Test
-    void calculateFee_distanceFarAway_capsAtMaxFee() {
-        assertEquals(new BigDecimal("50000.00"), shippingFeeService.calculateFee(new BigDecimal("25.00")));
+    void calculateFee_distanceBeforeMaxDistance_usesExtraFeePerKm() {
+        assertEquals(new BigDecimal("70000.00"), shippingFeeService.calculateFee(new BigDecimal("25.00")));
+    }
+
+    @Test
+    void calculateFee_distanceAtMaxDistance_returnsMaxFee() {
+        assertEquals(new BigDecimal("50000.00"), shippingFeeService.calculateFee(new BigDecimal("30.00")));
+    }
+
+    @Test
+    void calculateFee_distanceAboveMaxDistance_returnsMaxFee() {
+        assertEquals(new BigDecimal("50000.00"), shippingFeeService.calculateFee(new BigDecimal("31.00")));
     }
 
     @Test

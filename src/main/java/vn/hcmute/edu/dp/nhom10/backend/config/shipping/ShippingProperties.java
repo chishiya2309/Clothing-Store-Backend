@@ -13,6 +13,7 @@ public class ShippingProperties {
     private BigDecimal shopLongitude = new BigDecimal("106.660172");
     private BigDecimal baseFee = new BigDecimal("25000.00");
     private BigDecimal baseDistanceKm = new BigDecimal("10.00");
+    private BigDecimal maxDistanceKm = new BigDecimal("30.00");
     private BigDecimal extraFeePerKm = new BigDecimal("3000.00");
     private BigDecimal maxFee = new BigDecimal("50000.00");
 
@@ -46,6 +47,14 @@ public class ShippingProperties {
 
     public void setBaseDistanceKm(BigDecimal baseDistanceKm) {
         this.baseDistanceKm = baseDistanceKm;
+    }
+
+    public BigDecimal getMaxDistanceKm() {
+        return maxDistanceKm;
+    }
+
+    public void setMaxDistanceKm(BigDecimal maxDistanceKm) {
+        this.maxDistanceKm = maxDistanceKm;
     }
 
     public BigDecimal getExtraFeePerKm() {

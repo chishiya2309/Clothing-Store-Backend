@@ -57,9 +57,26 @@ class CheckoutPricingServiceImplTest {
     }
 
     @Test
-    void calculate_discountGreaterThanSubtotal_throwsException() {
-        assertThrows(InvalidDataException.class,
-                () -> service.calculate(request(null, "100000.00", "0.00", "100001.00")));
+    void calculate_discountGreaterThanSubtotal_capsProductPayableAtZero() {
+        CheckoutPricingResult result = service.calculate(request(null, "100000.00", "20000.00", "100001.00"));
+
+        assertEquals(new BigDecimal("100000.00"), result.discountAmount());
+        assertEquals(new BigDecimal("20000.00"), result.totalAmount());
+    }
+
+    @Test
+    void calculate_appliesShippingDiscountWithMaxZeroPayable() {
+        CheckoutPricingResult result = service.calculate(new CheckoutPricingRequest(
+                null,
+                new BigDecimal("100000.00"),
+                new BigDecimal("20000.00"),
+                BigDecimal.ZERO,
+                new BigDecimal("25000.00")
+        ));
+
+        assertEquals(new BigDecimal("20000.00"), result.shippingDiscountAmount());
+        assertEquals(new BigDecimal("20000.00"), result.discountAmount());
+        assertEquals(new BigDecimal("100000.00"), result.totalAmount());
     }
 
     @Test
@@ -84,7 +101,8 @@ class CheckoutPricingServiceImplTest {
                 user,
                 new BigDecimal(subtotal),
                 new BigDecimal(shippingFee),
-                voucherDiscountAmount == null ? null : new BigDecimal(voucherDiscountAmount)
+                voucherDiscountAmount == null ? null : new BigDecimal(voucherDiscountAmount),
+                null
         );
     }
 }

@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
@@ -23,6 +24,7 @@ public class OpenRouteServiceImpl implements OpenRouteService {
 
     private final OpenRouteServiceProperties properties;
     private final RestClient restClient;
+    private final AtomicBoolean missingApiKeyLogged = new AtomicBoolean(false);
 
     public OpenRouteServiceImpl(OpenRouteServiceProperties properties) {
         this.properties = properties;
@@ -33,7 +35,7 @@ public class OpenRouteServiceImpl implements OpenRouteService {
 
     @Override
     public Optional<GeoCoordinate> geocode(String address) {
-        if (!properties.hasApiKey() || address == null || address.isBlank()) {
+        if (!hasApiKey() || address == null || address.isBlank()) {
             return Optional.empty();
         }
 
@@ -58,7 +60,7 @@ public class OpenRouteServiceImpl implements OpenRouteService {
 
     @Override
     public Optional<BigDecimal> drivingDistanceKm(GeoCoordinate origin, GeoCoordinate destination) {
-        if (!properties.hasApiKey() || origin == null || destination == null) {
+        if (!hasApiKey() || origin == null || destination == null) {
             return Optional.empty();
         }
 
@@ -119,6 +121,14 @@ public class OpenRouteServiceImpl implements OpenRouteService {
 
     private BigDecimal normalizeCoordinate(BigDecimal coordinate) {
         return coordinate.setScale(COORDINATE_SCALE, RoundingMode.HALF_UP);
+    }
+
+    private boolean hasApiKey() {
+        boolean hasApiKey = properties.hasApiKey();
+        if (!hasApiKey && missingApiKeyLogged.compareAndSet(false, true)) {
+            log.warn("OpenRouteService API key is not configured. Shipping distance cannot be calculated.");
+        }
+        return hasApiKey;
     }
 
     private record GeocodeResponse(List<GeocodeFeature> features) {
