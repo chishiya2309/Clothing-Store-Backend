@@ -15,6 +15,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.AddressSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
@@ -43,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -70,6 +72,9 @@ class CheckoutServiceFacadeTest {
 
     @Mock
     private VoucherReservationService voucherService;
+
+    @Mock
+    private VoucherQuoteService voucherQuoteService;
 
     @Mock
     private CheckoutSessionRepository checkoutSessionRepository;
@@ -102,6 +107,8 @@ class CheckoutServiceFacadeTest {
             }
             return checkoutSession;
         });
+        lenient().when(voucherQuoteService.quote(anyString(), anyLong(), any(), any()))
+                .thenReturn(new VoucherQuote(100L, "SAVE10", null, BigDecimal.ZERO, BigDecimal.ZERO, "Voucher applied successfully"));
     }
 
     @Test

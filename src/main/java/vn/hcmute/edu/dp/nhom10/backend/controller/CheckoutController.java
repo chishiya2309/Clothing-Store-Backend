@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.PreviewCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.ApiResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.CheckoutPreviewResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PlaceOrderResponseDTO;
 import vn.hcmute.edu.dp.nhom10.backend.security.AuthenticatedUserProvider;
 import vn.hcmute.edu.dp.nhom10.backend.security.ClientIpResolver;
+import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutService;
 import vn.hcmute.edu.dp.nhom10.backend.service.PlaceOrderService;
 
 import java.time.OffsetDateTime;
@@ -28,8 +31,25 @@ import java.time.OffsetDateTime;
 public class CheckoutController {
 
     private final PlaceOrderService placeOrderService;
+    private final CheckoutService checkoutService;
     private final AuthenticatedUserProvider authenticatedUserProvider;
     private final ClientIpResolver clientIpResolver;
+
+    @PostMapping("/preview")
+    public ApiResponse previewCheckout(
+            @Valid @RequestBody PreviewCheckoutRequestDTO requestDTO,
+            Authentication authentication
+    ) {
+        Long userId = authenticatedUserProvider.getCurrentUserId(authentication);
+        log.info("Previewing checkout for authenticated user: {}", authentication.getName());
+        CheckoutPreviewResponse response = checkoutService.previewCheckout(requestDTO, userId);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Preview checkout successfully")
+                .data(response)
+                .timestamp(OffsetDateTime.now())
+                .build();
+    }
 
     @PostMapping("/confirm")
     public ApiResponse confirmCheckout(

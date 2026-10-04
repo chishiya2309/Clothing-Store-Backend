@@ -25,23 +25,29 @@ public class CheckoutPricingServiceImpl implements CheckoutPricingService {
         BigDecimal subtotal = requireAmount(request.subtotal(), "Subtotal");
         BigDecimal shippingFee = requireAmount(request.shippingFee(), "Shipping fee");
         BigDecimal voucherDiscountAmount = normalizeDiscount(request.voucherDiscountAmount(), "Voucher discount amount");
-        BigDecimal membershipDiscountAmount = calculateMembershipDiscount(request.user(), subtotal);
-        BigDecimal discountAmount = membershipDiscountAmount.add(voucherDiscountAmount).setScale(MONEY_SCALE, RoundingMode.HALF_UP);
+        BigDecimal shippingDiscountAmount = normalizeDiscount(request.shippingDiscountAmount(), "Shipping discount amount");
+        BigDecimal appliedShippingDiscountAmount = shippingDiscountAmount.min(shippingFee);
+        BigDecimal membershipDiscountAmount = calculateMembershipDiscount(request.user(), subtotal).min(subtotal);
+        BigDecimal voucherDiscountBaseAmount = subtotal.subtract(membershipDiscountAmount).max(BigDecimal.ZERO);
+        BigDecimal appliedVoucherDiscountAmount = voucherDiscountAmount.min(voucherDiscountBaseAmount);
+        BigDecimal productDiscountAmount = membershipDiscountAmount.add(appliedVoucherDiscountAmount);
+        BigDecimal productPayableAmount = subtotal.subtract(productDiscountAmount).max(BigDecimal.ZERO);
+        BigDecimal shippingPayableAmount = shippingFee.subtract(appliedShippingDiscountAmount);
+        BigDecimal totalAmount = productPayableAmount.add(shippingPayableAmount)
+                .setScale(MONEY_SCALE, RoundingMode.HALF_UP);
 
-        if (discountAmount.compareTo(subtotal) > 0) {
-            throw new InvalidDataException("Discount amount must not exceed subtotal");
-        }
-
-        BigDecimal totalAmount = subtotal.add(shippingFee).subtract(discountAmount);
         if (totalAmount.signum() < 0) {
             throw new InvalidDataException("Checkout total amount must not be negative");
         }
+        BigDecimal discountAmount = subtotal.add(shippingFee).subtract(totalAmount)
+                .setScale(MONEY_SCALE, RoundingMode.HALF_UP);
 
         return new CheckoutPricingResult(
                 subtotal,
                 shippingFee,
                 membershipDiscountAmount,
-                voucherDiscountAmount,
+                appliedVoucherDiscountAmount,
+                appliedShippingDiscountAmount,
                 discountAmount,
                 totalAmount
         );

@@ -7,7 +7,7 @@ public record CheckoutPricingResult(
         BigDecimal shippingFee,
         BigDecimal membershipDiscountAmount,
         BigDecimal voucherDiscountAmount,
+        BigDecimal shippingDiscountAmount,
         BigDecimal discountAmount,
         BigDecimal totalAmount
-) {
-}
+) {}

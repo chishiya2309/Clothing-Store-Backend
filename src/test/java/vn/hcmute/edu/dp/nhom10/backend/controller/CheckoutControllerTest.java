@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.PreviewCheckoutRequestDTO;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.CheckoutPreviewResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.OnlinePaymentResponseDTO;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderResponseDTO;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PlaceOrderResponseDTO;
@@ -25,6 +27,7 @@ import vn.hcmute.edu.dp.nhom10.backend.exception.PaymentGatewayUnavailableExcept
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.security.AuthenticatedUserProvider;
 import vn.hcmute.edu.dp.nhom10.backend.security.ClientIpResolver;
+import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutService;
 import vn.hcmute.edu.dp.nhom10.backend.service.PlaceOrderService;
 
 import java.math.BigDecimal;
@@ -52,6 +55,9 @@ class CheckoutControllerTest {
     private PlaceOrderService placeOrderService;
 
     @Mock
+    private CheckoutService checkoutService;
+
+    @Mock
     private AuthenticatedUserProvider authenticatedUserProvider;
 
     @Mock
@@ -69,6 +75,37 @@ class CheckoutControllerTest {
                 .setControllerAdvice(new GlobalExceptionHandling())
                 .setValidator(validator)
                 .build();
+    }
+
+    @Test
+    void previewCheckout_authenticated_returnsPricingPreview() throws Exception {
+        Authentication authentication = authentication();
+        PreviewCheckoutRequestDTO request = new PreviewCheckoutRequestDTO(1L, "SAVE10");
+        when(authenticatedUserProvider.getCurrentUserId(authentication)).thenReturn(10L);
+        when(checkoutService.previewCheckout(eq(request), eq(10L))).thenReturn(previewResponse());
+
+        mockMvc.perform(post("/api/checkouts/preview")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data.subtotal").value(100000.00))
+                .andExpect(jsonPath("$.data.shippingFee").value(25000.00))
+                .andExpect(jsonPath("$.data.voucherApplied").value(true))
+                .andExpect(jsonPath("$.data.voucherCode").value("SAVE10"))
+                .andExpect(jsonPath("$.data.totalAmount").value(105000.00));
+    }
+
+    @Test
+    void previewCheckout_missingAddressId_returnsBadRequest() throws Exception {
+        PreviewCheckoutRequestDTO request = new PreviewCheckoutRequestDTO(null, null);
+
+        mockMvc.perform(post("/api/checkouts/preview")
+                        .principal(authentication())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -272,6 +309,22 @@ class CheckoutControllerTest {
                         OffsetDateTime.now().plusMinutes(15)
                 )
         );
+    }
+
+    private CheckoutPreviewResponse previewResponse() {
+        return CheckoutPreviewResponse.builder()
+                .subtotal(money("100000.00"))
+                .shippingFee(money("25000.00"))
+                .membershipDiscountAmount(BigDecimal.ZERO)
+                .voucherDiscountAmount(money("20000.00"))
+                .shippingDiscountAmount(BigDecimal.ZERO)
+                .discountAmount(money("20000.00"))
+                .totalAmount(money("105000.00"))
+                .voucherApplied(true)
+                .voucherId(100L)
+                .voucherCode("SAVE10")
+                .voucherMessage("Voucher applied successfully")
+                .build();
     }
 
     private BigDecimal money(String value) {

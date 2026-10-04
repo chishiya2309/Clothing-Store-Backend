@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ApplyVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.CreateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
@@ -15,22 +16,12 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.state.voucher.ActiveVoucherState;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.state.voucher.ExhaustedVoucherState;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.state.voucher.ExpiredVoucherState;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.state.voucher.InactiveVoucherState;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.state.voucher.UpcomingVoucherState;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.state.voucher.VoucherStateResolver;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.strategy.voucher.FixedAmountDiscountStrategy;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.strategy.voucher.PercentageDiscountStrategy;
-import vn.hcmute.edu.dp.nhom10.backend.pattern.strategy.voucher.VoucherDiscountStrategyResolver;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.VoucherServiceImpl;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,21 +41,14 @@ class VoucherServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private VoucherQuoteService voucherQuoteService;
+
     private VoucherService voucherService;
 
     @BeforeEach
     void setUp() {
-        VoucherStateResolver stateResolver = new VoucherStateResolver(
-                new ActiveVoucherState(),
-                new InactiveVoucherState(),
-                new UpcomingVoucherState(),
-                new ExpiredVoucherState(),
-                new ExhaustedVoucherState()
-        );
-        VoucherDiscountStrategyResolver strategyResolver = new VoucherDiscountStrategyResolver(
-                List.of(new PercentageDiscountStrategy(), new FixedAmountDiscountStrategy())
-        );
-        voucherService = new VoucherServiceImpl(voucherRepository, userRepository, stateResolver, strategyResolver);
+        voucherService = new VoucherServiceImpl(voucherRepository, userRepository, voucherQuoteService);
     }
 
     @Test
@@ -165,10 +149,6 @@ class VoucherServiceImplTest {
         User customer = new User();
         customer.setId(10L);
         customer.setEmail("customer@test.com");
-        Voucher voucher = activeVoucher("SALE10", DiscountType.percentage, BigDecimal.TEN);
-        voucher.setId(1L);
-        voucher.setMaxDiscountAmount(BigDecimal.valueOf(40000));
-        voucher.setMinOrderAmount(BigDecimal.valueOf(100000));
 
         ApplyVoucherRequest request = new ApplyVoucherRequest(
                 "SALE10",
@@ -177,7 +157,19 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherRepository.findByCode("SALE10")).thenReturn(Optional.of(voucher));
+        when(voucherQuoteService.quote(
+                "SALE10",
+                10L,
+                BigDecimal.valueOf(500000),
+                BigDecimal.valueOf(30000)
+        )).thenReturn(new VoucherQuote(
+                1L,
+                "SALE10",
+                DiscountType.percentage,
+                BigDecimal.valueOf(40000),
+                BigDecimal.ZERO,
+                "Voucher applied successfully"
+        ));
 
         AppliedVoucherResponse response = voucherService.apply(request, "customer@test.com");
 
@@ -192,8 +184,6 @@ class VoucherServiceImplTest {
         User customer = new User();
         customer.setId(10L);
         customer.setEmail("customer@test.com");
-        Voucher voucher = activeVoucher("FIX50", DiscountType.fixed_amount, BigDecimal.valueOf(50000));
-        voucher.setId(2L);
 
         ApplyVoucherRequest request = new ApplyVoucherRequest(
                 "FIX50",
@@ -202,7 +192,19 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherRepository.findByCode("FIX50")).thenReturn(Optional.of(voucher));
+        when(voucherQuoteService.quote(
+                "FIX50",
+                10L,
+                BigDecimal.valueOf(300000),
+                BigDecimal.valueOf(30000)
+        )).thenReturn(new VoucherQuote(
+                2L,
+                "FIX50",
+                DiscountType.fixed_amount,
+                BigDecimal.valueOf(50000),
+                BigDecimal.ZERO,
+                "Voucher applied successfully"
+        ));
 
         AppliedVoucherResponse response = voucherService.apply(request, "customer@test.com");
 
@@ -222,7 +224,8 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherRepository.findByCode("UNKNOWN")).thenReturn(Optional.empty());
+        when(voucherQuoteService.quote("UNKNOWN", 10L, BigDecimal.valueOf(300000), BigDecimal.ZERO))
+                .thenThrow(new ResourceNotFoundException("Voucher code is invalid"));
 
         assertThrows(ResourceNotFoundException.class, () -> voucherService.apply(request, "customer@test.com"));
     }
@@ -231,8 +234,6 @@ class VoucherServiceImplTest {
     void apply_expiredVoucher_throwsException() {
         User customer = new User();
         customer.setId(10L);
-        Voucher voucher = activeVoucher("OLD10", DiscountType.percentage, BigDecimal.TEN);
-        voucher.setEndDate(OffsetDateTime.now().minusDays(1));
 
         ApplyVoucherRequest request = new ApplyVoucherRequest(
                 "OLD10",
@@ -241,7 +242,8 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherRepository.findByCode("OLD10")).thenReturn(Optional.of(voucher));
+        when(voucherQuoteService.quote("OLD10", 10L, BigDecimal.valueOf(300000), BigDecimal.ZERO))
+                .thenThrow(new InvalidDataException("Voucher has expired"));
 
         assertThrows(InvalidDataException.class, () -> voucherService.apply(request, "customer@test.com"));
     }
@@ -250,8 +252,6 @@ class VoucherServiceImplTest {
     void apply_orderBelowMinimum_throwsException() {
         User customer = new User();
         customer.setId(10L);
-        Voucher voucher = activeVoucher("MIN500", DiscountType.percentage, BigDecimal.TEN);
-        voucher.setMinOrderAmount(BigDecimal.valueOf(500000));
 
         ApplyVoucherRequest request = new ApplyVoucherRequest(
                 "MIN500",
@@ -260,7 +260,8 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherRepository.findByCode("MIN500")).thenReturn(Optional.of(voucher));
+        when(voucherQuoteService.quote("MIN500", 10L, BigDecimal.valueOf(300000), BigDecimal.ZERO))
+                .thenThrow(new InvalidDataException("Order amount does not meet voucher minimum"));
 
         assertThrows(InvalidDataException.class, () -> voucherService.apply(request, "customer@test.com"));
     }
