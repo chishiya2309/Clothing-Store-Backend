@@ -3,6 +3,10 @@ package vn.hcmute.edu.dp.nhom10.backend.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -328,33 +332,50 @@ class AuthServiceImplTest {
         verify(valueOperations).set(anyString(), eq("1"), eq(2592000L), eq(TimeUnit.SECONDS));
     }
 
-    @Test
-    void forgotPassword_success() {
-        ForgotPasswordRequest request = new ForgotPasswordRequest("test@test.com");
+    @ParameterizedTest
+    @CsvSource({
+            "aki23092005@gmail.com, aki23092005@gmail.com",
+            "AKI23092005@GMAIL.COM, aki23092005@gmail.com",
+            "aKi23092005@gmail.com, aki23092005@gmail.com",
+            "aki23092005@gMaIL.CoM, aki23092005@gmail.com",
+            "aKi23092005@gMaIL.CoM, aki23092005@gmail.com",
+            "aki23092005@gmail.com, aKi23092005@gMaIL.CoM"
+    })
+    void forgotPassword_emailCaseVariants_sendToStoredEmail(String inputEmail, String storedEmail) {
+        ForgotPasswordRequest request = new ForgotPasswordRequest(inputEmail);
         User user = new User();
         user.setId(1L);
-        user.setEmail(request.email());
+        user.setEmail(storedEmail);
         user.setFullName("Test User");
 
-        when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(request.email())).thenReturn(Optional.of(user));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
         authService.forgotPassword(request);
 
-        verify(valueOperations).set(startsWith("password_reset:"), eq("1"), eq(900L), eq(TimeUnit.SECONDS));
-        verify(eventPublisher).publishEvent(any(PasswordResetRequestedEvent.class));
+        ArgumentCaptor<PasswordResetRequestedEvent> eventCaptor =
+                ArgumentCaptor.forClass(PasswordResetRequestedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        PasswordResetRequestedEvent event = eventCaptor.getValue();
+        assertEquals(storedEmail, event.getEmail());
+        assertEquals(user.getFullName(), event.getFullName());
+        assertNotNull(event.getToken());
+        assertFalse(event.getToken().isBlank());
+        verify(valueOperations).set(eq("password_reset:" + event.getToken()), eq("1"), eq(900L), eq(TimeUnit.SECONDS));
+        verify(userRepository).findByEmailIgnoreCase(inputEmail);
+        verify(userRepository, never()).findByEmail(anyString());
     }
 
-    @Test
-    void forgotPassword_emailNotFound_doesNothingSilently() {
-        ForgotPasswordRequest request = new ForgotPasswordRequest("notfound@test.com");
+    @ParameterizedTest
+    @ValueSource(strings = {"notfound@test.com", "NotFound@TeSt.CoM"})
+    void forgotPassword_emailNotFound_doesNothingSilently(String email) {
+        ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
-        when(userRepository.findByEmail(request.email())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(request.email())).thenReturn(Optional.empty());
 
         authService.forgotPassword(request);
 
-        verify(redisTemplate, never()).opsForValue();
-        verify(eventPublisher, never()).publishEvent(any());
+        verifyNoInteractions(redisTemplate, valueOperations, eventPublisher);
     }
 
     @Test
