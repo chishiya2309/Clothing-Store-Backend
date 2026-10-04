@@ -16,6 +16,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.AddressRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutDataService;
 import vn.hcmute.edu.dp.nhom10.backend.service.ProductPricingService;
+import vn.hcmute.edu.dp.nhom10.backend.service.ShippingFeeService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,12 +26,10 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public class CheckoutDataServiceImpl implements CheckoutDataService {
 
-    private static final BigDecimal STANDARD_SHIPPING_FEE = new BigDecimal("30000.00");
-    private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("500000.00");
-
     private final AddressRepository addressRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductPricingService productPricingService;
+    private final ShippingFeeService shippingFeeService;
 
     @Override
     @Transactional(readOnly = true)
@@ -58,12 +57,8 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
                 toAddressSnapshot(address),
                 items,
                 subtotal,
-                calculateShippingFee(subtotal)
+                shippingFeeService.calculate(address)
         );
-    }
-
-    private BigDecimal calculateShippingFee(BigDecimal subtotal) {
-        return subtotal.compareTo(FREE_SHIPPING_THRESHOLD) > 0 ? BigDecimal.ZERO : STANDARD_SHIPPING_FEE;
     }
 
     private CheckoutItemSnapshot toItemSnapshot(CartItem cartItem, OffsetDateTime pricingTime) {
