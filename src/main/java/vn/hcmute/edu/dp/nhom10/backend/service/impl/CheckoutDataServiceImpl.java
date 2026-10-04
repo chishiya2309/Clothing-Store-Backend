@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.AddressSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
-import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ResolvedProductPrice;
+import vn.hcmute.edu.dp.nhom10.backend.dto.pricing.ProductPricingResult;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Address;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CartItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
@@ -15,7 +15,7 @@ import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.AddressRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CheckoutDataService;
-import vn.hcmute.edu.dp.nhom10.backend.service.FlashSalePricingService;
+import vn.hcmute.edu.dp.nhom10.backend.service.ProductPricingService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,7 +30,7 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
 
     private final AddressRepository addressRepository;
     private final CartItemRepository cartItemRepository;
-    private final FlashSalePricingService flashSalePricingService;
+    private final ProductPricingService productPricingService;
 
     @Override
     @Transactional(readOnly = true)
@@ -90,15 +90,8 @@ public class CheckoutDataServiceImpl implements CheckoutDataService {
             throw new IllegalArgumentException("Product variant is inactive: " + variant.getId());
         }
 
-        ResolvedProductPrice resolvedPrice = flashSalePricingService.resolve(product, pricingTime);
-        BigDecimal productPrice = resolvedPrice.price();
-
-        BigDecimal additionalPrice = variant.getAdditionalPrice() != null ? variant.getAdditionalPrice() : BigDecimal.ZERO;
-        BigDecimal unitPrice = productPrice.add(additionalPrice);
-        if (unitPrice.signum() < 0) {
-            throw new IllegalArgumentException("Unit price must not be negative");
-        }
-
+        ProductPricingResult resolvedPrice = productPricingService.resolve(product, variant, pricingTime);
+        BigDecimal unitPrice = resolvedPrice.unitPrice();
         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
         return new CheckoutItemSnapshot(

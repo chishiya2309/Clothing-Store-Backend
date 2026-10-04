@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.AddToCartRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.CartSyncItem;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.CartSyncRequest;
+import vn.hcmute.edu.dp.nhom10.backend.dto.pricing.ProductPricingResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.CartItemResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.CartResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CartItem;
@@ -19,8 +20,10 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CartItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.CartService;
+import vn.hcmute.edu.dp.nhom10.backend.service.ProductPricingService;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +34,7 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
+    private final ProductPricingService productPricingService;
 
     @Override
     @Transactional(readOnly = true)
@@ -157,10 +161,12 @@ public class CartServiceImpl implements CartService {
 
     private CartItemResponse mapToCartItemResponse(CartItem cartItem) {
         ProductVariant variant = cartItem.getProductVariant();
-        BigDecimal basePrice = variant.getProduct().getSalePrice() != null 
-                ? variant.getProduct().getSalePrice() 
-                : variant.getProduct().getBasePrice();
-        BigDecimal unitPrice = basePrice.add(variant.getAdditionalPrice());
+        ProductPricingResult price = productPricingService.resolve(
+                variant.getProduct(),
+                variant,
+                OffsetDateTime.now()
+        );
+        BigDecimal unitPrice = price.unitPrice();
         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
         String imageUrl = variant.getProduct().getImages().stream()
@@ -280,10 +286,12 @@ public class CartServiceImpl implements CartService {
                         return null;
                     }
 
-                    BigDecimal basePrice = variant.getProduct().getSalePrice() != null 
-                            ? variant.getProduct().getSalePrice() 
-                            : variant.getProduct().getBasePrice();
-                    BigDecimal unitPrice = basePrice.add(variant.getAdditionalPrice());
+                    ProductPricingResult price = productPricingService.resolve(
+                            variant.getProduct(),
+                            variant,
+                            OffsetDateTime.now()
+                    );
+                    BigDecimal unitPrice = price.unitPrice();
                     BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(qty));
 
                     String imageUrl = variant.getProduct().getImages().stream()
