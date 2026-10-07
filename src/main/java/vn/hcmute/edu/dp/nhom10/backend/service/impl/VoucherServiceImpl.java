@@ -152,15 +152,36 @@ public class VoucherServiceImpl implements VoucherService {
 
     private void validateVoucherData(DiscountType discountType, BigDecimal discountValue,
                                      OffsetDateTime startDate, OffsetDateTime endDate, Integer usageLimit) {
-        if (!endDate.isAfter(startDate)) {
+        if (discountType == null) {
+            throw new InvalidDataException("Discount type is required");
+        }
+        if (startDate == null || endDate == null || !endDate.isAfter(startDate)) {
             throw new InvalidDataException("End date must be after start date");
         }
         if (usageLimit == null || usageLimit < 1) {
             throw new InvalidDataException("Usage limit must be at least 1");
         }
-        if (discountType == DiscountType.percentage
-                && discountValue.compareTo(BigDecimal.valueOf(100)) > 0) {
-            throw new InvalidDataException("Percentage discount must not exceed 100");
+
+        switch (discountType) {
+            case percentage -> validatePositiveDiscountValue(discountValue);
+            case fixed_amount, shipping_fixed_amount -> validatePositiveDiscountValue(discountValue);
+            case cheapest_item_free -> {
+                if (discountValue != null && discountValue.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new InvalidDataException("Discount value must not be negative");
+                }
+            }
+        }
+
+        if (discountType == DiscountType.percentage) {
+            if (discountValue.compareTo(BigDecimal.valueOf(100)) > 0) {
+                throw new InvalidDataException("Percentage discount must not exceed 100");
+            }
+        }
+    }
+
+    private void validatePositiveDiscountValue(BigDecimal discountValue) {
+        if (discountValue == null || discountValue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidDataException("Discount value must be greater than 0");
         }
     }
 

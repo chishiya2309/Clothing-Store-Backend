@@ -122,6 +122,64 @@ class VoucherServiceImplTest {
     }
 
     @Test
+    void create_shippingFixedAmountVoucher_success() {
+        CreateVoucherRequest request = new CreateVoucherRequest(
+                "SHIP20",
+                DiscountType.shipping_fixed_amount,
+                BigDecimal.valueOf(20000),
+                null,
+                BigDecimal.ZERO,
+                OffsetDateTime.now().plusMinutes(1),
+                OffsetDateTime.now().plusDays(7),
+                100,
+                true
+        );
+
+        when(voucherRepository.existsByCode("SHIP20")).thenReturn(false);
+        when(voucherRepository.save(any(Voucher.class))).thenAnswer(invocation -> {
+            Voucher voucher = invocation.getArgument(0);
+            voucher.setId(2L);
+            return voucher;
+        });
+
+        VoucherResponse response = voucherService.create(request);
+
+        assertEquals(2L, response.id());
+        assertEquals(DiscountType.shipping_fixed_amount, response.discountType());
+        assertEquals(0, BigDecimal.valueOf(20000).compareTo(response.discountValue()));
+        verify(voucherRepository).save(any(Voucher.class));
+    }
+
+    @Test
+    void create_cheapestItemFreeVoucher_success() {
+        CreateVoucherRequest request = new CreateVoucherRequest(
+                "CHEAPFREE",
+                DiscountType.cheapest_item_free,
+                BigDecimal.ONE,
+                BigDecimal.valueOf(50000),
+                BigDecimal.ZERO,
+                OffsetDateTime.now().plusMinutes(1),
+                OffsetDateTime.now().plusDays(7),
+                100,
+                true
+        );
+
+        when(voucherRepository.existsByCode("CHEAPFREE")).thenReturn(false);
+        when(voucherRepository.save(any(Voucher.class))).thenAnswer(invocation -> {
+            Voucher voucher = invocation.getArgument(0);
+            voucher.setId(3L);
+            return voucher;
+        });
+
+        VoucherResponse response = voucherService.create(request);
+
+        assertEquals(3L, response.id());
+        assertEquals(DiscountType.cheapest_item_free, response.discountType());
+        assertEquals(0, BigDecimal.ONE.compareTo(response.discountValue()));
+        verify(voucherRepository).save(any(Voucher.class));
+    }
+
+    @Test
     void update_usageLimitLowerThanTimesUsed_throwsException() {
         Voucher voucher = activeVoucher("SALE10", DiscountType.percentage, BigDecimal.TEN);
         voucher.setId(1L);
