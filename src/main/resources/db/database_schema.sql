@@ -17,10 +17,11 @@ CREATE TYPE gender_type AS ENUM ('male', 'female', 'other');
 CREATE TYPE order_status AS ENUM ('pending', 'processing', 'shipping', 'completed', 'cancelled');
 CREATE TYPE payment_method AS ENUM ('cod', 'vnpay', 'momo');
 CREATE TYPE payment_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
-CREATE TYPE discount_type AS ENUM ('percentage', 'fixed_amount');
+CREATE TYPE discount_type AS ENUM ('percentage', 'fixed_amount', 'shipping_fixed_amount', 'cheapest_item_free');
 CREATE TYPE image_type AS ENUM ('main', 'thumbnail', 'gallery');
 CREATE TYPE checkout_session_status AS ENUM ('creating', 'reserved', 'completed', 'failed', 'expired', 'released');
 CREATE TYPE reservation_status AS ENUM ('active', 'consumed', 'released', 'expired');
+CREATE TYPE voucher_slot AS ENUM ('product', 'shipping');
 CREATE TYPE payment_attempt_status AS ENUM ('pending', 'completed', 'failed', 'expired', 'requires_refund', 'refund_requested', 'refunded');
 
 -- ============================================================
@@ -263,7 +264,7 @@ CREATE TABLE vouchers (
     CHECK (end_date > start_date)
 );
 
-COMMENT ON TABLE vouchers IS 'Mã giảm giá (QĐ7). QĐ11: mỗi đơn chỉ 1 voucher, kiểm tra điều kiện.';
+COMMENT ON TABLE vouchers IS 'Mã giảm giá (QĐ7). State kiểm tra hiệu lực; Strategy tính giảm theo discount_type.';
 
 -- ============================================================
 -- 11. ORDERS
@@ -455,15 +456,16 @@ CREATE TABLE voucher_reservations (
     checkout_session_id BIGINT          NOT NULL REFERENCES checkout_sessions(id) ON DELETE CASCADE,
     voucher_id          BIGINT          NOT NULL REFERENCES vouchers(id) ON DELETE RESTRICT,
     discount_amount     NUMERIC(12,2)   NOT NULL DEFAULT 0 CHECK (discount_amount >= 0),
+    voucher_slot        voucher_slot    NOT NULL DEFAULT 'product',
     status              reservation_status NOT NULL DEFAULT 'active',
     expires_at          TIMESTAMPTZ     NOT NULL,
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 
-    UNIQUE (checkout_session_id)
+    CONSTRAINT uq_voucher_reservations_checkout_slot UNIQUE (checkout_session_id, voucher_slot)
 );
 
-COMMENT ON TABLE voucher_reservations IS 'Giu luot su dung voucher tam thoi cho checkout, chua tang times_used khi reserve.';
+COMMENT ON TABLE voucher_reservations IS 'Giu luot su dung voucher tam thoi cho checkout theo slot product/shipping, chua tang times_used khi reserve.';
 
 -- ============================================================
 -- 13E. PAYMENT ATTEMPTS
@@ -739,6 +741,7 @@ CREATE INDEX idx_flash_sale_reservations_status_expires ON flash_sale_reservatio
 -- Voucher Reservations
 CREATE INDEX idx_voucher_reservations_voucher_status_expires ON voucher_reservations(voucher_id, status, expires_at);
 CREATE INDEX idx_voucher_reservations_checkout ON voucher_reservations(checkout_session_id);
+CREATE INDEX idx_voucher_reservations_checkout_slot ON voucher_reservations(checkout_session_id, voucher_slot);
 CREATE INDEX idx_voucher_reservations_status_expires ON voucher_reservations(status, expires_at);
 
 -- Payment Attempts
