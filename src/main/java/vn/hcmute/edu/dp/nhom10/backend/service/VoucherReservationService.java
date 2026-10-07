@@ -24,5 +24,9 @@ public interface VoucherReservationService {
 
     void consumeVoucherReservation(String checkoutCode);
 
+    void consumeVoucherReservations(String checkoutCode);
+
     void releaseVoucherReservation(String checkoutCode);
+
+    void releaseVoucherReservations(String checkoutCode);
 }

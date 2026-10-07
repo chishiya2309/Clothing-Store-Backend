@@ -119,14 +119,53 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
     @Override
     @Transactional
     public void consumeVoucherReservation(String checkoutCode) {
+        consumeVoucherReservations(checkoutCode);
+    }
+
+    @Override
+    @Transactional
+    public void consumeVoucherReservations(String checkoutCode) {
         String normalizedCheckoutCode = normalizeCheckoutCode(checkoutCode);
         CheckoutSession checkoutSession = checkoutSessionRepository.findByCheckoutCodeForUpdate(normalizedCheckoutCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Checkout session not found with code: " + normalizedCheckoutCode));
 
-        VoucherReservation reservation = voucherReservationRepository
-                .findByCheckoutSessionIdForUpdate(checkoutSession.getId())
-                .orElse(null);
-        if (reservation == null || reservation.getStatus() == ReservationStatus.consumed) {
+        List<VoucherReservation> reservations = voucherReservationRepository
+                .findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
+        if (reservations.isEmpty()) {
+            return;
+        }
+
+        for (VoucherReservation reservation : reservations) {
+            consumeReservationIfNeeded(reservation);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void releaseVoucherReservation(String checkoutCode) {
+        releaseVoucherReservations(checkoutCode);
+    }
+
+    @Override
+    @Transactional
+    public void releaseVoucherReservations(String checkoutCode) {
+        String normalizedCheckoutCode = normalizeCheckoutCode(checkoutCode);
+        CheckoutSession checkoutSession = checkoutSessionRepository.findByCheckoutCodeForUpdate(normalizedCheckoutCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Checkout session not found with code: " + normalizedCheckoutCode));
+
+        List<VoucherReservation> reservations = voucherReservationRepository
+                .findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
+        List<VoucherReservation> changedReservations = reservations.stream()
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.active)
+                .peek(reservation -> reservation.setStatus(ReservationStatus.released))
+                .toList();
+        if (!changedReservations.isEmpty()) {
+            voucherReservationRepository.saveAll(changedReservations);
+        }
+    }
+
+    private void consumeReservationIfNeeded(VoucherReservation reservation) {
+        if (reservation.getStatus() == ReservationStatus.consumed) {
             return;
         }
 
@@ -149,24 +188,6 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         reservation.setStatus(ReservationStatus.consumed);
 
         voucherRepository.save(voucher);
-        voucherReservationRepository.save(reservation);
-    }
-
-    @Override
-    @Transactional
-    public void releaseVoucherReservation(String checkoutCode) {
-        String normalizedCheckoutCode = normalizeCheckoutCode(checkoutCode);
-        CheckoutSession checkoutSession = checkoutSessionRepository.findByCheckoutCodeForUpdate(normalizedCheckoutCode)
-                .orElseThrow(() -> new ResourceNotFoundException("Checkout session not found with code: " + normalizedCheckoutCode));
-
-        VoucherReservation reservation = voucherReservationRepository
-                .findByCheckoutSessionIdForUpdate(checkoutSession.getId())
-                .orElse(null);
-        if (reservation == null || reservation.getStatus() != ReservationStatus.active) {
-            return;
-        }
-
-        reservation.setStatus(ReservationStatus.released);
         voucherReservationRepository.save(reservation);
     }
 

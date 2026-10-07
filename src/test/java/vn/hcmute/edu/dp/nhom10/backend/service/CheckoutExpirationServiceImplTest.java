@@ -23,7 +23,6 @@ import vn.hcmute.edu.dp.nhom10.backend.service.impl.CheckoutExpirationServiceImp
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -129,7 +128,7 @@ class CheckoutExpirationServiceImplTest {
         checkoutExpirationService.expireDueCheckouts(now);
 
         assertEquals(ReservationStatus.expired, reservation.getStatus());
-        verify(voucherReservationRepository).save(reservation);
+        verify(voucherReservationRepository).saveAll(List.of(reservation));
     }
 
     @Test
@@ -140,7 +139,7 @@ class CheckoutExpirationServiceImplTest {
         checkoutExpirationService.expireDueCheckouts(now);
 
         assertEquals(ReservationStatus.consumed, reservation.getStatus());
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
     }
 
     @Test
@@ -151,7 +150,7 @@ class CheckoutExpirationServiceImplTest {
         checkoutExpirationService.expireDueCheckouts(now);
 
         assertEquals(ReservationStatus.released, reservation.getStatus());
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
     }
 
     @Test
@@ -162,7 +161,27 @@ class CheckoutExpirationServiceImplTest {
         checkoutExpirationService.expireDueCheckouts(now);
 
         assertEquals(ReservationStatus.expired, reservation.getStatus());
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void expireDueCheckouts_activeVoucherReservations_marksAllExpired() {
+        VoucherReservation productReservation = voucherReservation(
+                ReservationStatus.active,
+                Voucher.builder().timesUsed(0).build()
+        );
+        VoucherReservation shippingReservation = voucherReservation(
+                ReservationStatus.active,
+                Voucher.builder().timesUsed(0).build()
+        );
+        shippingReservation.setId(21L);
+        mockExpiredCheckoutWithVouchers(List.of(productReservation, shippingReservation));
+
+        checkoutExpirationService.expireDueCheckouts(now);
+
+        assertEquals(ReservationStatus.expired, productReservation.getStatus());
+        assertEquals(ReservationStatus.expired, shippingReservation.getStatus());
+        verify(voucherReservationRepository).saveAll(List.of(productReservation, shippingReservation));
     }
 
     @Test
@@ -277,7 +296,7 @@ class CheckoutExpirationServiceImplTest {
         second.setId(2L);
         when(checkoutSessionRepository.findExpiredForUpdate(any(), eq(now))).thenReturn(List.of(first, second));
         when(inventoryReservationRepository.findAllByCheckoutSessionIdForUpdate(any())).thenReturn(List.of());
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(any())).thenReturn(Optional.empty());
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(any())).thenReturn(List.of());
         when(paymentAttemptRepository.findAllByCheckoutSessionIdForUpdate(any())).thenReturn(List.of());
 
         int count = checkoutExpirationService.expireDueCheckouts(now);
@@ -299,15 +318,19 @@ class CheckoutExpirationServiceImplTest {
         when(checkoutSessionRepository.findExpiredForUpdate(any(), eq(now)))
                 .thenReturn(List.of(checkout(CheckoutSessionStatus.reserved, now.minusMinutes(1))));
         when(inventoryReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of(reservation));
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(1L)).thenReturn(Optional.empty());
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
         when(paymentAttemptRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
     }
 
     private void mockExpiredCheckoutWithVoucher(VoucherReservation reservation) {
+        mockExpiredCheckoutWithVouchers(List.of(reservation));
+    }
+
+    private void mockExpiredCheckoutWithVouchers(List<VoucherReservation> reservations) {
         when(checkoutSessionRepository.findExpiredForUpdate(any(), eq(now)))
                 .thenReturn(List.of(checkout(CheckoutSessionStatus.reserved, now.minusMinutes(1))));
         when(inventoryReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(1L)).thenReturn(Optional.of(reservation));
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(reservations);
         when(paymentAttemptRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
     }
 
@@ -315,13 +338,13 @@ class CheckoutExpirationServiceImplTest {
         when(checkoutSessionRepository.findExpiredForUpdate(any(), eq(now)))
                 .thenReturn(List.of(checkout(CheckoutSessionStatus.reserved, now.minusMinutes(1))));
         when(inventoryReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(1L)).thenReturn(Optional.empty());
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
         when(paymentAttemptRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of(paymentAttempt));
     }
 
     private void mockEmptyLockedChildren() {
         when(inventoryReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(1L)).thenReturn(Optional.empty());
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
         when(paymentAttemptRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(List.of());
     }
 
