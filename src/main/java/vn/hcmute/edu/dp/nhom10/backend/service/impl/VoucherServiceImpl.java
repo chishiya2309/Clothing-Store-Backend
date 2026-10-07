@@ -8,11 +8,13 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.request.ApplyVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.CreateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuoteRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.AppliedVoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.VoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
@@ -112,12 +114,14 @@ public class VoucherServiceImpl implements VoucherService {
     public AppliedVoucherResponse apply(ApplyVoucherRequest request, String customerEmail) {
         User customer = userRepository.findByEmail(customerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
-        VoucherQuote quote = voucherQuoteService.quote(
+        VoucherSlot requestedSlot = request.slot() != null ? request.slot() : VoucherSlot.product;
+        VoucherQuote quote = voucherQuoteService.quote(new VoucherQuoteRequest(
                 request.code(),
+                requestedSlot,
                 customer.getId(),
                 request.subtotal(),
                 defaultZero(request.shippingFee())
-        );
+        ));
         BigDecimal totalAmount = request.subtotal()
                 .add(defaultZero(request.shippingFee()))
                 .subtract(defaultZero(quote.voucherDiscountAmount()))
@@ -127,6 +131,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .voucherId(quote.voucherId())
                 .code(quote.code())
                 .discountType(quote.discountType())
+                .slot(quote.slot())
                 .subtotal(request.subtotal())
                 .shippingFee(defaultZero(request.shippingFee()))
                 .discountAmount(quote.voucherDiscountAmount())

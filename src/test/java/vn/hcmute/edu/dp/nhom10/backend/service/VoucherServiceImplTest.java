@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuoteRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ApplyVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.CreateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
@@ -14,6 +15,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.VoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
@@ -215,15 +217,11 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherQuoteService.quote(
-                "SALE10",
-                10L,
-                BigDecimal.valueOf(500000),
-                BigDecimal.valueOf(30000)
-        )).thenReturn(new VoucherQuote(
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class))).thenReturn(new VoucherQuote(
                 1L,
                 "SALE10",
                 DiscountType.percentage,
+                VoucherSlot.product,
                 BigDecimal.valueOf(40000),
                 BigDecimal.ZERO,
                 "Voucher applied successfully"
@@ -233,6 +231,7 @@ class VoucherServiceImplTest {
 
         assertEquals(1L, response.voucherId());
         assertEquals("SALE10", response.code());
+        assertEquals(VoucherSlot.product, response.slot());
         assertEquals(0, BigDecimal.valueOf(40000).compareTo(response.discountAmount()));
         assertEquals(0, BigDecimal.valueOf(490000).compareTo(response.totalAmount()));
     }
@@ -250,15 +249,11 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherQuoteService.quote(
-                "FIX50",
-                10L,
-                BigDecimal.valueOf(300000),
-                BigDecimal.valueOf(30000)
-        )).thenReturn(new VoucherQuote(
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class))).thenReturn(new VoucherQuote(
                 2L,
                 "FIX50",
                 DiscountType.fixed_amount,
+                VoucherSlot.product,
                 BigDecimal.valueOf(50000),
                 BigDecimal.ZERO,
                 "Voucher applied successfully"
@@ -268,6 +263,38 @@ class VoucherServiceImplTest {
 
         assertEquals(0, BigDecimal.valueOf(50000).compareTo(response.discountAmount()));
         assertEquals(0, BigDecimal.valueOf(280000).compareTo(response.totalAmount()));
+    }
+
+    @Test
+    void apply_shippingVoucher_success() {
+        User customer = new User();
+        customer.setId(10L);
+        customer.setEmail("customer@test.com");
+
+        ApplyVoucherRequest request = new ApplyVoucherRequest(
+                "SHIP20",
+                VoucherSlot.shipping,
+                BigDecimal.valueOf(300000),
+                BigDecimal.valueOf(30000)
+        );
+
+        when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class))).thenReturn(new VoucherQuote(
+                3L,
+                "SHIP20",
+                DiscountType.shipping_fixed_amount,
+                VoucherSlot.shipping,
+                BigDecimal.ZERO,
+                BigDecimal.valueOf(20000),
+                "Voucher applied successfully"
+        ));
+
+        AppliedVoucherResponse response = voucherService.apply(request, "customer@test.com");
+
+        assertEquals(VoucherSlot.shipping, response.slot());
+        assertEquals(0, BigDecimal.ZERO.compareTo(response.discountAmount()));
+        assertEquals(0, BigDecimal.valueOf(20000).compareTo(response.shippingDiscountAmount()));
+        assertEquals(0, BigDecimal.valueOf(310000).compareTo(response.totalAmount()));
     }
 
     @Test
@@ -282,7 +309,7 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherQuoteService.quote("UNKNOWN", 10L, BigDecimal.valueOf(300000), BigDecimal.ZERO))
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class)))
                 .thenThrow(new ResourceNotFoundException("Voucher code is invalid"));
 
         assertThrows(ResourceNotFoundException.class, () -> voucherService.apply(request, "customer@test.com"));
@@ -300,7 +327,7 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherQuoteService.quote("OLD10", 10L, BigDecimal.valueOf(300000), BigDecimal.ZERO))
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class)))
                 .thenThrow(new InvalidDataException("Voucher has expired"));
 
         assertThrows(InvalidDataException.class, () -> voucherService.apply(request, "customer@test.com"));
@@ -318,7 +345,7 @@ class VoucherServiceImplTest {
         );
 
         when(userRepository.findByEmail("customer@test.com")).thenReturn(Optional.of(customer));
-        when(voucherQuoteService.quote("MIN500", 10L, BigDecimal.valueOf(300000), BigDecimal.ZERO))
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class)))
                 .thenThrow(new InvalidDataException("Order amount does not meet voucher minimum"));
 
         assertThrows(InvalidDataException.class, () -> voucherService.apply(request, "customer@test.com"));

@@ -16,6 +16,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuoteRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
@@ -107,7 +108,7 @@ class CheckoutServiceFacadeTest {
             }
             return checkoutSession;
         });
-        lenient().when(voucherQuoteService.quote(anyString(), anyLong(), any(), any()))
+        lenient().when(voucherQuoteService.quote(any(VoucherQuoteRequest.class)))
                 .thenReturn(new VoucherQuote(100L, "SAVE10", null, BigDecimal.ZERO, BigDecimal.ZERO, "Voucher applied successfully"));
     }
 

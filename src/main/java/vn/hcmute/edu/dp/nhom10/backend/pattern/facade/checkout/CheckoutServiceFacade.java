@@ -10,6 +10,7 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuoteRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.pricing.CheckoutPricingRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.pricing.CheckoutPricingResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
@@ -25,6 +26,7 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PriceSource;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionItemRepository;
@@ -78,7 +80,13 @@ public class CheckoutServiceFacade implements CheckoutService {
 
         BigDecimal subtotal = requireAmount(checkoutData.subtotal(), "Subtotal");
         BigDecimal shippingFee = requireAmount(checkoutData.shippingFee(), "Shipping fee");
-        VoucherQuote voucherQuote = quoteVoucherIfPresent(requestDTO.voucherCode(), userId, subtotal, shippingFee);
+        VoucherQuote voucherQuote = quoteVoucherIfPresent(
+                requestDTO.voucherCode(),
+                userId,
+                subtotal,
+                shippingFee,
+                checkoutData.items()
+        );
 
         CheckoutPricingResult pricing = checkoutPricingService.calculate(
                 new CheckoutPricingRequest(
@@ -140,7 +148,14 @@ public class CheckoutServiceFacade implements CheckoutService {
         BigDecimal shippingDiscountAmount = BigDecimal.ZERO;
         String voucherCode = normalizeVoucherCode(requestDTO.voucherCode());
         if (voucherCode != null) {
-            VoucherQuote voucherQuote = voucherQuoteService.quote(voucherCode, userId, subtotal, shippingFee);
+            VoucherQuote voucherQuote = voucherQuoteService.quote(new VoucherQuoteRequest(
+                    voucherCode,
+                    VoucherSlot.product,
+                    userId,
+                    subtotal,
+                    shippingFee,
+                    checkoutData.items()
+            ));
             voucherDiscountAmount = requireAmount(
                     voucherService.reserveVoucher(savedCheckoutSession.getId(), voucherCode, subtotal, expiresAt),
                     "Voucher discount amount"
@@ -297,13 +312,21 @@ public class CheckoutServiceFacade implements CheckoutService {
             String voucherCode,
             Long userId,
             BigDecimal subtotal,
-            BigDecimal shippingFee
+            BigDecimal shippingFee,
+            List<CheckoutItemSnapshot> items
     ) {
         String normalizedVoucherCode = normalizeVoucherCode(voucherCode);
         if (normalizedVoucherCode == null) {
             return VoucherQuote.empty();
         }
-        return voucherQuoteService.quote(normalizedVoucherCode, userId, subtotal, shippingFee);
+        return voucherQuoteService.quote(new VoucherQuoteRequest(
+                normalizedVoucherCode,
+                VoucherSlot.product,
+                userId,
+                subtotal,
+                shippingFee,
+                items
+        ));
     }
 
     private String normalizeVoucherCode(String voucherCode) {
