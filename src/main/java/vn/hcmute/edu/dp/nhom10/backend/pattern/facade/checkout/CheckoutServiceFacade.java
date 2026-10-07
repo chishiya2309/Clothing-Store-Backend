@@ -80,12 +80,21 @@ public class CheckoutServiceFacade implements CheckoutService {
 
         BigDecimal subtotal = requireAmount(checkoutData.subtotal(), "Subtotal");
         BigDecimal shippingFee = requireAmount(checkoutData.shippingFee(), "Shipping fee");
-        VoucherQuote voucherQuote = quoteVoucherIfPresent(
-                requestDTO.voucherCode(),
+        VoucherQuote productVoucherQuote = quoteVoucherIfPresent(
+                productVoucherCode(requestDTO),
                 userId,
                 subtotal,
                 shippingFee,
-                checkoutData.items()
+                checkoutData.items(),
+                VoucherSlot.product
+        );
+        VoucherQuote shippingVoucherQuote = quoteVoucherIfPresent(
+                requestDTO.shippingVoucherCode(),
+                userId,
+                subtotal,
+                shippingFee,
+                checkoutData.items(),
+                VoucherSlot.shipping
         );
 
         CheckoutPricingResult pricing = checkoutPricingService.calculate(
@@ -93,8 +102,8 @@ public class CheckoutServiceFacade implements CheckoutService {
                         user,
                         subtotal,
                         shippingFee,
-                        voucherQuote.voucherDiscountAmount(),
-                        voucherQuote.shippingDiscountAmount()
+                        productVoucherQuote.voucherDiscountAmount(),
+                        shippingVoucherQuote.shippingDiscountAmount()
                 )
         );
 
@@ -106,11 +115,21 @@ public class CheckoutServiceFacade implements CheckoutService {
                 .shippingDiscountAmount(pricing.shippingDiscountAmount())
                 .discountAmount(pricing.discountAmount())
                 .totalAmount(pricing.totalAmount())
-                .voucherApplied(voucherQuote.voucherId() != null)
-                .voucherId(voucherQuote.voucherId())
-                .voucherCode(voucherQuote.code())
-                .voucherDiscountType(voucherQuote.discountType())
-                .voucherMessage(voucherQuote.message())
+                .voucherApplied(productVoucherQuote.voucherId() != null)
+                .voucherId(productVoucherQuote.voucherId())
+                .voucherCode(productVoucherQuote.code())
+                .voucherDiscountType(productVoucherQuote.discountType())
+                .voucherMessage(productVoucherQuote.message())
+                .productVoucherApplied(productVoucherQuote.voucherId() != null)
+                .productVoucherId(productVoucherQuote.voucherId())
+                .productVoucherCode(productVoucherQuote.code())
+                .productVoucherDiscountType(productVoucherQuote.discountType())
+                .productVoucherMessage(productVoucherQuote.message())
+                .shippingVoucherApplied(shippingVoucherQuote.voucherId() != null)
+                .shippingVoucherId(shippingVoucherQuote.voucherId())
+                .shippingVoucherCode(shippingVoucherQuote.code())
+                .shippingVoucherDiscountType(shippingVoucherQuote.discountType())
+                .shippingVoucherMessage(shippingVoucherQuote.message())
                 .build();
     }
 
@@ -146,10 +165,12 @@ public class CheckoutServiceFacade implements CheckoutService {
 
         BigDecimal voucherDiscountAmount = BigDecimal.ZERO;
         BigDecimal shippingDiscountAmount = BigDecimal.ZERO;
-        String voucherCode = normalizeVoucherCode(requestDTO.voucherCode());
-        if (voucherCode != null) {
-            VoucherQuote voucherQuote = voucherQuoteService.quote(new VoucherQuoteRequest(
-                    voucherCode,
+        String productVoucherCode = normalizeVoucherCode(productVoucherCode(requestDTO));
+        String shippingVoucherCode = normalizeVoucherCode(requestDTO.shippingVoucherCode());
+
+        if (productVoucherCode != null) {
+            voucherQuoteService.quote(new VoucherQuoteRequest(
+                    productVoucherCode,
                     VoucherSlot.product,
                     userId,
                     subtotal,
@@ -157,17 +178,41 @@ public class CheckoutServiceFacade implements CheckoutService {
                     checkoutData.items()
             ));
             voucherDiscountAmount = requireAmount(
-                    voucherService.reserveVoucher(savedCheckoutSession.getId(), voucherCode, subtotal, expiresAt),
+                    voucherService.reserveVoucher(
+                            savedCheckoutSession.getId(),
+                            productVoucherCode,
+                            VoucherSlot.product,
+                            checkoutData,
+                            expiresAt
+                    ),
                     "Voucher discount amount"
             );
+        }
+
+        if (shippingVoucherCode != null) {
+            voucherQuoteService.quote(new VoucherQuoteRequest(
+                    shippingVoucherCode,
+                    VoucherSlot.shipping,
+                    userId,
+                    subtotal,
+                    shippingFee,
+                    checkoutData.items()
+            ));
             shippingDiscountAmount = requireAmount(
-                    voucherQuote.shippingDiscountAmount(),
+                    voucherService.reserveVoucher(
+                            savedCheckoutSession.getId(),
+                            shippingVoucherCode,
+                            VoucherSlot.shipping,
+                            checkoutData,
+                            expiresAt
+                    ),
                     "Shipping discount amount"
             );
-            savedCheckoutSession.setVoucher(findReservedVoucher(savedCheckoutSession.getId()));
-        } else {
-            savedCheckoutSession.setVoucher(null);
         }
+
+        savedCheckoutSession.setVoucher(productVoucherCode != null
+                ? findReservedVoucher(savedCheckoutSession.getId(), VoucherSlot.product)
+                : null);
 
         CheckoutPricingResult finalPricing = checkoutPricingService.calculate(
                 new CheckoutPricingRequest(user, subtotal, shippingFee, voucherDiscountAmount, shippingDiscountAmount)
@@ -290,8 +335,9 @@ public class CheckoutServiceFacade implements CheckoutService {
                 .build();
     }
 
-    private Voucher findReservedVoucher(Long checkoutSessionId) {
-        VoucherReservation voucherReservation = voucherReservationRepository.findByCheckoutSessionId(checkoutSessionId)
+    private Voucher findReservedVoucher(Long checkoutSessionId, VoucherSlot slot) {
+        VoucherReservation voucherReservation = voucherReservationRepository
+                .findByCheckoutSessionIdAndVoucherSlot(checkoutSessionId, slot)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Voucher reservation not found for checkout session: " + checkoutSessionId
                 ));
@@ -313,7 +359,8 @@ public class CheckoutServiceFacade implements CheckoutService {
             Long userId,
             BigDecimal subtotal,
             BigDecimal shippingFee,
-            List<CheckoutItemSnapshot> items
+            List<CheckoutItemSnapshot> items,
+            VoucherSlot slot
     ) {
         String normalizedVoucherCode = normalizeVoucherCode(voucherCode);
         if (normalizedVoucherCode == null) {
@@ -321,12 +368,22 @@ public class CheckoutServiceFacade implements CheckoutService {
         }
         return voucherQuoteService.quote(new VoucherQuoteRequest(
                 normalizedVoucherCode,
-                VoucherSlot.product,
+                slot,
                 userId,
                 subtotal,
                 shippingFee,
                 items
         ));
+    }
+
+    private String productVoucherCode(PreviewCheckoutRequestDTO requestDTO) {
+        String productVoucherCode = normalizeVoucherCode(requestDTO.productVoucherCode());
+        return productVoucherCode != null ? productVoucherCode : requestDTO.voucherCode();
+    }
+
+    private String productVoucherCode(ConfirmCheckoutRequestDTO requestDTO) {
+        String productVoucherCode = normalizeVoucherCode(requestDTO.productVoucherCode());
+        return productVoucherCode != null ? productVoucherCode : requestDTO.voucherCode();
     }
 
     private String normalizeVoucherCode(String voucherCode) {

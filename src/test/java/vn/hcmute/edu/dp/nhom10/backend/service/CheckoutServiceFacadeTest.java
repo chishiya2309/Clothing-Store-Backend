@@ -18,6 +18,8 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuoteRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
+import vn.hcmute.edu.dp.nhom10.backend.dto.request.PreviewCheckoutRequestDTO;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.CheckoutPreviewResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.MembershipTier;
@@ -26,7 +28,9 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.pattern.facade.checkout.CheckoutServiceFacade;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionItemRepository;
@@ -45,7 +49,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -127,12 +130,53 @@ class CheckoutServiceFacadeTest {
     }
 
     @Test
+    void previewCheckout_withProductAndShippingVoucher_success() {
+        mockSuccessfulBaseFlow();
+        when(voucherQuoteService.quote(any(VoucherQuoteRequest.class))).thenAnswer(invocation -> {
+            VoucherQuoteRequest request = invocation.getArgument(0);
+            if (request.expectedSlot() == VoucherSlot.shipping) {
+                return new VoucherQuote(
+                        200L,
+                        "SHIP20",
+                        DiscountType.shipping_fixed_amount,
+                        VoucherSlot.shipping,
+                        BigDecimal.ZERO,
+                        money("10000.00"),
+                        "Voucher applied successfully"
+                );
+            }
+            return new VoucherQuote(
+                    100L,
+                    "SAVE10",
+                    DiscountType.fixed_amount,
+                    VoucherSlot.product,
+                    money("30000.00"),
+                    BigDecimal.ZERO,
+                    "Voucher applied successfully"
+            );
+        });
+
+        CheckoutPreviewResponse response = checkoutService.previewCheckout(
+                new PreviewCheckoutRequestDTO(1L, null, "SAVE10", "SHIP20"),
+                10L
+        );
+
+        assertEquals(money("30000.00"), response.voucherDiscountAmount());
+        assertEquals(money("10000.00"), response.shippingDiscountAmount());
+        assertEquals(money("40000.00"), response.discountAmount());
+        assertEquals(money("180000.00"), response.totalAmount());
+        assertEquals("SAVE10", response.productVoucherCode());
+        assertEquals("SHIP20", response.shippingVoucherCode());
+    }
+
+    @Test
     void prepareCheckout_withVoucher_success() {
         mockSuccessfulBaseFlow();
         Voucher voucher = Voucher.builder().id(100L).code("SAVE10").build();
-        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
                 .thenReturn(money("30000.00"));
-        when(voucherReservationRepository.findByCheckoutSessionId(1L))
+        when(voucherReservationRepository.findByCheckoutSessionIdAndVoucherSlot(1L, VoucherSlot.product))
                 .thenReturn(Optional.of(VoucherReservation.builder().voucher(voucher).build()));
 
         ReservedCheckoutResult result = checkoutService.prepareCheckout(request("SAVE10"), 10L);
@@ -143,13 +187,40 @@ class CheckoutServiceFacadeTest {
     }
 
     @Test
+    void prepareCheckout_withProductAndShippingVoucher_success() {
+        mockSuccessfulBaseFlow();
+        Voucher productVoucher = Voucher.builder().id(100L).code("SAVE10").build();
+        ConfirmCheckoutRequestDTO request = new ConfirmCheckoutRequestDTO(
+                1L,
+                null,
+                "SAVE10",
+                "SHIP20",
+                PaymentMethod.cod
+        );
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
+                .thenReturn(money("30000.00"));
+        when(voucherService.reserveVoucher(eq(1L), eq("SHIP20"), eq(VoucherSlot.shipping),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
+                .thenReturn(money("10000.00"));
+        when(voucherReservationRepository.findByCheckoutSessionIdAndVoucherSlot(1L, VoucherSlot.product))
+                .thenReturn(Optional.of(VoucherReservation.builder().voucher(productVoucher).build()));
+
+        ReservedCheckoutResult result = checkoutService.prepareCheckout(request, 10L);
+
+        assertEquals(money("40000.00"), result.discountAmount());
+        assertEquals(money("180000.00"), result.totalAmount());
+        assertEquals(productVoucher, captureLastSavedSession().getVoucher());
+    }
+
+    @Test
     void prepareCheckout_nullVoucherCode_doesNotCallVoucherService() {
         mockSuccessfulBaseFlow();
 
         checkoutService.prepareCheckout(request(null), 10L);
 
         verifyNoInteractions(voucherService);
-        verify(voucherReservationRepository, never()).findByCheckoutSessionId(anyLong());
+        verify(voucherReservationRepository, never()).findByCheckoutSessionIdAndVoucherSlot(anyLong(), any(VoucherSlot.class));
     }
 
     @Test
@@ -159,20 +230,22 @@ class CheckoutServiceFacadeTest {
         checkoutService.prepareCheckout(request(" "), 10L);
 
         verifyNoInteractions(voucherService);
-        verify(voucherReservationRepository, never()).findByCheckoutSessionId(anyLong());
+        verify(voucherReservationRepository, never()).findByCheckoutSessionIdAndVoucherSlot(anyLong(), any(VoucherSlot.class));
     }
 
     @Test
     void prepareCheckout_trimsVoucherCode() {
         mockSuccessfulBaseFlow();
-        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
                 .thenReturn(money("10000.00"));
-        when(voucherReservationRepository.findByCheckoutSessionId(1L))
+        when(voucherReservationRepository.findByCheckoutSessionIdAndVoucherSlot(1L, VoucherSlot.product))
                 .thenReturn(Optional.of(VoucherReservation.builder().voucher(Voucher.builder().id(100L).build()).build()));
 
         checkoutService.prepareCheckout(request(" SAVE10 "), 10L);
 
-        verify(voucherService).reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class));
+        verify(voucherService).reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class));
     }
 
     @Test
@@ -244,7 +317,8 @@ class CheckoutServiceFacadeTest {
     @Test
     void prepareCheckout_voucherFails_doesNotSaveItemsOrReserveSession() {
         mockSuccessfulBaseFlow();
-        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
                 .thenThrow(new IllegalArgumentException("Invalid voucher"));
 
         assertThrows(IllegalArgumentException.class, () -> checkoutService.prepareCheckout(request("SAVE10"), 10L));
@@ -266,9 +340,10 @@ class CheckoutServiceFacadeTest {
     @Test
     void prepareCheckout_calculatesTotal() {
         mockSuccessfulBaseFlow();
-        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
                 .thenReturn(money("50000.00"));
-        when(voucherReservationRepository.findByCheckoutSessionId(1L))
+        when(voucherReservationRepository.findByCheckoutSessionIdAndVoucherSlot(1L, VoucherSlot.product))
                 .thenReturn(Optional.of(VoucherReservation.builder().voucher(Voucher.builder().id(100L).build()).build()));
 
         ReservedCheckoutResult result = checkoutService.prepareCheckout(request("SAVE10"), 10L);
@@ -284,9 +359,10 @@ class CheckoutServiceFacadeTest {
                         .discountPercent(new BigDecimal("10.00"))
                         .build())
                 .build());
-        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
                 .thenReturn(money("30000.00"));
-        when(voucherReservationRepository.findByCheckoutSessionId(1L))
+        when(voucherReservationRepository.findByCheckoutSessionIdAndVoucherSlot(1L, VoucherSlot.product))
                 .thenReturn(Optional.of(VoucherReservation.builder().voucher(Voucher.builder().id(100L).build()).build()));
 
         ReservedCheckoutResult result = checkoutService.prepareCheckout(request("SAVE10"), 10L);
@@ -345,9 +421,10 @@ class CheckoutServiceFacadeTest {
     @Test
     void prepareCheckout_inventoryAndVoucherUseSameExpiresAt() {
         mockSuccessfulBaseFlow();
-        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), any(OffsetDateTime.class)))
                 .thenReturn(money("10000.00"));
-        when(voucherReservationRepository.findByCheckoutSessionId(1L))
+        when(voucherReservationRepository.findByCheckoutSessionIdAndVoucherSlot(1L, VoucherSlot.product))
                 .thenReturn(Optional.of(VoucherReservation.builder().voucher(Voucher.builder().id(100L).build()).build()));
 
         checkoutService.prepareCheckout(request("SAVE10"), 10L);
@@ -355,7 +432,8 @@ class CheckoutServiceFacadeTest {
         ArgumentCaptor<OffsetDateTime> inventoryExpiresAt = ArgumentCaptor.forClass(OffsetDateTime.class);
         ArgumentCaptor<OffsetDateTime> voucherExpiresAt = ArgumentCaptor.forClass(OffsetDateTime.class);
         verify(inventoryReservationService).reserveStock(eq(1L), any(), inventoryExpiresAt.capture());
-        verify(voucherService).reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), voucherExpiresAt.capture());
+        verify(voucherService).reserveVoucher(eq(1L), eq("SAVE10"), eq(VoucherSlot.product),
+                any(CheckoutData.class), voucherExpiresAt.capture());
         assertEquals(inventoryExpiresAt.getValue(), voucherExpiresAt.getValue());
     }
 

@@ -3,16 +3,14 @@ package vn.hcmute.edu.dp.nhom10.backend.pattern.reservation.voucher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import vn.hcmute.edu.dp.nhom10.backend.dto.request.ApplyVoucherRequest;
-import vn.hcmute.edu.dp.nhom10.backend.dto.request.CreateVoucherRequest;
-import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
-import vn.hcmute.edu.dp.nhom10.backend.dto.response.AppliedVoucherResponse;
-import vn.hcmute.edu.dp.nhom10.backend.dto.response.VoucherResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
 import vn.hcmute.edu.dp.nhom10.backend.enums.ReservationStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
@@ -45,18 +43,56 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
             BigDecimal subtotal,
             OffsetDateTime expiresAt
     ) {
+        return reserveVoucher(
+                checkoutSessionId,
+                code,
+                VoucherSlot.product,
+                new CheckoutData(null, null, null, List.of(), subtotal, BigDecimal.ZERO),
+                expiresAt,
+                true
+        );
+    }
+
+    @Override
+    @Transactional
+    public BigDecimal reserveVoucher(
+            Long checkoutSessionId,
+            String code,
+            VoucherSlot slot,
+            CheckoutData checkoutData,
+            OffsetDateTime expiresAt
+    ) {
+        if (checkoutData == null) {
+            throw new IllegalArgumentException("Checkout data is required");
+        }
+        return reserveVoucher(checkoutSessionId, code, defaultSlot(slot), checkoutData, expiresAt, false);
+    }
+
+    private BigDecimal reserveVoucher(
+            Long checkoutSessionId,
+            String code,
+            VoucherSlot slot,
+            CheckoutData checkoutData,
+            OffsetDateTime expiresAt,
+            boolean legacySingleVoucherMode
+    ) {
         if (checkoutSessionId == null) {
             throw new IllegalArgumentException("Checkout session ID is required");
         }
         String normalizedCode = normalizeVoucherCode(code);
-        validateSubtotal(subtotal);
+        BigDecimal subtotal = requireAmount(checkoutData.subtotal(), "Subtotal");
+        BigDecimal shippingFee = defaultZero(checkoutData.shippingFee());
+        List<CheckoutItemSnapshot> items = checkoutData.items() != null ? checkoutData.items() : List.of();
         OffsetDateTime now = now();
         validateExpiresAt(expiresAt, now);
 
         CheckoutSession checkoutSession = checkoutSessionRepository.findByIdForUpdate(checkoutSessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Checkout session not found with ID: " + checkoutSessionId));
 
-        if (voucherReservationRepository.existsByCheckoutSession_Id(checkoutSessionId)) {
+        boolean reservationExists = legacySingleVoucherMode
+                ? voucherReservationRepository.existsByCheckoutSession_Id(checkoutSessionId)
+                : voucherReservationRepository.existsByCheckoutSession_IdAndVoucherSlot(checkoutSessionId, slot);
+        if (reservationExists) {
             throw new InvalidDataException("Voucher reservation already exists for checkout session: " + checkoutSessionId);
         }
 
@@ -64,12 +100,14 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
                 .orElseThrow(() -> new ResourceNotFoundException("Voucher not found with code: " + normalizedCode));
 
         validateVoucherAvailable(voucher, subtotal, now);
-        BigDecimal discountAmount = calculateDiscountAmount(voucher, subtotal);
+        validateSlot(voucher, slot);
+        BigDecimal discountAmount = calculateDiscountAmount(voucher, subtotal, shippingFee, items);
 
         VoucherReservation reservation = VoucherReservation.builder()
                 .checkoutSession(checkoutSession)
                 .voucher(voucher)
                 .discountAmount(discountAmount)
+                .voucherSlot(slot)
                 .status(ReservationStatus.active)
                 .expiresAt(expiresAt)
                 .build();
@@ -178,7 +216,12 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         }
     }
 
-    private BigDecimal calculateDiscountAmount(Voucher voucher, BigDecimal subtotal) {
+    private BigDecimal calculateDiscountAmount(
+            Voucher voucher,
+            BigDecimal subtotal,
+            BigDecimal shippingFee,
+            List<CheckoutItemSnapshot> items
+    ) {
         BigDecimal discountValue = voucher.getDiscountValue();
         if (discountValue == null || discountValue.signum() < 0) {
             throw new InvalidDataException("Voucher discount value is invalid: " + voucher.getId());
@@ -190,15 +233,22 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         } else if (voucher.getDiscountType() == DiscountType.percentage) {
             discountAmount = subtotal.multiply(discountValue)
                     .divide(ONE_HUNDRED, MONEY_SCALE, RoundingMode.HALF_UP);
+        } else if (voucher.getDiscountType() == DiscountType.shipping_fixed_amount) {
+            discountAmount = discountValue.min(shippingFee);
+        } else if (voucher.getDiscountType() == DiscountType.cheapest_item_free) {
+            discountAmount = calculateCheapestItemDiscount(items);
         } else {
             throw new InvalidDataException("Voucher discount type is invalid: " + voucher.getDiscountType());
         }
 
-        BigDecimal maxDiscountAmount = voucher.getMaxDiscountAmount();
-        if (maxDiscountAmount != null && discountAmount.compareTo(maxDiscountAmount) > 0) {
-            discountAmount = maxDiscountAmount;
+        if (voucher.getDiscountType() != DiscountType.shipping_fixed_amount) {
+            BigDecimal maxDiscountAmount = voucher.getMaxDiscountAmount();
+            if (maxDiscountAmount != null && discountAmount.compareTo(maxDiscountAmount) > 0) {
+                discountAmount = maxDiscountAmount;
+            }
         }
-        if (discountAmount.compareTo(subtotal) > 0) {
+        if (voucher.getDiscountType() != DiscountType.shipping_fixed_amount
+                && discountAmount.compareTo(subtotal) > 0) {
             discountAmount = subtotal;
         }
         if (discountAmount.signum() < 0) {
@@ -206,6 +256,26 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         }
 
         return discountAmount.setScale(MONEY_SCALE, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal calculateCheapestItemDiscount(List<CheckoutItemSnapshot> items) {
+        int totalQuantity = items.stream()
+                .mapToInt(this::safeQuantity)
+                .sum();
+        if (totalQuantity <= 1) {
+            throw new InvalidDataException("Cheapest item voucher requires at least two items");
+        }
+
+        return items.stream()
+                .filter(item -> safeQuantity(item) > 0)
+                .map(CheckoutItemSnapshot::unitPrice)
+                .filter(price -> price != null && price.compareTo(BigDecimal.ZERO) >= 0)
+                .min(BigDecimal::compareTo)
+                .orElseThrow(() -> new InvalidDataException("Checkout items are required for cheapest item voucher"));
+    }
+
+    private int safeQuantity(CheckoutItemSnapshot item) {
+        return item.quantity() != null ? item.quantity() : 0;
     }
 
     private Voucher lockVoucher(VoucherReservation reservation) {
@@ -231,15 +301,6 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         return checkoutCode.trim();
     }
 
-    private void validateSubtotal(BigDecimal subtotal) {
-        if (subtotal == null) {
-            throw new IllegalArgumentException("Subtotal is required");
-        }
-        if (subtotal.signum() < 0) {
-            throw new IllegalArgumentException("Subtotal must not be negative");
-        }
-    }
-
     private void validateExpiresAt(OffsetDateTime expiresAt, OffsetDateTime now) {
         if (expiresAt == null || !expiresAt.isAfter(now)) {
             throw new IllegalArgumentException("Voucher reservation expiry time must be in the future");
@@ -248,5 +309,37 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
 
     private OffsetDateTime now() {
         return OffsetDateTime.now();
+    }
+
+    private BigDecimal requireAmount(BigDecimal amount, String fieldName) {
+        if (amount == null) {
+            throw new IllegalArgumentException(fieldName + " is required");
+        }
+        if (amount.signum() < 0) {
+            throw new IllegalArgumentException(fieldName + " must not be negative");
+        }
+        return amount;
+    }
+
+    private BigDecimal defaultZero(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
+    }
+
+    private VoucherSlot defaultSlot(VoucherSlot slot) {
+        return slot != null ? slot : VoucherSlot.product;
+    }
+
+    private void validateSlot(Voucher voucher, VoucherSlot expectedSlot) {
+        VoucherSlot actualSlot = slotOf(voucher.getDiscountType());
+        if (actualSlot != expectedSlot) {
+            throw new InvalidDataException("Voucher " + voucher.getCode() + " is not valid for " + expectedSlot + " slot");
+        }
+    }
+
+    private VoucherSlot slotOf(DiscountType discountType) {
+        return switch (discountType) {
+            case percentage, fixed_amount, cheapest_item_free -> VoucherSlot.product;
+            case shipping_fixed_amount -> VoucherSlot.shipping;
+        };
     }
 }

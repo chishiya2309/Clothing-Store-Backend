@@ -9,7 +9,14 @@ public record ConfirmCheckoutRequestDTO(
 
         String voucherCode,
 
+        String productVoucherCode,
+
+        String shippingVoucherCode,
+
         @NotNull(message = "Payment method is required")
         PaymentMethod paymentMethod
 ) {
+    public ConfirmCheckoutRequestDTO(Long addressId, String voucherCode, PaymentMethod paymentMethod) {
+        this(addressId, voucherCode, null, null, paymentMethod);
+    }
 }
