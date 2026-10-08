@@ -230,10 +230,19 @@ src/main/resources/db/
 ├── 5. phase4_review_moderation_schema_patch.sql      # Kiểm duyệt đánh giá
 ├── 6. phase5_flash_sale_schema_patch.sql             # Flash Sale
 ├── 7. phase5_ab_testing_analytics_schema_patch.sql   # A/B Testing & Analytics
-├── 8. seed_data_1.sql                               # Users + Products cơ bản
-├── 9. seed_data_2.sql                               # Thêm sản phẩm + variant
-├── 10. seed_data_3.sql                              # Đơn hàng mẫu
-└── 11. seed_data_4.sql                              # Dữ liệu mở rộng
+├── 8. phase6_voucher_discount_types_schema_patch.sql  # Voucher shipping/cheapest item
+├── 9. phase9_order_vouchers_schema_patch.sql          # Lưu snapshot voucher theo đơn hàng
+├── 10. seed_data_1.sql                                # Users + Products cơ bản
+├── 11. seed_data_2.sql                                # Thêm sản phẩm + variant
+├── 12. seed_data_3.sql                                # Đơn hàng mẫu
+└── 13. seed_data_4.sql                                # Dữ liệu mở rộng
+```
+
+Nếu database đã tồn tại từ trước khi thêm voucher mới, chạy tối thiểu script sau một lần để cập nhật enum PostgreSQL:
+
+```bash
+psql -d clothing_store -f src/main/resources/db/phase6_voucher_discount_types_schema_patch.sql
+psql -d clothing_store -f src/main/resources/db/phase9_order_vouchers_schema_patch.sql
 ```
 
 Sau khi chạy đủ seed data:

@@ -4,22 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
-import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
-import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderVoucherAdjustmentService;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class OrderVoucherRestorationObserver implements OrderCancellationObserver {
-    private final VoucherRepository voucherRepository;
+    private final OrderVoucherAdjustmentService orderVoucherAdjustmentService;
 
     @Override
     public void onOrderCancelled(Order order) {
-        Voucher voucher = order.getVoucher();
-        if (voucher != null && voucher.getTimesUsed() > 0) {
-            log.info("Restoring voucher usage for voucher: {}", voucher.getCode());
-            voucher.setTimesUsed(voucher.getTimesUsed() - 1);
-            voucherRepository.save(voucher);
-        }
+        log.info("Restoring voucher usage for cancelled order: {}", order.getOrderCode());
+        orderVoucherAdjustmentService.restoreVoucherUsageForCancelledOrder(order);
     }
 }

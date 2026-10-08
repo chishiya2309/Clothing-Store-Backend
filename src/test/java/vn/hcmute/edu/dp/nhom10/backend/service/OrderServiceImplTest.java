@@ -30,6 +30,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.OrderServiceImpl;
 
 import java.math.BigDecimal;
@@ -79,6 +80,12 @@ class OrderServiceImplTest {
     private VoucherReservationService voucherService;
 
     @Mock
+    private VoucherReservationRepository voucherReservationRepository;
+
+    @Mock
+    private OrderVoucherSnapshotService orderVoucherSnapshotService;
+
+    @Mock
     private OrderStatusHistoryService orderStatusHistoryService;
 
     @Mock
@@ -99,7 +106,7 @@ class OrderServiceImplTest {
         assertEquals(money("20000.00"), response.getShippingFee());
         assertEquals(BigDecimal.ZERO, response.getDiscountAmount());
         assertEquals(money("220000.00"), response.getTotalAmount());
-        verify(voucherService, never()).consumeVoucherReservation(any());
+        verify(voucherService).consumeVoucherReservations("CHK-1");
     }
 
     @Test
@@ -109,7 +116,7 @@ class OrderServiceImplTest {
         OrderResponseDTO response = orderService.createCodOrder("CHK-1", 10L);
 
         assertEquals(money("190000.00"), response.getTotalAmount());
-        verify(voucherService).consumeVoucherReservation("CHK-1");
+        verify(voucherService).consumeVoucherReservations("CHK-1");
     }
 
     @Test
@@ -216,16 +223,16 @@ class OrderServiceImplTest {
 
         orderService.createCodOrder("CHK-1", 10L);
 
-        verify(voucherService).consumeVoucherReservation("CHK-1");
+        verify(voucherService).consumeVoucherReservations("CHK-1");
     }
 
     @Test
-    void createCodOrder_withoutVoucherDoesNotConsumeVoucher() {
+    void createCodOrder_withoutVoucherConsumesVoucherReservations() {
         mockSuccessfulFlow(null);
 
         orderService.createCodOrder("CHK-1", 10L);
 
-        verifyNoInteractions(voucherService);
+        verify(voucherService).consumeVoucherReservations("CHK-1");
     }
 
     @Test
@@ -387,7 +394,7 @@ class OrderServiceImplTest {
 
         assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
 
-        verify(voucherService, never()).consumeVoucherReservation(any());
+        verify(voucherService, never()).consumeVoucherReservations(any());
         verify(cartItemRepository, never()).deletePurchasedItems(any(), anyCollection());
         verify(checkoutSessionRepository, never()).save(any());
     }
@@ -396,7 +403,7 @@ class OrderServiceImplTest {
     void createCodOrder_consumeVoucherFails_stopsFlow() {
         mockSuccessfulFlow(Voucher.builder().id(100L).build());
         doThrow(new IllegalArgumentException("Cannot consume voucher"))
-                .when(voucherService).consumeVoucherReservation("CHK-1");
+                .when(voucherService).consumeVoucherReservations("CHK-1");
 
         assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
 
@@ -472,7 +479,7 @@ class OrderServiceImplTest {
         inOrder.verify(orderItemRepository).saveAll(any());
         inOrder.verify(paymentRepository).save(any(Payment.class));
         inOrder.verify(inventoryReservationService).consumeStockReservation("CHK-1");
-        inOrder.verify(voucherService).consumeVoucherReservation("CHK-1");
+        inOrder.verify(voucherService).consumeVoucherReservations("CHK-1");
         inOrder.verify(cartItemRepository).deletePurchasedItems(eq(10L), anyCollection());
         inOrder.verify(checkoutSessionRepository).save(any(CheckoutSession.class));
     }
@@ -506,7 +513,7 @@ class OrderServiceImplTest {
         inOrder.verify(orderItemRepository).saveAll(any());
         inOrder.verify(paymentRepository).save(any(Payment.class));
         inOrder.verify(inventoryReservationService).consumeStockReservation("CHK-1");
-        inOrder.verify(voucherService).consumeVoucherReservation("CHK-1");
+        inOrder.verify(voucherService).consumeVoucherReservations("CHK-1");
         inOrder.verify(cartItemRepository).deletePurchasedItems(eq(10L), anyCollection());
         inOrder.verify(checkoutSessionRepository).save(any(CheckoutSession.class));
         inOrder.verify(eventPublisher).publishEvent(any(OrderCreatedEvent.class));
@@ -558,7 +565,7 @@ class OrderServiceImplTest {
     void createCodOrder_consumeVoucherFails_doesNotPublishEvent() {
         mockSuccessfulFlow(Voucher.builder().id(100L).build());
         doThrow(new IllegalArgumentException("Cannot consume voucher"))
-                .when(voucherService).consumeVoucherReservation("CHK-1");
+                .when(voucherService).consumeVoucherReservations("CHK-1");
 
         assertThrows(IllegalArgumentException.class, () -> orderService.createCodOrder("CHK-1", 10L));
 

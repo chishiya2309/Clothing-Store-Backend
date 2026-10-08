@@ -20,6 +20,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -361,6 +362,30 @@ class VoucherReservationServiceImplTest {
     }
 
     @Test
+    void consumeVoucherReservations_activeReservations_consumesAll() {
+        Voucher productVoucher = voucher(DiscountType.fixed_amount, "10000.00");
+        Voucher shippingVoucher = voucher(DiscountType.shipping_fixed_amount, "15000.00");
+        shippingVoucher.setId(101L);
+        VoucherReservation productReservation = reservation(productVoucher, ReservationStatus.active, future());
+        VoucherReservation shippingReservation = reservation(shippingVoucher, ReservationStatus.active, future());
+        shippingReservation.setId(201L);
+        mockConsume(List.of(productReservation, shippingReservation));
+        when(voucherRepository.findByIdForUpdate(100L)).thenReturn(Optional.of(productVoucher));
+        when(voucherRepository.findByIdForUpdate(101L)).thenReturn(Optional.of(shippingVoucher));
+
+        voucherService.consumeVoucherReservations("CHK-1");
+
+        assertEquals(ReservationStatus.consumed, productReservation.getStatus());
+        assertEquals(ReservationStatus.consumed, shippingReservation.getStatus());
+        assertEquals(1, productVoucher.getTimesUsed());
+        assertEquals(1, shippingVoucher.getTimesUsed());
+        verify(voucherRepository).save(productVoucher);
+        verify(voucherRepository).save(shippingVoucher);
+        verify(voucherReservationRepository).save(productReservation);
+        verify(voucherReservationRepository).save(shippingReservation);
+    }
+
+    @Test
     void releaseVoucherReservation_active_setsReleased() {
         VoucherReservation reservation = reservation(voucher(DiscountType.fixed_amount, "10000.00"), ReservationStatus.active, future());
         mockRelease(Optional.of(reservation));
@@ -368,7 +393,7 @@ class VoucherReservationServiceImplTest {
         voucherService.releaseVoucherReservation("CHK-1");
 
         assertEquals(ReservationStatus.released, reservation.getStatus());
-        verify(voucherReservationRepository).save(reservation);
+        verify(voucherReservationRepository).saveAll(List.of(reservation));
     }
 
     @Test
@@ -379,7 +404,7 @@ class VoucherReservationServiceImplTest {
         voucherService.releaseVoucherReservation("CHK-1");
 
         assertEquals(ReservationStatus.released, reservation.getStatus());
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
     }
 
     @Test
@@ -390,7 +415,7 @@ class VoucherReservationServiceImplTest {
         voucherService.releaseVoucherReservation("CHK-1");
 
         assertEquals(ReservationStatus.expired, reservation.getStatus());
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
     }
 
     @Test
@@ -401,7 +426,7 @@ class VoucherReservationServiceImplTest {
         voucherService.releaseVoucherReservation("CHK-1");
 
         assertEquals(ReservationStatus.consumed, reservation.getStatus());
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
     }
 
     @Test
@@ -410,7 +435,29 @@ class VoucherReservationServiceImplTest {
 
         voucherService.releaseVoucherReservation("CHK-1");
 
-        verify(voucherReservationRepository, never()).save(any());
+        verify(voucherReservationRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void releaseVoucherReservations_activeReservations_releaseAll() {
+        VoucherReservation productReservation = reservation(
+                voucher(DiscountType.fixed_amount, "10000.00"),
+                ReservationStatus.active,
+                future()
+        );
+        VoucherReservation shippingReservation = reservation(
+                voucher(DiscountType.shipping_fixed_amount, "15000.00"),
+                ReservationStatus.active,
+                future()
+        );
+        shippingReservation.setId(201L);
+        mockRelease(List.of(productReservation, shippingReservation));
+
+        voucherService.releaseVoucherReservations("CHK-1");
+
+        assertEquals(ReservationStatus.released, productReservation.getStatus());
+        assertEquals(ReservationStatus.released, shippingReservation.getStatus());
+        verify(voucherReservationRepository).saveAll(List.of(productReservation, shippingReservation));
     }
 
     @Test
@@ -434,13 +481,21 @@ class VoucherReservationServiceImplTest {
     }
 
     private void mockConsume(VoucherReservation reservation) {
+        mockConsume(List.of(reservation));
+    }
+
+    private void mockConsume(List<VoucherReservation> reservations) {
         when(checkoutSessionRepository.findByCheckoutCodeForUpdate("CHK-1")).thenReturn(Optional.of(checkoutSession()));
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(1L)).thenReturn(Optional.of(reservation));
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(reservations);
     }
 
     private void mockRelease(Optional<VoucherReservation> reservation) {
+        mockRelease(reservation.map(value -> List.of(value)).orElseGet(List::of));
+    }
+
+    private void mockRelease(List<VoucherReservation> reservations) {
         when(checkoutSessionRepository.findByCheckoutCodeForUpdate("CHK-1")).thenReturn(Optional.of(checkoutSession()));
-        when(voucherReservationRepository.findByCheckoutSessionIdForUpdate(1L)).thenReturn(reservation);
+        when(voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(1L)).thenReturn(reservations);
     }
 
     private VoucherReservation captureSavedReservation() {

@@ -144,7 +144,14 @@ public abstract class AbstractPostgresIntegrationTest {
              Statement statement = connection.createStatement()) {
             for (String scriptLocation : List.of(
                     "db/database_schema.sql",
-                    "db/phase1_checkout_schema_patch.sql"
+                    "db/phase1_checkout_schema_patch.sql",
+                    "db/phase2_momo_payment_method_patch.sql",
+                    "db/phase3_order_status_history_schema_patch.sql",
+                    "db/phase4_review_moderation_schema_patch.sql",
+                    "db/phase5_flash_sale_schema_patch.sql",
+                    "db/phase5_ab_testing_analytics_schema_patch.sql",
+                    "db/phase6_voucher_discount_types_schema_patch.sql",
+                    "db/phase9_order_vouchers_schema_patch.sql"
             )) {
                 String script = readClasspathResource(scriptLocation);
                 for (String sql : splitPostgresStatements(script)) {

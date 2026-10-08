@@ -8,11 +8,13 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.request.ApplyVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.CreateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.UpdateVoucherRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuoteRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.AppliedVoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.VoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
@@ -45,7 +47,7 @@ public class VoucherServiceImpl implements VoucherService {
         Voucher voucher = Voucher.builder()
                 .code(code)
                 .discountType(request.discountType())
-                .discountValue(request.discountValue())
+                .discountValue(normalizeDiscountValue(request.discountType(), request.discountValue()))
                 .maxDiscountAmount(request.maxDiscountAmount())
                 .minOrderAmount(defaultZero(request.minOrderAmount()))
                 .startDate(request.startDate())
@@ -69,7 +71,7 @@ public class VoucherServiceImpl implements VoucherService {
         }
 
         voucher.setDiscountType(request.discountType());
-        voucher.setDiscountValue(request.discountValue());
+        voucher.setDiscountValue(normalizeDiscountValue(request.discountType(), request.discountValue()));
         voucher.setMaxDiscountAmount(request.maxDiscountAmount());
         voucher.setMinOrderAmount(defaultZero(request.minOrderAmount()));
         voucher.setStartDate(request.startDate());
@@ -112,12 +114,14 @@ public class VoucherServiceImpl implements VoucherService {
     public AppliedVoucherResponse apply(ApplyVoucherRequest request, String customerEmail) {
         User customer = userRepository.findByEmail(customerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
-        VoucherQuote quote = voucherQuoteService.quote(
+        VoucherSlot requestedSlot = request.slot() != null ? request.slot() : VoucherSlot.product;
+        VoucherQuote quote = voucherQuoteService.quote(new VoucherQuoteRequest(
                 request.code(),
+                requestedSlot,
                 customer.getId(),
                 request.subtotal(),
                 defaultZero(request.shippingFee())
-        );
+        ));
         BigDecimal totalAmount = request.subtotal()
                 .add(defaultZero(request.shippingFee()))
                 .subtract(defaultZero(quote.voucherDiscountAmount()))
@@ -127,6 +131,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .voucherId(quote.voucherId())
                 .code(quote.code())
                 .discountType(quote.discountType())
+                .slot(quote.slot())
                 .subtotal(request.subtotal())
                 .shippingFee(defaultZero(request.shippingFee()))
                 .discountAmount(quote.voucherDiscountAmount())
@@ -150,17 +155,45 @@ public class VoucherServiceImpl implements VoucherService {
         return value != null ? value : BigDecimal.ZERO;
     }
 
+    private BigDecimal normalizeDiscountValue(DiscountType discountType, BigDecimal discountValue) {
+        if (discountType == DiscountType.cheapest_item_free) {
+            return defaultZero(discountValue);
+        }
+        return discountValue;
+    }
+
     private void validateVoucherData(DiscountType discountType, BigDecimal discountValue,
                                      OffsetDateTime startDate, OffsetDateTime endDate, Integer usageLimit) {
-        if (!endDate.isAfter(startDate)) {
+        if (discountType == null) {
+            throw new InvalidDataException("Discount type is required");
+        }
+        if (startDate == null || endDate == null || !endDate.isAfter(startDate)) {
             throw new InvalidDataException("End date must be after start date");
         }
         if (usageLimit == null || usageLimit < 1) {
             throw new InvalidDataException("Usage limit must be at least 1");
         }
-        if (discountType == DiscountType.percentage
-                && discountValue.compareTo(BigDecimal.valueOf(100)) > 0) {
-            throw new InvalidDataException("Percentage discount must not exceed 100");
+
+        switch (discountType) {
+            case percentage -> validatePositiveDiscountValue(discountValue);
+            case fixed_amount, shipping_fixed_amount -> validatePositiveDiscountValue(discountValue);
+            case cheapest_item_free -> {
+                if (discountValue != null && discountValue.compareTo(BigDecimal.ZERO) < 0) {
+                    throw new InvalidDataException("Discount value must not be negative");
+                }
+            }
+        }
+
+        if (discountType == DiscountType.percentage) {
+            if (discountValue.compareTo(BigDecimal.valueOf(100)) > 0) {
+                throw new InvalidDataException("Percentage discount must not exceed 100");
+            }
+        }
+    }
+
+    private void validatePositiveDiscountValue(BigDecimal discountValue) {
+        if (discountValue == null || discountValue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidDataException("Discount value must be greater than 0");
         }
     }
 

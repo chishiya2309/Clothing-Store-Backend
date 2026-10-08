@@ -18,6 +18,16 @@ public record CheckoutPreviewResponse(
         Long voucherId,
         String voucherCode,
         DiscountType voucherDiscountType,
-        String voucherMessage
+        String voucherMessage,
+        Boolean productVoucherApplied,
+        Long productVoucherId,
+        String productVoucherCode,
+        DiscountType productVoucherDiscountType,
+        String productVoucherMessage,
+        Boolean shippingVoucherApplied,
+        Long shippingVoucherId,
+        String shippingVoucherCode,
+        DiscountType shippingVoucherDiscountType,
+        String shippingVoucherMessage
 ) {
 }

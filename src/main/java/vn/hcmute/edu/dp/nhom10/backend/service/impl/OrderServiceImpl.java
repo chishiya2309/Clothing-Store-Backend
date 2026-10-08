@@ -9,11 +9,15 @@ import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
 import vn.hcmute.edu.dp.nhom10.backend.entity.OrderItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.OrderVoucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
+import vn.hcmute.edu.dp.nhom10.backend.entity.VoucherReservation;
 import vn.hcmute.edu.dp.nhom10.backend.enums.CheckoutSessionStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.event.OrderCreatedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.InvalidDataException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
@@ -26,9 +30,11 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.InventoryReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderVoucherSnapshotService;
 import vn.hcmute.edu.dp.nhom10.backend.service.VoucherReservationService;
 import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
@@ -41,11 +47,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderDetailResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderHistoryItemResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderVoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.PageResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductImage;
 import vn.hcmute.edu.dp.nhom10.backend.enums.ImageType;
 
 import java.time.OffsetDateTime;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -70,6 +78,8 @@ public class OrderServiceImpl implements OrderService {
     private final ApplicationEventPublisher eventPublisher;
     private final ProductVariantRepository productVariantRepository;
     private final VoucherRepository voucherRepository;
+    private final VoucherReservationRepository voucherReservationRepository;
+    private final OrderVoucherSnapshotService orderVoucherSnapshotService;
     private final CustomerOrderCancellationStrategy customerOrderCancellationStrategy;
     private final OrderCancellationManager orderCancellationManager;
 
@@ -108,10 +118,12 @@ public class OrderServiceImpl implements OrderService {
                 .build();
         paymentRepository.save(payment);
 
+        List<VoucherReservation> voucherReservations = voucherReservationRepository
+                .findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
+        orderVoucherSnapshotService.saveSnapshots(savedOrder, voucherReservations);
+
         inventoryReservationService.consumeStockReservation(normalizedCheckoutCode);
-        if (checkoutSession.getVoucher() != null) {
-            voucherService.consumeVoucherReservation(normalizedCheckoutCode);
-        }
+        voucherService.consumeVoucherReservations(normalizedCheckoutCode);
 
         cartItemRepository.deletePurchasedItems(userId, getProductVariantIds(checkoutItems));
 
@@ -299,6 +311,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(Payment::getStatus)
                 .findFirst()
                 .orElse(null);
+        List<OrderVoucherResponse> voucherResponses = voucherResponses(order);
 
         return OrderDetailResponse.builder()
                 .id(order.getId())
@@ -306,6 +319,8 @@ public class OrderServiceImpl implements OrderService {
                 .subtotal(order.getSubtotal())
                 .shippingFee(order.getShippingFee())
                 .discountAmount(order.getDiscountAmount())
+                .productVoucherDiscountAmount(sumVoucherDiscount(voucherResponses, VoucherSlot.product))
+                .shippingVoucherDiscountAmount(sumVoucherDiscount(voucherResponses, VoucherSlot.shipping))
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .createdAt(order.getCreatedAt())
@@ -319,7 +334,53 @@ public class OrderServiceImpl implements OrderService {
                 .shippingWard(order.getShippingWard())
                 .shippingAddress(order.getShippingAddress())
                 .items(itemResponses)
+                .vouchers(voucherResponses)
                 .build();
+    }
+
+    private List<OrderVoucherResponse> voucherResponses(Order order) {
+        List<OrderVoucher> snapshots = orderVoucherSnapshotService.findSnapshots(order.getId());
+        if (!snapshots.isEmpty()) {
+            return snapshots.stream()
+                    .map(this::toOrderVoucherResponse)
+                    .toList();
+        }
+
+        Voucher voucher = order.getVoucher();
+        if (voucher == null || order.getDiscountAmount() == null || order.getDiscountAmount().signum() <= 0) {
+            return List.of();
+        }
+
+        return List.of(OrderVoucherResponse.builder()
+                .voucherId(voucher.getId())
+                .voucherCode(voucher.getCode())
+                .discountType(voucher.getDiscountType())
+                .slot(legacySlotOf(voucher.getDiscountType()))
+                .discountAmount(order.getDiscountAmount())
+                .build());
+    }
+
+    private OrderVoucherResponse toOrderVoucherResponse(OrderVoucher orderVoucher) {
+        Voucher voucher = orderVoucher.getVoucher();
+        return OrderVoucherResponse.builder()
+                .voucherId(voucher == null ? null : voucher.getId())
+                .voucherCode(orderVoucher.getVoucherCode())
+                .discountType(orderVoucher.getDiscountType())
+                .slot(orderVoucher.getVoucherSlot())
+                .discountAmount(orderVoucher.getDiscountAmount())
+                .build();
+    }
+
+    private BigDecimal sumVoucherDiscount(List<OrderVoucherResponse> vouchers, VoucherSlot slot) {
+        return vouchers.stream()
+                .filter(voucher -> voucher.slot() == slot)
+                .map(OrderVoucherResponse::discountAmount)
+                .filter(amount -> amount != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private VoucherSlot legacySlotOf(DiscountType discountType) {
+        return discountType == DiscountType.shipping_fixed_amount ? VoucherSlot.shipping : VoucherSlot.product;
     }
 
     @Override

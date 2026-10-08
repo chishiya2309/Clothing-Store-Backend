@@ -16,17 +16,21 @@ import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderItemResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderListItemResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffOrderStatusTimelineResponse;
 import vn.hcmute.edu.dp.nhom10.backend.dto.response.StaffPaymentSummaryResponse;
+import vn.hcmute.edu.dp.nhom10.backend.dto.response.OrderVoucherResponse;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Order;
 import vn.hcmute.edu.dp.nhom10.backend.entity.OrderItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.OrderVoucher;
 import vn.hcmute.edu.dp.nhom10.backend.entity.OrderStatusHistory;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Payment;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderCompletionSource;
+import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
 import vn.hcmute.edu.dp.nhom10.backend.enums.OrderStatus;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentMethod;
 import vn.hcmute.edu.dp.nhom10.backend.enums.PaymentStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 import vn.hcmute.edu.dp.nhom10.backend.event.OrderStatusChangedEvent;
 import vn.hcmute.edu.dp.nhom10.backend.exception.OrderStateConflictException;
 import vn.hcmute.edu.dp.nhom10.backend.exception.ResourceNotFoundException;
@@ -42,8 +46,10 @@ import vn.hcmute.edu.dp.nhom10.backend.service.LoyaltyPointService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderInventoryAdjustmentService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderVoucherAdjustmentService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderVoucherSnapshotService;
 import vn.hcmute.edu.dp.nhom10.backend.service.StaffOrderService;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -81,6 +87,7 @@ public class StaffOrderServiceImpl implements StaffOrderService {
     private final LoyaltyPointService loyaltyPointService;
     private final OrderInventoryAdjustmentService orderInventoryAdjustmentService;
     private final OrderVoucherAdjustmentService orderVoucherAdjustmentService;
+    private final OrderVoucherSnapshotService orderVoucherSnapshotService;
     private final ApplicationEventPublisher eventPublisher;
     private final Clock clock;
 
@@ -204,7 +211,7 @@ public class StaffOrderServiceImpl implements StaffOrderService {
         orderStatusTransitionPolicy.validate(fromStatus, OrderStatus.cancelled);
         PaymentSnapshot paymentSnapshot = representativePaymentSnapshot(order);
         boolean requiresManualRefundReview = requiresManualRefundReview(paymentSnapshot);
-        boolean hasVoucher = order.getVoucher() != null;
+        boolean hasVoucher = order.getVoucher() != null || orderVoucherSnapshotService.hasSnapshots(order.getId());
 
         orderInventoryAdjustmentService.restoreInventoryForCancelledOrder(order);
         orderVoucherAdjustmentService.restoreVoucherUsageForCancelledOrder(order);
@@ -485,6 +492,7 @@ public class StaffOrderServiceImpl implements StaffOrderService {
     ) {
         User customer = order.getUser();
         Voucher voucher = order.getVoucher();
+        List<OrderVoucherResponse> voucherResponses = voucherResponses(order);
 
         return StaffOrderDetailResponse.builder()
                 .orderCode(order.getOrderCode())
@@ -492,6 +500,8 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 .subtotal(order.getSubtotal())
                 .shippingFee(order.getShippingFee())
                 .discountAmount(order.getDiscountAmount())
+                .productVoucherDiscountAmount(sumVoucherDiscount(voucherResponses, VoucherSlot.product))
+                .shippingVoucherDiscountAmount(sumVoucherDiscount(voucherResponses, VoucherSlot.shipping))
                 .totalAmount(order.getTotalAmount())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
@@ -507,10 +517,56 @@ public class StaffOrderServiceImpl implements StaffOrderService {
                 .shippingAddress(order.getShippingAddress())
                 .voucherId(voucher == null ? null : voucher.getId())
                 .voucherCode(voucher == null ? null : voucher.getCode())
+                .vouchers(voucherResponses)
                 .items(orderItems.stream().map(this::toOrderItemResponse).toList())
                 .payment(toPaymentSummaryResponse(representativePayment))
                 .timeline(histories.stream().map(this::toTimelineResponse).toList())
                 .build();
+    }
+
+    private List<OrderVoucherResponse> voucherResponses(Order order) {
+        List<OrderVoucher> snapshots = orderVoucherSnapshotService.findSnapshots(order.getId());
+        if (!snapshots.isEmpty()) {
+            return snapshots.stream()
+                    .map(this::toOrderVoucherResponse)
+                    .toList();
+        }
+
+        Voucher voucher = order.getVoucher();
+        if (voucher == null || order.getDiscountAmount() == null || order.getDiscountAmount().signum() <= 0) {
+            return List.of();
+        }
+
+        return List.of(OrderVoucherResponse.builder()
+                .voucherId(voucher.getId())
+                .voucherCode(voucher.getCode())
+                .discountType(voucher.getDiscountType())
+                .slot(legacySlotOf(voucher.getDiscountType()))
+                .discountAmount(order.getDiscountAmount())
+                .build());
+    }
+
+    private OrderVoucherResponse toOrderVoucherResponse(OrderVoucher orderVoucher) {
+        Voucher voucher = orderVoucher.getVoucher();
+        return OrderVoucherResponse.builder()
+                .voucherId(voucher == null ? null : voucher.getId())
+                .voucherCode(orderVoucher.getVoucherCode())
+                .discountType(orderVoucher.getDiscountType())
+                .slot(orderVoucher.getVoucherSlot())
+                .discountAmount(orderVoucher.getDiscountAmount())
+                .build();
+    }
+
+    private BigDecimal sumVoucherDiscount(List<OrderVoucherResponse> vouchers, VoucherSlot slot) {
+        return vouchers.stream()
+                .filter(voucher -> voucher.slot() == slot)
+                .map(OrderVoucherResponse::discountAmount)
+                .filter(amount -> amount != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private VoucherSlot legacySlotOf(DiscountType discountType) {
+        return discountType == DiscountType.shipping_fixed_amount ? VoucherSlot.shipping : VoucherSlot.product;
     }
 
     private StaffOrderDetailResponse toDetailResponse(Order order) {

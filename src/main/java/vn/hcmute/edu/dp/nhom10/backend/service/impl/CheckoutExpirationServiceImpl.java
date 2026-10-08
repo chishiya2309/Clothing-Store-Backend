@@ -54,7 +54,7 @@ public class CheckoutExpirationServiceImpl implements CheckoutExpirationService 
             }
             expireInventoryReservations(checkoutSession.getId());
             flashSaleReservationService.expireQuota(checkoutSession.getId());
-            expireVoucherReservation(checkoutSession.getId());
+            expireVoucherReservations(checkoutSession.getId());
             expirePaymentAttempts(checkoutSession.getId());
 
             checkoutSession.setStatus(CheckoutSessionStatus.expired);
@@ -83,13 +83,16 @@ public class CheckoutExpirationServiceImpl implements CheckoutExpirationService 
         }
     }
 
-    private void expireVoucherReservation(Long checkoutSessionId) {
-        voucherReservationRepository.findByCheckoutSessionIdForUpdate(checkoutSessionId)
+    private void expireVoucherReservations(Long checkoutSessionId) {
+        List<VoucherReservation> reservations =
+                voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(checkoutSessionId);
+        List<VoucherReservation> changedReservations = reservations.stream()
                 .filter(reservation -> reservation.getStatus() == ReservationStatus.active)
-                .ifPresent(reservation -> {
-                    reservation.setStatus(ReservationStatus.expired);
-                    voucherReservationRepository.save(reservation);
-                });
+                .peek(reservation -> reservation.setStatus(ReservationStatus.expired))
+                .toList();
+        if (!changedReservations.isEmpty()) {
+            voucherReservationRepository.saveAll(changedReservations);
+        }
     }
 
     private void expirePaymentAttempts(Long checkoutSessionId) {

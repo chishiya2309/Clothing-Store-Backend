@@ -97,6 +97,9 @@ class StaffOrderServiceImplTest {
     private OrderVoucherAdjustmentService orderVoucherAdjustmentService;
 
     @Mock
+    private OrderVoucherSnapshotService orderVoucherSnapshotService;
+
+    @Mock
     private LoyaltyPointService loyaltyPointService;
 
     @Mock

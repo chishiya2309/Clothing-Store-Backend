@@ -2,6 +2,7 @@ package vn.hcmute.edu.dp.nhom10.backend.dto.response;
 
 import lombok.Builder;
 import vn.hcmute.edu.dp.nhom10.backend.enums.DiscountType;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,6 +13,7 @@ public record AppliedVoucherResponse(
         Long voucherId,
         String code,
         DiscountType discountType,
+        VoucherSlot slot,
         BigDecimal subtotal,
         BigDecimal shippingFee,
         BigDecimal discountAmount,

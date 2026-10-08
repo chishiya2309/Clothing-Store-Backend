@@ -57,17 +57,17 @@ class CheckoutFailureTransactionServiceTest {
 
         checkoutFailureTransactionService.failAndReleaseReservedCheckout("CHK-1");
 
-        verify(voucherService).releaseVoucherReservation("CHK-1");
+        verify(voucherService).releaseVoucherReservations("CHK-1");
     }
 
     @Test
-    void failAndReleaseReservedCheckout_withoutVoucher_doesNotReleaseVoucher() {
+    void failAndReleaseReservedCheckout_withoutVoucher_releasesVoucherReservations() {
         CheckoutSession checkoutSession = checkout(CheckoutSessionStatus.reserved, null);
         mockCheckout(checkoutSession);
 
         checkoutFailureTransactionService.failAndReleaseReservedCheckout("CHK-1");
 
-        verify(voucherService, never()).releaseVoucherReservation(anyString());
+        verify(voucherService).releaseVoucherReservations("CHK-1");
     }
 
     @Test
@@ -78,7 +78,7 @@ class CheckoutFailureTransactionServiceTest {
         checkoutFailureTransactionService.failAndReleaseReservedCheckout("CHK-1");
 
         verify(inventoryReservationService, never()).releaseStockReservation(anyString());
-        verify(voucherService, never()).releaseVoucherReservation(anyString());
+        verify(voucherService, never()).releaseVoucherReservations(anyString());
         verify(checkoutSessionRepository, never()).save(any());
         assertEquals(CheckoutSessionStatus.completed, checkoutSession.getStatus());
     }
@@ -102,7 +102,7 @@ class CheckoutFailureTransactionServiceTest {
         checkoutFailureTransactionService.failAndReleaseReservedCheckout("CHK-1");
 
         verify(inventoryReservationService, never()).releaseStockReservation(anyString());
-        verify(voucherService, never()).releaseVoucherReservation(anyString());
+        verify(voucherService, never()).releaseVoucherReservations(anyString());
     }
 
     @Test
@@ -114,7 +114,7 @@ class CheckoutFailureTransactionServiceTest {
 
         InOrder inOrder = inOrder(inventoryReservationService, voucherService);
         inOrder.verify(inventoryReservationService).releaseStockReservation("CHK-1");
-        inOrder.verify(voucherService).releaseVoucherReservation("CHK-1");
+        inOrder.verify(voucherService).releaseVoucherReservations("CHK-1");
     }
 
     @Test
