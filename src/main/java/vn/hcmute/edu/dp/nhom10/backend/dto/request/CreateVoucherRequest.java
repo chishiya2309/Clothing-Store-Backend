@@ -19,7 +19,7 @@ public record CreateVoucherRequest(
         @NotNull(message = "Discount type is required")
         DiscountType discountType,
 
-        @DecimalMin(value = "0.01", message = "Discount value must be greater than 0")
+        @DecimalMin(value = "0.00", message = "Discount value must not be negative")
         BigDecimal discountValue,
 
         @DecimalMin(value = "0.00", message = "Max discount amount must not be negative")
