@@ -8,15 +8,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.AddressSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutItemSnapshot;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ReservedCheckoutResult;
+import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.VoucherQuote;
 import vn.hcmute.edu.dp.nhom10.backend.dto.request.ConfirmCheckoutRequestDTO;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSession;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CheckoutSessionItem;
+import vn.hcmute.edu.dp.nhom10.backend.entity.MembershipTier;
 import vn.hcmute.edu.dp.nhom10.backend.entity.ProductVariant;
 import vn.hcmute.edu.dp.nhom10.backend.entity.User;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Voucher;
@@ -29,6 +32,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.UserRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
+import vn.hcmute.edu.dp.nhom10.backend.service.impl.CheckoutPricingServiceImpl;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -40,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -56,6 +61,9 @@ class CheckoutServiceFacadeTest {
     @Mock
     private CheckoutDataService checkoutDataService;
 
+    @Spy
+    private CheckoutPricingServiceImpl checkoutPricingService = new CheckoutPricingServiceImpl();
+
     @Mock
     private InventoryReservationService inventoryReservationService;
 
@@ -64,6 +72,9 @@ class CheckoutServiceFacadeTest {
 
     @Mock
     private VoucherReservationService voucherService;
+
+    @Mock
+    private VoucherQuoteService voucherQuoteService;
 
     @Mock
     private CheckoutSessionRepository checkoutSessionRepository;
@@ -96,6 +107,8 @@ class CheckoutServiceFacadeTest {
             }
             return checkoutSession;
         });
+        lenient().when(voucherQuoteService.quote(anyString(), anyLong(), any(), any()))
+                .thenReturn(new VoucherQuote(100L, "SAVE10", null, BigDecimal.ZERO, BigDecimal.ZERO, "Voucher applied successfully"));
     }
 
     @Test
@@ -108,7 +121,7 @@ class CheckoutServiceFacadeTest {
         assertEquals(1L, result.checkoutSessionId());
         assertEquals(PaymentMethod.cod, result.paymentMethod());
         assertEquals(money("200000.00"), result.subtotal());
-        assertEquals(BigDecimal.ZERO, result.discountAmount());
+        assertEquals(money("0.00"), result.discountAmount());
         assertEquals(money("220000.00"), result.totalAmount());
     }
 
@@ -263,6 +276,25 @@ class CheckoutServiceFacadeTest {
     }
 
     @Test
+    void prepareCheckout_appliesMembershipDiscountBeforeVoucher() {
+        mockSuccessfulBaseFlow(User.builder()
+                .id(10L)
+                .membershipTier(MembershipTier.builder()
+                        .discountPercent(new BigDecimal("10.00"))
+                        .build())
+                .build());
+        when(voucherService.reserveVoucher(eq(1L), eq("SAVE10"), eq(money("200000.00")), any(OffsetDateTime.class)))
+                .thenReturn(money("30000.00"));
+        when(voucherReservationRepository.findByCheckoutSessionId(1L))
+                .thenReturn(Optional.of(VoucherReservation.builder().voucher(Voucher.builder().id(100L).build()).build()));
+
+        ReservedCheckoutResult result = checkoutService.prepareCheckout(request("SAVE10"), 10L);
+
+        assertEquals(money("50000.00"), result.discountAmount());
+        assertEquals(money("170000.00"), result.totalAmount());
+    }
+
+    @Test
     void prepareCheckout_mapsAddressSnapshot() {
         mockSuccessfulBaseFlow();
 
@@ -332,7 +364,7 @@ class CheckoutServiceFacadeTest {
 
         ReservedCheckoutResult result = checkoutService.prepareCheckout(request(null), 10L);
 
-        assertEquals(BigDecimal.ZERO, result.discountAmount());
+        assertEquals(money("0.00"), result.discountAmount());
     }
 
     @Test
@@ -350,8 +382,12 @@ class CheckoutServiceFacadeTest {
     }
 
     private void mockSuccessfulBaseFlow() {
+        mockSuccessfulBaseFlow(User.builder().id(10L).build());
+    }
+
+    private void mockSuccessfulBaseFlow(User user) {
         when(checkoutDataService.getCheckoutData(10L, 1L)).thenReturn(checkoutData());
-        when(userRepository.findById(10L)).thenReturn(Optional.of(User.builder().id(10L).build()));
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         lenient().when(entityManager.getReference(ProductVariant.class, 100L))
                 .thenReturn(ProductVariant.builder().id(100L).build());
     }

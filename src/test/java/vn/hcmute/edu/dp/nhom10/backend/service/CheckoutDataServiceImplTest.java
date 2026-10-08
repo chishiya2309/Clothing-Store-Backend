@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.junit.jupiter.MockitoExtension;
 import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.CheckoutData;
-import vn.hcmute.edu.dp.nhom10.backend.dto.checkout.ResolvedProductPrice;
+import vn.hcmute.edu.dp.nhom10.backend.dto.pricing.ProductPricingResult;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Address;
 import vn.hcmute.edu.dp.nhom10.backend.entity.CartItem;
 import vn.hcmute.edu.dp.nhom10.backend.entity.Product;
@@ -42,21 +42,39 @@ class CheckoutDataServiceImplTest {
     private CartItemRepository cartItemRepository;
 
     @Mock
-    private FlashSalePricingService flashSalePricingService;
+    private ProductPricingService productPricingService;
+
+    @Mock
+    private ShippingFeeService shippingFeeService;
 
     @InjectMocks
     private CheckoutDataServiceImpl checkoutDataService;
 
     @BeforeEach
     void setUpPricing() {
-        lenient().when(flashSalePricingService.resolve(any(Product.class), any()))
+        lenient().when(productPricingService.resolve(any(Product.class), any(ProductVariant.class), any()))
                 .thenAnswer(invocation -> {
                     Product product = invocation.getArgument(0);
-                    if (product.getSalePrice() != null) {
-                        return new ResolvedProductPrice(product.getSalePrice(), PriceSource.PRODUCT_SALE, null);
-                    }
-                    return new ResolvedProductPrice(product.getBasePrice(), PriceSource.REGULAR, null);
+                    ProductVariant variant = invocation.getArgument(1);
+                    BigDecimal productPrice = product.getSalePrice() != null
+                            ? product.getSalePrice()
+                            : product.getBasePrice();
+                    BigDecimal additionalPrice = variant.getAdditionalPrice() == null
+                            ? BigDecimal.ZERO
+                            : variant.getAdditionalPrice();
+                    PriceSource source = product.getSalePrice() != null
+                            ? PriceSource.PRODUCT_SALE
+                            : PriceSource.REGULAR;
+                    return new ProductPricingResult(
+                            productPrice,
+                            additionalPrice,
+                            productPrice.add(additionalPrice),
+                            source,
+                            null
+                    );
                 });
+        lenient().when(shippingFeeService.calculate(any(Address.class)))
+                .thenReturn(new BigDecimal("25000.00"));
     }
 
     @Test
@@ -172,7 +190,7 @@ class CheckoutDataServiceImplTest {
     }
 
     @Test
-    void getCheckoutData_subtotalBelowFreeShippingThreshold_usesStandardShippingFee() {
+    void getCheckoutData_usesShippingFeeService() {
         Product product = product(1L, "T-Shirt", "470000.00", null, true);
         ProductVariant variant = variant(2L, "0.00", true);
         CartItem cartItem = cartItem(3L, product, variant, 1);
@@ -181,33 +199,8 @@ class CheckoutDataServiceImplTest {
         CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
 
         assertEquals(new BigDecimal("470000.00"), result.subtotal());
-        assertEquals(new BigDecimal("30000.00"), result.shippingFee());
-    }
-
-    @Test
-    void getCheckoutData_subtotalEqualFreeShippingThreshold_usesStandardShippingFee() {
-        Product product = product(1L, "T-Shirt", "500000.00", null, true);
-        ProductVariant variant = variant(2L, "0.00", true);
-        CartItem cartItem = cartItem(3L, product, variant, 1);
-        mockCheckoutCart(List.of(cartItem));
-
-        CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
-
-        assertEquals(new BigDecimal("500000.00"), result.subtotal());
-        assertEquals(new BigDecimal("30000.00"), result.shippingFee());
-    }
-
-    @Test
-    void getCheckoutData_subtotalGreaterThanFreeShippingThreshold_usesFreeShipping() {
-        Product product = product(1L, "T-Shirt", "500001.00", null, true);
-        ProductVariant variant = variant(2L, "0.00", true);
-        CartItem cartItem = cartItem(3L, product, variant, 1);
-        mockCheckoutCart(List.of(cartItem));
-
-        CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
-
-        assertEquals(new BigDecimal("500001.00"), result.subtotal());
-        assertEquals(BigDecimal.ZERO, result.shippingFee());
+        assertEquals(new BigDecimal("25000.00"), result.shippingFee());
+        verify(shippingFeeService).calculate(any(Address.class));
     }
 
     @Test
@@ -241,13 +234,19 @@ class CheckoutDataServiceImplTest {
     }
 
     @Test
-    void getCheckoutData_flashSale_snapshotsPriceSourceItemAndVariantPrice() {
+    void getCheckoutData_pricingService_snapshotsPriceSourceItemAndVariantPrice() {
         Product product = product(1L, "T-Shirt", "100000.00", "80000.00", true);
         ProductVariant variant = variant(2L, "5000.00", true);
         CartItem cartItem = cartItem(3L, product, variant, 2);
         mockCheckoutCart(List.of(cartItem));
-        when(flashSalePricingService.resolve(eq(product), any()))
-                .thenReturn(new ResolvedProductPrice(new BigDecimal("60000.00"), PriceSource.FLASH_SALE, 9L));
+        when(productPricingService.resolve(eq(product), eq(variant), any()))
+                .thenReturn(new ProductPricingResult(
+                        new BigDecimal("60000.00"),
+                        new BigDecimal("5000.00"),
+                        new BigDecimal("65000.00"),
+                        PriceSource.FLASH_SALE,
+                        9L
+                ));
 
         CheckoutData result = checkoutDataService.getCheckoutData(10L, 1L);
 
