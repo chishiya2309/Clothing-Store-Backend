@@ -82,6 +82,9 @@ class VnPayIpnTransactionServiceTest {
     private OrderStatusHistoryService orderStatusHistoryService;
 
     @Mock
+    private OrderVoucherSnapshotService orderVoucherSnapshotService;
+
+    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks

@@ -39,6 +39,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.ProductVariantRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.OrderStatusHistoryService;
+import vn.hcmute.edu.dp.nhom10.backend.service.OrderVoucherSnapshotService;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
@@ -70,6 +71,7 @@ public class VnPayIpnTransactionService {
     private final CartItemRepository cartItemRepository;
     private final VnPayAmountMatcher amountMatcher;
     private final OrderStatusHistoryService orderStatusHistoryService;
+    private final OrderVoucherSnapshotService orderVoucherSnapshotService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -194,6 +196,7 @@ public class VnPayIpnTransactionService {
                 .paymentData(sanitizedPayload(callbackData))
                 .paidAt(now)
                 .build());
+        orderVoucherSnapshotService.saveSnapshots(savedOrder, voucherReservations);
 
         consumeInventoryReservations(inventoryReservations, variantsById);
         consumeVoucherReservations(voucherReservations, lockedVouchers);

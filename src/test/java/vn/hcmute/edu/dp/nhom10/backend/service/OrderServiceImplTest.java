@@ -30,6 +30,7 @@ import vn.hcmute.edu.dp.nhom10.backend.repository.CheckoutSessionRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderItemRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.OrderRepository;
 import vn.hcmute.edu.dp.nhom10.backend.repository.PaymentRepository;
+import vn.hcmute.edu.dp.nhom10.backend.repository.VoucherReservationRepository;
 import vn.hcmute.edu.dp.nhom10.backend.service.impl.OrderServiceImpl;
 
 import java.math.BigDecimal;
@@ -77,6 +78,12 @@ class OrderServiceImplTest {
 
     @Mock
     private VoucherReservationService voucherService;
+
+    @Mock
+    private VoucherReservationRepository voucherReservationRepository;
+
+    @Mock
+    private OrderVoucherSnapshotService orderVoucherSnapshotService;
 
     @Mock
     private OrderStatusHistoryService orderStatusHistoryService;

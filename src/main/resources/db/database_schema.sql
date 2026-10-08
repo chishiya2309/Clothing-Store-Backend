@@ -250,7 +250,7 @@ CREATE TABLE vouchers (
     id                  BIGSERIAL       PRIMARY KEY,
     code                VARCHAR(50)     NOT NULL UNIQUE,
     discount_type       discount_type   NOT NULL,
-    discount_value      NUMERIC(12,2)   NOT NULL CHECK (discount_value > 0),
+    discount_value      NUMERIC(12,2)   NOT NULL,
     max_discount_amount NUMERIC(12,2),                           -- Giới hạn giảm tối đa (cho loại %)
     min_order_amount    NUMERIC(12,2)   NOT NULL DEFAULT 0,      -- QĐ11: điều kiện đơn tối thiểu
     start_date          TIMESTAMPTZ     NOT NULL,
@@ -261,7 +261,11 @@ CREATE TABLE vouchers (
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 
-    CHECK (end_date > start_date)
+    CHECK (end_date > start_date),
+    CONSTRAINT chk_vouchers_discount_value CHECK (
+        (discount_type = 'cheapest_item_free' AND discount_value >= 0)
+        OR (discount_type <> 'cheapest_item_free' AND discount_value > 0)
+    )
 );
 
 COMMENT ON TABLE vouchers IS 'Mã giảm giá (QĐ7). State kiểm tra hiệu lực; Strategy tính giảm theo discount_type.';
@@ -297,6 +301,19 @@ CREATE TABLE orders (
 );
 
 COMMENT ON TABLE orders IS 'Đơn hàng (QĐ8). Ship: đơn < 500K → 30K, đơn >= 500K → miễn phí (app logic).';
+
+CREATE TABLE order_vouchers (
+    id                  BIGSERIAL       PRIMARY KEY,
+    order_id            BIGINT          NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    voucher_id          BIGINT          REFERENCES vouchers(id) ON DELETE SET NULL,
+    voucher_code        VARCHAR(50)     NOT NULL,
+    discount_type       discount_type   NOT NULL,
+    voucher_slot        voucher_slot    NOT NULL,
+    discount_amount     NUMERIC(12,2)   NOT NULL DEFAULT 0 CHECK (discount_amount >= 0),
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE order_vouchers IS 'Snapshot cac voucher da ap dung vao don hang, giu dung lich su khi voucher thay doi sau nay.';
 
 -- ============================================================
 -- 12. ORDER STATUS HISTORIES
