@@ -168,15 +168,14 @@ public class MomoIpnTransactionService {
                 .findAllByCheckoutSessionIdWithVariant(checkoutSession.getId());
         List<InventoryReservation> inventoryReservations = inventoryReservationRepository
                 .findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
-        VoucherReservation voucherReservation = voucherReservationRepository
-                .findByCheckoutSessionIdForUpdate(checkoutSession.getId())
-                .orElse(null);
+        List<VoucherReservation> voucherReservations = voucherReservationRepository
+                .findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
 
         String refundReason = refundReasonIfCannotFulfill(
                 checkoutSession,
                 checkoutItems,
                 inventoryReservations,
-                voucherReservation,
+                voucherReservations,
                 now
         );
         if (refundReason != null) {
@@ -185,7 +184,7 @@ public class MomoIpnTransactionService {
         }
 
         Map<Long, ProductVariant> variantsById = lockVariants(inventoryReservations);
-        Voucher lockedVoucher = lockVoucherIfNeeded(checkoutSession, voucherReservation);
+        Map<Long, Voucher> lockedVouchers = lockVouchers(voucherReservations);
 
         Order savedOrder = orderRepository.save(createOrder(checkoutSession));
         orderStatusHistoryService.recordInitialStatus(savedOrder);
@@ -203,7 +202,7 @@ public class MomoIpnTransactionService {
                 .build());
 
         consumeInventoryReservations(inventoryReservations, variantsById);
-        consumeVoucherReservation(voucherReservation, lockedVoucher);
+        consumeVoucherReservations(voucherReservations, lockedVouchers);
         cartItemRepository.deletePurchasedItems(
                 checkoutSession.getUser().getId(),
                 productVariantIds(checkoutItems)
@@ -228,7 +227,7 @@ public class MomoIpnTransactionService {
             CheckoutSession checkoutSession,
             List<CheckoutSessionItem> checkoutItems,
             List<InventoryReservation> inventoryReservations,
-            VoucherReservation voucherReservation,
+            List<VoucherReservation> voucherReservations,
             OffsetDateTime now
     ) {
         if (checkoutSession.getStatus() != CheckoutSessionStatus.reserved) {
@@ -251,18 +250,68 @@ public class MomoIpnTransactionService {
                 return "Inventory reservation expired";
             }
         }
-        if (checkoutSession.getVoucher() != null) {
-            if (voucherReservation == null) {
-                return "Voucher reservation is missing";
-            }
-            if (voucherReservation.getStatus() != ReservationStatus.active) {
-                return "Voucher reservation is " + voucherReservation.getStatus();
-            }
-            if (voucherReservation.getExpiresAt() == null || !voucherReservation.getExpiresAt().isAfter(now)) {
-                return "Voucher reservation expired";
+        if (checkoutSession.getVoucher() != null && (voucherReservations == null || voucherReservations.isEmpty())) {
+            return "Voucher reservation is missing";
+        }
+        if (voucherReservations != null) {
+            for (VoucherReservation voucherReservation : voucherReservations) {
+                if (voucherReservation.getStatus() != ReservationStatus.active) {
+                    return "Voucher reservation is " + voucherReservation.getStatus();
+                }
+                if (voucherReservation.getExpiresAt() == null || !voucherReservation.getExpiresAt().isAfter(now)) {
+                    return "Voucher reservation expired";
+                }
+                if (voucherReservation.getVoucher() == null || voucherReservation.getVoucher().getId() == null) {
+                    return "Voucher reservation is missing voucher";
+                }
             }
         }
         return null;
+    }
+
+    private Map<Long, Voucher> lockVouchers(List<VoucherReservation> voucherReservations) {
+        if (voucherReservations == null || voucherReservations.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> voucherIds = voucherReservations.stream()
+                .map(VoucherReservation::getVoucher)
+                .filter(Objects::nonNull)
+                .map(Voucher::getId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+        Map<Long, Voucher> vouchersById = new LinkedHashMap<>();
+        for (Long voucherId : voucherIds) {
+            Voucher voucher = voucherRepository.findByIdForUpdate(voucherId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Voucher not found with ID: " + voucherId));
+            vouchersById.put(voucherId, voucher);
+        }
+        return vouchersById;
+    }
+
+    private void consumeVoucherReservations(
+            List<VoucherReservation> voucherReservations,
+            Map<Long, Voucher> lockedVouchers
+    ) {
+        if (voucherReservations == null || voucherReservations.isEmpty()) {
+            return;
+        }
+        for (VoucherReservation voucherReservation : voucherReservations) {
+            Voucher lockedVoucher = lockedVouchers.get(voucherReservation.getVoucher().getId());
+            if (lockedVoucher == null) {
+                throw new ResourceNotFoundException("Voucher not found for reservation: " + voucherReservation.getId());
+            }
+            Integer timesUsed = lockedVoucher.getTimesUsed();
+            Integer usageLimit = lockedVoucher.getUsageLimit();
+            if (timesUsed == null || usageLimit == null || timesUsed >= usageLimit) {
+                throw new InvalidDataException("Voucher usage limit has been reached");
+            }
+            lockedVoucher.setTimesUsed(timesUsed + 1);
+            voucherReservation.setStatus(ReservationStatus.consumed);
+        }
+        voucherRepository.saveAll(lockedVouchers.values());
+        voucherReservationRepository.saveAll(voucherReservations);
     }
 
     private Map<Long, ProductVariant> lockVariants(List<InventoryReservation> inventoryReservations) {
@@ -280,15 +329,6 @@ public class MomoIpnTransactionService {
             }
         }
         return variantsById;
-    }
-
-    private Voucher lockVoucherIfNeeded(CheckoutSession checkoutSession, VoucherReservation voucherReservation) {
-        if (checkoutSession.getVoucher() == null) {
-            return null;
-        }
-        Long voucherId = voucherReservation.getVoucher().getId();
-        return voucherRepository.findByIdForUpdate(voucherId)
-                .orElseThrow(() -> new ResourceNotFoundException("Voucher not found with ID: " + voucherId));
     }
 
     private void consumeInventoryReservations(
@@ -309,21 +349,6 @@ public class MomoIpnTransactionService {
         inventoryReservationRepository.saveAll(inventoryReservations);
     }
 
-    private void consumeVoucherReservation(VoucherReservation voucherReservation, Voucher lockedVoucher) {
-        if (voucherReservation == null || lockedVoucher == null) {
-            return;
-        }
-        Integer timesUsed = lockedVoucher.getTimesUsed();
-        Integer usageLimit = lockedVoucher.getUsageLimit();
-        if (timesUsed == null || usageLimit == null || timesUsed >= usageLimit) {
-            throw new InvalidDataException("Voucher usage limit has been reached");
-        }
-        lockedVoucher.setTimesUsed(timesUsed + 1);
-        voucherReservation.setStatus(ReservationStatus.consumed);
-        voucherRepository.save(lockedVoucher);
-        voucherReservationRepository.save(voucherReservation);
-    }
-
     private void releaseReservations(CheckoutSession checkoutSession) {
         List<InventoryReservation> inventoryReservations =
                 inventoryReservationRepository.findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
@@ -335,12 +360,15 @@ public class MomoIpnTransactionService {
             inventoryReservationRepository.saveAll(changedInventoryReservations);
         }
 
-        voucherReservationRepository.findByCheckoutSessionIdForUpdate(checkoutSession.getId())
+        List<VoucherReservation> voucherReservations =
+                voucherReservationRepository.findAllByCheckoutSessionIdForUpdate(checkoutSession.getId());
+        List<VoucherReservation> changedVoucherReservations = voucherReservations.stream()
                 .filter(reservation -> reservation.getStatus() == ReservationStatus.active)
-                .ifPresent(reservation -> {
-                    reservation.setStatus(ReservationStatus.released);
-                    voucherReservationRepository.save(reservation);
-                });
+                .peek(reservation -> reservation.setStatus(ReservationStatus.released))
+                .toList();
+        if (!changedVoucherReservations.isEmpty()) {
+            voucherReservationRepository.saveAll(changedVoucherReservations);
+        }
     }
 
     private void markRequiresRefund(

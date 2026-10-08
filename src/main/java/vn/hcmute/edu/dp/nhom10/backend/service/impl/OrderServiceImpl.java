@@ -109,9 +109,7 @@ public class OrderServiceImpl implements OrderService {
         paymentRepository.save(payment);
 
         inventoryReservationService.consumeStockReservation(normalizedCheckoutCode);
-        if (checkoutSession.getVoucher() != null) {
-            voucherService.consumeVoucherReservation(normalizedCheckoutCode);
-        }
+        voucherService.consumeVoucherReservations(normalizedCheckoutCode);
 
         cartItemRepository.deletePurchasedItems(userId, getProductVariantIds(checkoutItems));
 
