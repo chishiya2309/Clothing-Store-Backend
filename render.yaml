@@ -28,6 +28,10 @@ services:
         sync: false
       - key: BREVO_API_KEY
         sync: false
+      - key: OPENROUTESERVICE_API_KEY
+        sync: false
+      - key: OPENROUTESERVICE_BASE_URL
+        value: https://api.heigit.org
       - key: AWS_ACCESS_KEY
         sync: false
       - key: AWS_SECRET_KEY

@@ -65,7 +65,7 @@ public class ShippingFeeServiceImpl implements ShippingFeeService {
         BigDecimal extraKm = distanceKm.subtract(baseDistanceKm)
                 .setScale(0, RoundingMode.CEILING);
         BigDecimal calculatedFee = baseFee.add(extraKm.multiply(shippingProperties.getExtraFeePerKm()));
-        return money(calculatedFee);
+        return money(calculatedFee.min(shippingProperties.getMaxFee()));
     }
 
     private String buildFullAddress(Address address) {

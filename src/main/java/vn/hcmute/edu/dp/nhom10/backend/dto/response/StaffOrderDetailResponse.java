@@ -23,6 +23,8 @@ public class StaffOrderDetailResponse implements Serializable {
     private BigDecimal subtotal;
     private BigDecimal shippingFee;
     private BigDecimal discountAmount;
+    private BigDecimal productVoucherDiscountAmount;
+    private BigDecimal shippingVoucherDiscountAmount;
     private BigDecimal totalAmount;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -41,6 +43,7 @@ public class StaffOrderDetailResponse implements Serializable {
 
     private Long voucherId;
     private String voucherCode;
+    private List<OrderVoucherResponse> vouchers;
 
     private List<StaffOrderItemResponse> items;
     private StaffPaymentSummaryResponse payment;

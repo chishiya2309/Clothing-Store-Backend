@@ -7,13 +7,14 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 import vn.hcmute.edu.dp.nhom10.backend.enums.ReservationStatus;
+import vn.hcmute.edu.dp.nhom10.backend.enums.VoucherSlot;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "voucher_reservations",
-       uniqueConstraints = @UniqueConstraint(columnNames = "checkout_session_id"))
+       uniqueConstraints = @UniqueConstraint(columnNames = {"checkout_session_id", "voucher_slot"}))
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
@@ -33,6 +34,12 @@ public class VoucherReservation {
 
     @Column(name = "discount_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "voucher_slot", nullable = false, columnDefinition = "voucher_slot")
+    @Builder.Default
+    private VoucherSlot voucherSlot = VoucherSlot.product;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)

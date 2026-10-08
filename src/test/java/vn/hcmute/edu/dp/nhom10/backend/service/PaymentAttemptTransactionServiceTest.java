@@ -309,7 +309,7 @@ class PaymentAttemptTransactionServiceTest {
         assertNotNull(paymentAttempt.getFailedAt());
         assertEquals(CheckoutSessionStatus.failed, checkoutSession.getStatus());
         verify(inventoryReservationService).releaseStockReservation("CHK-1");
-        verify(voucherService).releaseVoucherReservation("CHK-1");
+        verify(voucherService).releaseVoucherReservations("CHK-1");
     }
 
     @Test
@@ -324,11 +324,11 @@ class PaymentAttemptTransactionServiceTest {
 
         InOrder inOrder = inOrder(inventoryReservationService, voucherService);
         inOrder.verify(inventoryReservationService).releaseStockReservation("CHK-1");
-        inOrder.verify(voucherService).releaseVoucherReservation("CHK-1");
+        inOrder.verify(voucherService).releaseVoucherReservations("CHK-1");
     }
 
     @Test
-    void failInitialization_withoutVoucher_doesNotReleaseVoucher() {
+    void failInitialization_withoutVoucher_releasesVoucherReservations() {
         CheckoutSession checkoutSession = checkout(PaymentMethod.vnpay, CheckoutSessionStatus.reserved, 10L,
                 money("120000.00"), null, expiresAt);
         PaymentAttempt paymentAttempt = paymentAttempt(checkoutSession, PaymentAttemptStatus.pending, null, expiresAt);
@@ -336,7 +336,7 @@ class PaymentAttemptTransactionServiceTest {
 
         paymentAttemptTransactionService.failInitialization("PAY-1", "Gateway unavailable");
 
-        verify(voucherService, never()).releaseVoucherReservation(anyString());
+        verify(voucherService).releaseVoucherReservations("CHK-1");
     }
 
     @Test

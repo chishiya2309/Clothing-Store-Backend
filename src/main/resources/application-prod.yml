@@ -88,6 +88,19 @@ payment:
     connect-timeout-seconds: ${MOMO_CONNECT_TIMEOUT_SECONDS:10}
     read-timeout-seconds: ${MOMO_READ_TIMEOUT_SECONDS:30}
 
+openrouteservice:
+  api-key: ${OPENROUTESERVICE_API_KEY:}
+  base-url: ${OPENROUTESERVICE_BASE_URL:https://api.heigit.org}
+
+shipping:
+  shop-latitude: ${SHIPPING_SHOP_LATITUDE:10.762622}
+  shop-longitude: ${SHIPPING_SHOP_LONGITUDE:106.660172}
+  base-fee: ${SHIPPING_BASE_FEE:25000.00}
+  base-distance-km: ${SHIPPING_BASE_DISTANCE_KM:10.00}
+  max-distance-km: ${SHIPPING_MAX_DISTANCE_KM:30.00}
+  extra-fee-per-km: ${SHIPPING_EXTRA_FEE_PER_KM:3000.00}
+  max-fee: ${SHIPPING_MAX_FEE:50000.00}
+
 aws:
   s3:
     access-key: ${AWS_ACCESS_KEY:}

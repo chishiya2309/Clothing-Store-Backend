@@ -126,9 +126,7 @@ public class PaymentAttemptTransactionService {
         }
 
         inventoryReservationService.releaseStockReservation(checkoutSession.getCheckoutCode());
-        if (checkoutSession.getVoucher() != null) {
-            voucherService.releaseVoucherReservation(checkoutSession.getCheckoutCode());
-        }
+        voucherService.releaseVoucherReservations(checkoutSession.getCheckoutCode());
         if (checkoutSession.getStatus() != CheckoutSessionStatus.failed) {
             checkoutSession.setStatus(CheckoutSessionStatus.failed);
             checkoutSessionRepository.save(checkoutSession);

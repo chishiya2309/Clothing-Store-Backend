@@ -27,9 +27,7 @@ public class CheckoutFailureTransactionService {
         }
 
         inventoryReservationService.releaseStockReservation(normalizedCheckoutCode);
-        if (checkoutSession.getVoucher() != null) {
-            voucherService.releaseVoucherReservation(normalizedCheckoutCode);
-        }
+        voucherService.releaseVoucherReservations(normalizedCheckoutCode);
         if (checkoutSession.getStatus() != CheckoutSessionStatus.failed) {
             checkoutSession.setStatus(CheckoutSessionStatus.failed);
             checkoutSessionRepository.save(checkoutSession);

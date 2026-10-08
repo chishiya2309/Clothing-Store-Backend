@@ -25,6 +25,8 @@ public class OrderDetailResponse implements Serializable {
     private BigDecimal subtotal;
     private BigDecimal shippingFee;
     private BigDecimal discountAmount;
+    private BigDecimal productVoucherDiscountAmount;
+    private BigDecimal shippingVoucherDiscountAmount;
     private BigDecimal totalAmount;
     private OrderStatus status;
     private OffsetDateTime createdAt;
@@ -42,6 +44,7 @@ public class OrderDetailResponse implements Serializable {
 
     // Items
     private List<OrderDetailItemResponse> items;
+    private List<OrderVoucherResponse> vouchers;
 
     @Getter
     @Setter
