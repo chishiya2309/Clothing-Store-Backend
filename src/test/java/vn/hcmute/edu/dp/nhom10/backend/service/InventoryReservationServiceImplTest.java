@@ -52,6 +52,30 @@ class InventoryReservationServiceImplTest {
     private InventoryReservationServiceImpl inventoryReservationService;
 
     @Test
+    void wbR01_nullCheckoutSessionId_throwsBeforeRepositoryAccess() {
+        assertThrows(IllegalArgumentException.class,
+                () -> inventoryReservationService.reserveStock(null, List.of(item(10L, 1)), future()));
+
+        verifyNoInteractions(checkoutSessionRepository, inventoryReservationRepository, productVariantRepository);
+    }
+
+    @Test
+    void wbR02_nullItems_throwsBeforeRepositoryAccess() {
+        assertThrows(IllegalArgumentException.class,
+                () -> inventoryReservationService.reserveStock(1L, null, future()));
+
+        verifyNoInteractions(checkoutSessionRepository, inventoryReservationRepository, productVariantRepository);
+    }
+
+    @Test
+    void wbR04_nullExpiresAt_throwsBeforeRepositoryAccess() {
+        assertThrows(IllegalArgumentException.class,
+                () -> inventoryReservationService.reserveStock(1L, List.of(item(10L, 1)), null));
+
+        verifyNoInteractions(checkoutSessionRepository, inventoryReservationRepository, productVariantRepository);
+    }
+
+    @Test
     void reserveStock_oneVariant_success() {
         OffsetDateTime expiresAt = future();
         CheckoutSession session = checkoutSession(1L, "CHK-1");
