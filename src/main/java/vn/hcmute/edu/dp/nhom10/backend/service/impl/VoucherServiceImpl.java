@@ -47,7 +47,7 @@ public class VoucherServiceImpl implements VoucherService {
         Voucher voucher = Voucher.builder()
                 .code(code)
                 .discountType(request.discountType())
-                .discountValue(request.discountValue())
+                .discountValue(normalizeDiscountValue(request.discountType(), request.discountValue()))
                 .maxDiscountAmount(request.maxDiscountAmount())
                 .minOrderAmount(defaultZero(request.minOrderAmount()))
                 .startDate(request.startDate())
@@ -71,7 +71,7 @@ public class VoucherServiceImpl implements VoucherService {
         }
 
         voucher.setDiscountType(request.discountType());
-        voucher.setDiscountValue(request.discountValue());
+        voucher.setDiscountValue(normalizeDiscountValue(request.discountType(), request.discountValue()));
         voucher.setMaxDiscountAmount(request.maxDiscountAmount());
         voucher.setMinOrderAmount(defaultZero(request.minOrderAmount()));
         voucher.setStartDate(request.startDate());
@@ -153,6 +153,13 @@ public class VoucherServiceImpl implements VoucherService {
 
     private BigDecimal defaultZero(BigDecimal value) {
         return value != null ? value : BigDecimal.ZERO;
+    }
+
+    private BigDecimal normalizeDiscountValue(DiscountType discountType, BigDecimal discountValue) {
+        if (discountType == DiscountType.cheapest_item_free) {
+            return defaultZero(discountValue);
+        }
+        return discountValue;
     }
 
     private void validateVoucherData(DiscountType discountType, BigDecimal discountValue,

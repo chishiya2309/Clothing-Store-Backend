@@ -157,7 +157,7 @@ class VoucherServiceImplTest {
         CreateVoucherRequest request = new CreateVoucherRequest(
                 "CHEAPFREE",
                 DiscountType.cheapest_item_free,
-                BigDecimal.ONE,
+                null,
                 BigDecimal.valueOf(50000),
                 BigDecimal.ZERO,
                 OffsetDateTime.now().plusMinutes(1),
@@ -177,7 +177,7 @@ class VoucherServiceImplTest {
 
         assertEquals(3L, response.id());
         assertEquals(DiscountType.cheapest_item_free, response.discountType());
-        assertEquals(0, BigDecimal.ONE.compareTo(response.discountValue()));
+        assertEquals(0, BigDecimal.ZERO.compareTo(response.discountValue()));
         verify(voucherRepository).save(any(Voucher.class));
     }
 
