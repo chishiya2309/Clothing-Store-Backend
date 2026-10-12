@@ -168,25 +168,20 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         if (reservation.getStatus() == ReservationStatus.consumed) {
             return;
         }
-
         if (reservation.getStatus() == ReservationStatus.released || reservation.getStatus() == ReservationStatus.expired) {
             throw new InvalidDataException("Voucher reservation cannot be consumed because it is " + reservation.getStatus());
         }
         if (reservation.getStatus() != ReservationStatus.active) {
             throw new InvalidDataException("Voucher reservation status is invalid: " + reservation.getStatus());
         }
-
         OffsetDateTime now = now();
         if (reservation.getExpiresAt() == null || !reservation.getExpiresAt().isAfter(now)) {
             throw new InvalidDataException("Voucher reservation has expired");
         }
-
         Voucher voucher = lockVoucher(reservation);
         validateFiniteUsageLimitBeforeConsume(voucher);
-
         voucher.setTimesUsed(voucher.getTimesUsed() + 1);
         reservation.setStatus(ReservationStatus.consumed);
-
         voucherRepository.save(voucher);
         voucherReservationRepository.save(reservation);
     }
@@ -237,12 +232,7 @@ public class VoucherReservationServiceImpl implements VoucherReservationService 
         }
     }
 
-    private BigDecimal calculateDiscountAmount(
-            Voucher voucher,
-            BigDecimal subtotal,
-            BigDecimal shippingFee,
-            List<CheckoutItemSnapshot> items
-    ) {
+    private BigDecimal calculateDiscountAmount(Voucher voucher, BigDecimal subtotal, BigDecimal shippingFee, List<CheckoutItemSnapshot> items) {
         BigDecimal discountValue = voucher.getDiscountValue();
         if (discountValue == null || discountValue.signum() < 0) {
             throw new InvalidDataException("Voucher discount value is invalid: " + voucher.getId());
