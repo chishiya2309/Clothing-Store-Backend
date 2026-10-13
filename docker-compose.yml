@@ -20,6 +20,8 @@ services:
       AWS_SECRET_KEY: ${AWS_SECRET_KEY:-mock}
       AWS_REGION: ${AWS_REGION:-ap-southeast-1}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:8080}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
     networks:
       - default
 
