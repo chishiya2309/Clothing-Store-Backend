@@ -112,3 +112,6 @@ logging:
   level:
     root: WARN
     vn.hcmute.edu.dp.nhom10.backend: INFO
+    EMAIL-SERVICE: INFO
+    EMAIL-LISTENER: INFO
+    AUTHENTICATION-SERVICE: INFO

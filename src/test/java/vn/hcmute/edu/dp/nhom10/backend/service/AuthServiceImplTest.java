@@ -88,7 +88,7 @@ class AuthServiceImplTest {
         MembershipTier tier = new MembershipTier();
         tier.setId(1L);
 
-        when(userRepository.existsByEmail(request.email())).thenReturn(false);
+        when(userRepository.findByEmailIgnoreCase(request.email())).thenReturn(Optional.empty());
         when(membershipTierRepository.findById(1L)).thenReturn(Optional.of(tier));
         when(passwordEncoder.encode(request.password())).thenReturn("hashed_password");
 
@@ -108,12 +108,41 @@ class AuthServiceImplTest {
     }
 
     @Test
-    void register_duplicateEmail_throwsException() {
+    void register_duplicateVerifiedEmail_throwsException() {
         RegisterRequest request = new RegisterRequest("test@test.com", "Password123", "Test User");
-        when(userRepository.existsByEmail(request.email())).thenReturn(true);
+        User verifiedUser = User.builder()
+                .id(1L)
+                .email("test@test.com")
+                .emailVerified(true)
+                .build();
+        when(userRepository.findByEmailIgnoreCase(request.email())).thenReturn(Optional.of(verifiedUser));
 
         assertThrows(InvalidDataException.class, () -> authService.register(request));
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void register_duplicateUnverifiedEmail_updatesAndResendsVerification() {
+        RegisterRequest request = new RegisterRequest("test@test.com", "Password123", "Updated Name");
+        User unverifiedUser = User.builder()
+                .id(1L)
+                .email("test@test.com")
+                .fullName("Old Name")
+                .passwordHash("old_hash")
+                .emailVerified(false)
+                .build();
+
+        when(userRepository.findByEmailIgnoreCase(request.email())).thenReturn(Optional.of(unverifiedUser));
+        when(passwordEncoder.encode(request.password())).thenReturn("new_hash");
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+        authService.register(request);
+
+        assertEquals("new_hash", unverifiedUser.getPasswordHash());
+        assertEquals("Updated Name", unverifiedUser.getFullName());
+        verify(userRepository).save(unverifiedUser);
+        verify(valueOperations).set(anyString(), eq("1"), eq(900L), eq(TimeUnit.SECONDS));
+        verify(eventPublisher).publishEvent(any(UserRegisteredEvent.class));
     }
 
     @Test
@@ -171,7 +200,7 @@ class AuthServiceImplTest {
         user.setFullName("Test User");
         user.setEmailVerified(false);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(email)).thenReturn(Optional.of(user));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
         authService.resendVerificationEmail(email);
@@ -187,7 +216,7 @@ class AuthServiceImplTest {
         user.setId(1L);
         user.setEmailVerified(true);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailIgnoreCase(email)).thenReturn(Optional.of(user));
 
         assertThrows(InvalidDataException.class, () -> authService.resendVerificationEmail(email));
         verify(eventPublisher, never()).publishEvent(any());
