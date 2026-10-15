@@ -162,8 +162,7 @@ public class VoucherServiceImpl implements VoucherService {
         return discountValue;
     }
 
-    private void validateVoucherData(DiscountType discountType, BigDecimal discountValue,
-                                     OffsetDateTime startDate, OffsetDateTime endDate, Integer usageLimit) {
+    private void validateVoucherData(DiscountType discountType, BigDecimal discountValue, OffsetDateTime startDate, OffsetDateTime endDate, Integer usageLimit) {
         if (discountType == null) {
             throw new InvalidDataException("Discount type is required");
         }
@@ -173,21 +172,25 @@ public class VoucherServiceImpl implements VoucherService {
         if (usageLimit == null || usageLimit < 1) {
             throw new InvalidDataException("Usage limit must be at least 1");
         }
-
         switch (discountType) {
-            case percentage -> validatePositiveDiscountValue(discountValue);
-            case fixed_amount, shipping_fixed_amount -> validatePositiveDiscountValue(discountValue);
-            case cheapest_item_free -> {
-                if (discountValue != null && discountValue.compareTo(BigDecimal.ZERO) < 0) {
+            case percentage:
+                validatePositiveDiscountValue(discountValue);
+                if (discountValue.compareTo(BigDecimal.valueOf(100)) > 0) {
+                    throw new InvalidDataException("Percentage discount must not exceed 100");
+                }
+                break;
+            case fixed_amount:
+            case shipping_fixed_amount:
+                validatePositiveDiscountValue(discountValue);
+                break;
+            case cheapest_item_free:
+                if (discountValue != null &&
+                        discountValue.compareTo(BigDecimal.ZERO) < 0) {
                     throw new InvalidDataException("Discount value must not be negative");
                 }
-            }
-        }
-
-        if (discountType == DiscountType.percentage) {
-            if (discountValue.compareTo(BigDecimal.valueOf(100)) > 0) {
-                throw new InvalidDataException("Percentage discount must not exceed 100");
-            }
+                break;
+            default:
+                throw new InvalidDataException("Unsupported discount type");
         }
     }
 
