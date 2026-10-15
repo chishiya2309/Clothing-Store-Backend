@@ -40,6 +40,7 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -78,15 +79,34 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public void register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new InvalidDataException("Email is already registered");
+        String email = request.email().trim();
+        Optional<User> existingUserOpt = userRepository.findByEmailIgnoreCase(email);
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            if (Boolean.TRUE.equals(existingUser.getEmailVerified())) {
+                throw new InvalidDataException("Email is already registered");
+            }
+
+            // User previously registered but email is not verified yet (e.g. link expired).
+            // Update credentials and issue a fresh verification token.
+            existingUser.setPasswordHash(passwordEncoder.encode(request.password()));
+            existingUser.setFullName(request.fullName());
+            if (existingUser.getMembershipTier() == null) {
+                MembershipTier bronzeTier = membershipTierRepository.findById(1L).orElse(null);
+                existingUser.setMembershipTier(bronzeTier);
+            }
+            userRepository.save(existingUser);
+
+            String token = generateAndSaveVerificationToken(existingUser.getId());
+            eventPublisher.publishEvent(new UserRegisteredEvent(this, existingUser.getEmail(), existingUser.getFullName(), token));
+            return;
         }
 
         MembershipTier bronzeTier = membershipTierRepository.findById(1L)
                 .orElse(null);
 
         User user = User.builder()
-                .email(request.email())
+                .email(email)
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .fullName(request.fullName())
                 .role(UserRole.customer)
@@ -129,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void resendVerificationEmail(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email.trim())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
         if (Boolean.TRUE.equals(user.getEmailVerified())) {

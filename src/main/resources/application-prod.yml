@@ -52,8 +52,8 @@ brevo:
   sender-name: Clothing Store
 
 app:
-  backend-url: ${BACKEND_URL}
-  frontend-url: ${FRONTEND_URL}
+  backend-url: ${BACKEND_URL:http://localhost:8080}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
   verification-token-ttl: 900
   refresh-token-ttl: 604800
   remember-me-token-ttl: 2592000
@@ -112,3 +112,6 @@ logging:
   level:
     root: WARN
     vn.hcmute.edu.dp.nhom10.backend: INFO
+    EMAIL-SERVICE: INFO
+    EMAIL-LISTENER: INFO
+    AUTHENTICATION-SERVICE: INFO

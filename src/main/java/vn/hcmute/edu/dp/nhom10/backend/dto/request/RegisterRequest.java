@@ -12,8 +12,8 @@ public record RegisterRequest(
 
         @NotBlank(message = "Mật khẩu là bắt buộc")
         @Size(min = 8, max = 100, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
-        @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).+$",
-                message = "Mật khẩu phải chứa ít nhất một chữ hoa và một chữ số")
+        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
+                message = "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường và một chữ số")
         String password,
 
         @NotBlank(message = "Họ và tên là bắt buộc")

@@ -42,6 +42,10 @@ public class BrevoEmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendVerificationEmail(String toEmail, String fullName, String token) {
+        String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
+        String verificationLink = frontendUrl + "/verify-email?token=" + encodedToken;
+        log.warn("=== VERIFICATION LINK for {} ===: {}", toEmail, verificationLink);
+
         String htmlContent = buildVerificationEmailHtml(fullName, token);
 
         Map<String, Object> requestBody = Map.of(
@@ -68,6 +72,10 @@ public class BrevoEmailServiceImpl implements EmailService {
     @Async
     @Override
     public void sendPasswordResetEmail(String toEmail, String fullName, String token) {
+        String encodedToken = java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
+        String resetLink = frontendUrl + "/reset-password?token=" + encodedToken;
+        log.warn("=== PASSWORD RESET LINK for {} ===: {}", toEmail, resetLink);
+
         String htmlContent = buildPasswordResetEmailHtml(fullName, token);
 
         Map<String, Object> requestBody = Map.of(
